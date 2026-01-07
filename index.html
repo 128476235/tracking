@@ -19,6 +19,7 @@
       width:100%;border:1px solid rgba(34,49,88,.9);background:#0d1429;color:var(--text);
       padding:10px 12px;border-radius:12px;outline:none
     }
+    input::placeholder{color:rgba(147,164,199,.75)}
     input:focus{border-color:rgba(79,140,255,.8);box-shadow:0 0 0 4px rgba(79,140,255,.15)}
     .btn{border:1px solid rgba(34,49,88,.9);background:#0f1730;color:var(--text);padding:10px 12px;border-radius:12px;cursor:pointer}
     .btn.primary{background:linear-gradient(135deg,var(--acc),#6d5cff);border-color:transparent}
@@ -42,24 +43,41 @@
     .kvLabel{color:var(--muted);font-size:12px}
     .kvValue{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .kvValue.right{text-align:right}
+
+    /* ✅ Small UX improvement for login */
+    .loginCard{max-width:520px;width:100%;padding:18px}
+    .loginHeader{text-align:center;margin-bottom:10px}
+    .loginTitle{display:flex;align-items:center;justify-content:center;gap:10px}
+    .pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(34,49,88,.85);background:#0d1429;color:var(--muted);font-size:12px}
+    .loginForm{max-width:380px;margin:0 auto}
+    .loginActions{justify-content:center}
+    .loginMsg{text-align:center;min-height:18px}
   </style>
 </head>
 <body>
 
 <section id="loginView" class="center">
-  <div class="card" style="max-width:520px;width:100%">
-    <h1>Delivery Overview 📦</h1>
-    <div class="sub" style="margin-top:6px">Enter password to access your deliveries.</div>
-
-    <label for="keyInput" style="margin-top:14px">Password</label>
-    <input id="keyInput" type="password" autocomplete="current-password" />
-
-    <div class="row" style="margin-top:12px">
-      <button id="loginBtn" class="btn primary" type="button">Login</button>
-      <button id="clearBtn" class="btn" type="button">Clear</button>
+  <div class="card loginCard">
+    <div class="loginHeader">
+      <div class="loginTitle">
+        <h1>Delivery Overview 📦</h1>
+      </div>
+      <div class="sub" style="margin-top:6px">Enter password to access your deliveries.</div>
+      <div class="pill" style="margin:10px auto 0">Suppliers &amp; Master login</div>
     </div>
 
-    <div id="loginMsg" class="hint"></div>
+    <div class="loginForm">
+      <label for="keyInput">Password</label>
+      <input id="keyInput" type="password" autocomplete="current-password" placeholder="Enter password…" />
+
+      <div class="row loginActions" style="margin-top:12px">
+        <button id="loginBtn" class="btn primary" type="button">Login</button>
+        <button id="clearBtn" class="btn" type="button">Clear</button>
+      </div>
+
+      <div id="loginMsg" class="hint loginMsg"></div>
+    </div>
   </div>
 </section>
 
@@ -108,7 +126,7 @@
           <div class="row" style="margin-top:12px">
             <button id="saveBtn" class="btn primary" type="button">Save</button>
 
-            <!-- ✅ MASTER ONLY -->
+            <!-- ✅ MASTER ONLY: mail drafts -->
             <button id="gmailDraftBtn" class="btn hidden" type="button">Gmail draft</button>
             <button id="appleMailDraftBtn" class="btn hidden" type="button">Apple Mail draft</button>
           </div>
@@ -241,14 +259,14 @@ function updateMasterUI(){
 function getDraftData(){
   if(!selected) return null;
 
-  // Use latest input values (even if not saved yet)
+  // Recipient should be Mail Customer from the SAME row as Customer.
+  // (Apps Script must return MailCustomer on the order objects in master mode)
+  const to = String(selected.MailCustomer || selected.Mailadress || "").trim();
+
   const Customer = (selected.Customer || "").trim();
   const OrderID = (selected.OrderID || "").trim();
 
-  // IMPORTANT: Apps Script should return MailCustomer for master list.
-  // If empty, draft still opens but without recipient.
-  const to = String(selected.MailCustomer || "").trim();
-
+  // Use latest input values (even if not saved yet)
   const Carrier = (carrier.value || selected.Carrier || "").trim();
   const Trackingnumber = (trackingNumber.value || selected.Trackingnumber || "").trim();
   const Trackinglink = (trackingLink.value || selected.Trackinglink || "").trim();
@@ -275,6 +293,11 @@ function openGmailDraft(){
   const d = getDraftData();
   if (!d) return;
 
+  if(!d.to){
+    msg.innerHTML = "<span style='color:var(--warn)'>No customer email found for this row (Mail Customer).</span>";
+    return;
+  }
+
   const url =
     "https://mail.google.com/mail/?view=cm&fs=1" +
     `&to=${encodeURIComponent(d.to)}` +
@@ -289,7 +312,12 @@ function openAppleMailDraft(){
   const d = getDraftData();
   if (!d) return;
 
-  // mailto: works with Apple Mail (and most default mail apps)
+  if(!d.to){
+    msg.innerHTML = "<span style='color:var(--warn)'>No customer email found for this row (Mail Customer).</span>";
+    return;
+  }
+
+  // mailto: -> Apple Mail (and most default mail apps)
   const url =
     "mailto:" + encodeURIComponent(d.to) +
     `?subject=${encodeURIComponent(d.subject)}` +
