@@ -379,6 +379,11 @@ saveBtn.addEventListener("click", save);
     showLogin();
   }
 })();
+  const API_BASE = "https://script.google.com/macros/s/AKfycbwIhwZV_7UTkkB_r04DzKlEsT-5lddUg0YjUMUoKspseuuLCk6h2ba0VamcW-HrrDJCxA/exec";
+const s=document.createElement("script");
+s.src=API_BASE+"?action=auth&supplierKey=KB26&callback=cbx";
+window.cbx=(d)=>console.log("AUTH:",d);
+document.head.appendChild(s);
 </script>
 </body>
 </html>
