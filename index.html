@@ -42,13 +42,10 @@
 </head>
 <body>
 
-<!-- LOGIN VIEW -->
 <section id="loginView" class="center">
   <div class="card" style="max-width:520px;width:100%">
     <h1>Supplier Portal – Login</h1>
-    <div class="sub" style="margin-top:6px">
-      Enter your <strong>Supplier KEY</strong> to access your orders.
-    </div>
+    <div class="sub" style="margin-top:6px">Enter your <strong>Supplier KEY</strong> to access your orders.</div>
 
     <label for="keyInput" style="margin-top:14px">Supplier KEY</label>
     <input id="keyInput" type="password" autocomplete="current-password" />
@@ -59,14 +56,9 @@
     </div>
 
     <div id="loginMsg" class="hint"></div>
-
-    <div class="hint muted">
-      Tip: Keys are stored in Google Sheet column <code>Supplier KEY</code>.
-    </div>
   </div>
 </section>
 
-<!-- PORTAL VIEW -->
 <section id="portalView" class="hidden">
   <div class="wrap">
     <header>
@@ -81,7 +73,6 @@
     </header>
 
     <div class="two">
-      <!-- Editor -->
       <section class="card">
         <div class="row" style="justify-content:space-between">
           <div class="muted">Row: <strong id="rowLabel" style="color:var(--text)">—</strong></div>
@@ -110,7 +101,6 @@
         </div>
       </section>
 
-      <!-- Orders -->
       <section class="card">
         <table class="table">
           <thead>
@@ -126,16 +116,13 @@
           </tbody>
         </table>
 
-        <div class="hint muted">
-          Supplier is determined by your Supplier KEY (validated in the backend). Customer email is not shown.
-        </div>
+        <div class="hint muted">No CORS issues: this portal uses JSONP.</div>
       </section>
     </div>
   </div>
 </section>
 
 <script>
-/* Your Apps Script Web App URL */
 const API_BASE = "https://script.google.com/macros/s/AKfycbzECvKYF1JLchfpJKzHvWn86c4SHdLAeCfnu-n7Upq-BilFoK-LdrleDvolOJb9G4j9Og/exec";
 
 const $ = (id) => document.getElementById(id);
@@ -196,6 +183,25 @@ function showPortal(){
   portalView.classList.remove("hidden");
 }
 
+function jsonp(url){
+  return new Promise((resolve, reject) => {
+    const cb = "cb_" + Math.random().toString(36).slice(2);
+    window[cb] = (data) => {
+      try { delete window[cb]; } catch(_) {}
+      script.remove();
+      resolve(data);
+    };
+    const script = document.createElement("script");
+    script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
+    script.onerror = () => {
+      try { delete window[cb]; } catch(_) {}
+      script.remove();
+      reject(new Error("JSONP failed"));
+    };
+    document.head.appendChild(script);
+  });
+}
+
 async function doLogin(){
   const key = keyInput.value.trim();
   if(!key){
@@ -207,13 +213,7 @@ async function doLogin(){
   loginMsg.textContent = "Checking…";
 
   try{
-    const res = await fetch(`${API_BASE}?action=auth`, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ supplierKey: key })
-    });
-
-    const data = await res.json().catch(()=> ({}));
+    const data = await jsonp(`${API_BASE}?action=auth&supplierKey=${encodeURIComponent(key)}`);
 
     if(!data.ok || !data.supplier){
       loginMsg.innerHTML = "<span style='color:var(--bad)'>Invalid key.</span>";
@@ -247,8 +247,7 @@ async function loadOrders(){
 
   tbody.innerHTML = "<tr><td colspan='4' class='muted'>Loading…</td></tr>";
 
-  const res = await fetch(`${API_BASE}?action=orders&supplier=${encodeURIComponent(supplier)}`, { cache:"no-store" });
-  const data = await res.json().catch(()=> ({}));
+  const data = await jsonp(`${API_BASE}?action=orders&supplier=${encodeURIComponent(supplier)}`);
 
   if(!data.ok){
     tbody.innerHTML = `<tr><td colspan="4" class="muted">${escapeHTML(data.error || "Error")}</td></tr>`;
@@ -309,16 +308,11 @@ function openRow(rowId){
 async function save(){
   if(!selected) return;
 
-  const payload = {
-    rowId: selected.rowId,
-    supplier: supplier,
-    supplierKey: supplierKey,
-    Carrier: carrier.value.trim(),
-    Trackingnumber: trackingNumber.value.trim(),
-    Trackinglink: trackingLink.value.trim(),
-  };
+  const Carrier = carrier.value.trim();
+  const Trackingnumber = trackingNumber.value.trim();
+  const Trackinglink = trackingLink.value.trim();
 
-  if(!payload.Carrier || !payload.Trackingnumber || !payload.Trackinglink){
+  if(!Carrier || !Trackingnumber || !Trackinglink){
     msg.innerHTML = "<span style='color:var(--warn)'>Please fill in all fields.</span>";
     return;
   }
@@ -326,26 +320,33 @@ async function save(){
   saveBtn.disabled = true;
   msg.textContent = "Saving…";
 
-  const res = await fetch(`${API_BASE}?action=update`, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(payload)
-  });
-  const data = await res.json().catch(()=> ({}));
+  try{
+    const url =
+      `${API_BASE}?action=update` +
+      `&rowId=${encodeURIComponent(selected.rowId)}` +
+      `&supplier=${encodeURIComponent(supplier)}` +
+      `&supplierKey=${encodeURIComponent(supplierKey)}` +
+      `&Carrier=${encodeURIComponent(C    arrier)}` +
+      `&Trackingnumber=${encodeURIComponent(Trackingnumber)}` +
+      `&Trackinglink=${encodeURIComponent(Trackinglink)}`;
 
-  if(data.ok){
-    selected.Carrier = payload.Carrier;
-    selected.Trackingnumber = payload.Trackingnumber;
-    selected.Trackinglink = payload.Trackinglink;
+    const data = await jsonp(url);
 
-    renderOrders();
-    setStatus("Complete", true);
-    msg.innerHTML = "<span style='color:var(--ok)'>Saved ✓</span>";
-  } else {
-    msg.innerHTML = "<span style='color:var(--bad)'>Save failed.</span>";
+    if(data.ok){
+      selected.Carrier = Carrier;
+      selected.Trackingnumber = Trackingnumber;
+      selected.Trackinglink = Trackinglink;
+      renderOrders();
+      setStatus("Complete", true);
+      msg.innerHTML = "<span style='color:var(--ok)'>Saved ✓</span>";
+    } else {
+      msg.innerHTML = "<span style='color:var(--bad)'>Save failed.</span>";
+    }
+  }catch(e){
+    msg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
+  }finally{
+    saveBtn.disabled = false;
   }
-
-  saveBtn.disabled = false;
 }
 
 function logout(){
