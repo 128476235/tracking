@@ -186,18 +186,21 @@ function showPortal(){
 function jsonp(url){
   return new Promise((resolve, reject) => {
     const cb = "cb_" + Math.random().toString(36).slice(2);
+    const script = document.createElement("script");
+
     window[cb] = (data) => {
       try { delete window[cb]; } catch(_) {}
       script.remove();
       resolve(data);
     };
-    const script = document.createElement("script");
+
     script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
     script.onerror = () => {
       try { delete window[cb]; } catch(_) {}
       script.remove();
       reject(new Error("JSONP failed"));
     };
+
     document.head.appendChild(script);
   });
 }
@@ -217,7 +220,6 @@ async function doLogin(){
 
     if(!data.ok || !data.supplier){
       loginMsg.innerHTML = "<span style='color:var(--bad)'>Invalid key.</span>";
-      loginBtn.disabled = false;
       return;
     }
 
@@ -229,7 +231,6 @@ async function doLogin(){
 
     showPortal();
     await loadOrders();
-
   }catch(e){
     loginMsg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
   }finally{
@@ -326,7 +327,7 @@ async function save(){
       `&rowId=${encodeURIComponent(selected.rowId)}` +
       `&supplier=${encodeURIComponent(supplier)}` +
       `&supplierKey=${encodeURIComponent(supplierKey)}` +
-      `&Carrier=${encodeURIComponent(C    arrier)}` +
+      `&Carrier=${encodeURIComponent(Carrier)}` +
       `&Trackingnumber=${encodeURIComponent(Trackingnumber)}` +
       `&Trackinglink=${encodeURIComponent(Trackinglink)}`;
 
@@ -379,11 +380,6 @@ saveBtn.addEventListener("click", save);
     showLogin();
   }
 })();
-  const API_BASE = "https://script.google.com/macros/s/AKfycbwIhwZV_7UTkkB_r04DzKlEsT-5lddUg0YjUMUoKspseuuLCk6h2ba0VamcW-HrrDJCxA/exec";
-const s=document.createElement("script");
-s.src=API_BASE+"?action=auth&supplierKey=KB26&callback=cbx";
-window.cbx=(d)=>console.log("AUTH:",d);
-document.head.appendChild(s);
 </script>
 </body>
 </html>
