@@ -85,7 +85,6 @@
         <div id="noSelection" class="hint">Open an order from the table.</div>
 
         <div id="form" class="hidden">
-          <!-- Customer (left) + Order ID (right), same style -->
           <div class="kvRow">
             <div class="kvBlock" style="flex:1">
               <div class="kvLabel">Customer</div>
@@ -283,7 +282,6 @@ function renderOrders(){
     tr.innerHTML = `
       <td>
         <div style="font-weight:600">${escapeHTML(o.Customer || "")}</div>
-        <div class="muted" style="font-size:11px">Order ID: ${escapeHTML(o.rowId)}</div>
       </td>
       <td>
         <span class="status ${ok ? "ready":"missing"}">
@@ -305,7 +303,8 @@ function openRow(rowId){
   if(!selected) return;
 
   customerLabel.textContent = selected.Customer || "—";
-  orderIdLabel.textContent = String(selected.rowId || "—");
+  // IMPORTANT: OrderID must come from the Google Sheet (Apps Script must return `OrderID`)
+  orderIdLabel.textContent = String(selected.OrderID || "—");
 
   carrier.value = selected.Carrier || "";
   trackingNumber.value = selected.Trackingnumber || "";
