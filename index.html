@@ -60,7 +60,6 @@
     /* master new order card */
     .cardHeaderRow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
     .cardTitle{font-weight:700;font-size:13px;color:var(--muted);margin:0}
-    .toggleBtn{display:inline-flex;align-items:center;gap:8px}
     .togglePlus{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:10px;border:1px solid rgba(34,49,88,.9);background:#0f1730;color:var(--text);cursor:pointer}
     .togglePlus:active{transform:translateY(1px)}
     .sectionDivider{height:1px;background:rgba(34,49,88,.7);margin:10px 0}
@@ -148,17 +147,18 @@
 
       <!-- RIGHT column -->
       <section class="card">
-        <!-- ✅ master new order as separate block/card area inside right panel -->
+        <!-- ✅ New order (title WITHOUT “(master)”) -->
         <div id="newOrderCard" class="hidden" style="margin-bottom:12px">
           <div class="card" style="padding:12px">
             <div class="cardHeaderRow">
-              <div class="cardTitle">New order (master)</div>
-              <button id="toggleNewOrderBtn" class="togglePlus" type="button" aria-expanded="false" title="Toggle new order">
-                +
+              <div class="cardTitle">New order</div>
+              <button id="toggleNewOrderBtn" class="togglePlus" type="button" aria-expanded="true" title="Toggle new order">
+                –
               </button>
             </div>
 
-            <div id="newOrderBody" class="hidden">
+            <!-- ✅ default OPEN for master -->
+            <div id="newOrderBody">
               <div class="sectionDivider"></div>
 
               <label>Customer</label>
@@ -235,7 +235,7 @@ const mailCustomerBtn = $("mailCustomerBtn");
 const appleMailBtn = $("appleMailBtn");
 const msg = $("msg");
 
-// master new order UI (now right column)
+// new order UI
 const newOrderCard = $("newOrderCard");
 const toggleNewOrderBtn = $("toggleNewOrderBtn");
 const newOrderBody = $("newOrderBody");
@@ -251,7 +251,7 @@ let supplierKey = "";
 let orders = [];
 let selected = null;
 
-// ✅ local UI state: mark mailed rows as completed (persists per browser)
+// UI-only completed by mailing
 const mailedKey = "mailed_rows_v1";
 const mailedSet = new Set(JSON.parse(localStorage.getItem(mailedKey) || "[]"));
 function markMailed(rowId){
@@ -269,7 +269,6 @@ function isComplete(o){
   return !!(o.Carrier && o.Trackingnumber && o.Trackinglink);
 }
 function isRowCompletedUI(o){
-  // completed if tracking complete OR mailed customer clicked
   return isComplete(o) || mailedSet.has(String(o.rowId));
 }
 function setStatus(text, ok){
@@ -344,7 +343,6 @@ function openGmailOrMailto(to, subject, body){
   }
 }
 
-/* ✅ load suppliers for dropdown */
 async function loadSuppliers(){
   try{
     newSupplier.innerHTML = `<option value="">Loading suppliers…</option>`;
@@ -393,9 +391,14 @@ async function doLogin(){
 
     showPortal();
 
-    // master new order card
+    // master new order visible + open by default
     newOrderCard.classList.toggle("hidden", !isMasterLogin());
-    if(isMasterLogin()) loadSuppliers();
+    if(isMasterLogin()){
+      loadSuppliers();
+      newOrderBody.classList.remove("hidden");
+      toggleNewOrderBtn.textContent = "–";
+      toggleNewOrderBtn.setAttribute("aria-expanded","true");
+    }
 
     await loadOrders();
   }catch(e){
@@ -441,7 +444,6 @@ function renderOrders(){
   const master = isMasterLogin();
   tbody.innerHTML = "";
 
-  // ✅ split: active vs completed (UI)
   const active = [];
   const completed = [];
   for (const o of orders){
@@ -599,7 +601,6 @@ Tracking link: ${Trackinglink || "-"}
 
 Kind regards`;
 
-  // ✅ mark as "completed" in UI immediately after click
   markMailed(selected.rowId);
   renderOrders();
 
@@ -703,6 +704,14 @@ async function createOrder(){
   }
 }
 
+/* ---- Toggle new order ---- */
+function toggleNewOrder(){
+  const isOpen = !newOrderBody.classList.contains("hidden");
+  newOrderBody.classList.toggle("hidden", isOpen);
+  toggleNewOrderBtn.textContent = isOpen ? "+" : "–";
+  toggleNewOrderBtn.setAttribute("aria-expanded", String(!isOpen));
+}
+
 /* ---- Logout ---- */
 function logout(){
   supplier = "";
@@ -712,14 +721,6 @@ function logout(){
   sessionStorage.removeItem("supplier_key");
   sessionStorage.removeItem("supplier_name");
   showLogin();
-}
-
-/* ---- UI: toggle new order ---- */
-function toggleNewOrder(){
-  const isOpen = !newOrderBody.classList.contains("hidden");
-  newOrderBody.classList.toggle("hidden", isOpen);
-  toggleNewOrderBtn.textContent = isOpen ? "+" : "–";
-  toggleNewOrderBtn.setAttribute("aria-expanded", String(!isOpen));
 }
 
 /* ---- Events ---- */
@@ -750,10 +751,9 @@ toggleNewOrderBtn.addEventListener("click", toggleNewOrder);
     newOrderCard.classList.toggle("hidden", !isMasterLogin());
     if(isMasterLogin()){
       loadSuppliers();
-      // default collapsed
-      newOrderBody.classList.add("hidden");
-      toggleNewOrderBtn.textContent = "+";
-      toggleNewOrderBtn.setAttribute("aria-expanded","false");
+      newOrderBody.classList.remove("hidden");
+      toggleNewOrderBtn.textContent = "–";
+      toggleNewOrderBtn.setAttribute("aria-expanded","true");
     }
     loadOrders();
   } else {
