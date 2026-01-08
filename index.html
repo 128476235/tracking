@@ -15,11 +15,11 @@
     .card{background:var(--card);border:1px solid rgba(34,49,88,.8);border-radius:16px;padding:14px}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
-    input{
+    input, select{
       width:100%;border:1px solid rgba(34,49,88,.9);background:#0d1429;color:var(--text);
       padding:10px 12px;border-radius:12px;outline:none
     }
-    input:focus{border-color:rgba(79,140,255,.8);box-shadow:0 0 0 4px rgba(79,140,255,.15)}
+    input:focus, select:focus{border-color:rgba(79,140,255,.8);box-shadow:0 0 0 4px rgba(79,140,255,.15)}
     .btn{border:1px solid rgba(34,49,88,.9);background:#0f1730;color:var(--text);padding:10px 12px;border-radius:12px;cursor:pointer}
     .btn.primary{background:linear-gradient(135deg,var(--acc),#6d5cff);border-color:transparent}
     .btn:disabled{opacity:.55;cursor:not-allowed}
@@ -56,6 +56,10 @@
     /* icon text helpers */
     .icon{display:inline-flex;align-items:center;gap:8px}
     .appleBadge{font-size:14px;line-height:1;opacity:.9;margin-right:2px}
+
+    /* master new order */
+    .divider{height:1px;background:rgba(34,49,88,.7);margin:14px 0}
+    .sectionTitle{font-weight:700;font-size:13px;color:var(--muted);margin:0 0 6px}
   </style>
 </head>
 <body>
@@ -134,6 +138,32 @@
             </button>
           </div>
 
+          <!-- ✅ Master: New order section (dropdown pulls from Suppliers tab) -->
+          <div id="newOrderBox" class="hidden">
+            <div class="divider"></div>
+            <div class="sectionTitle">New order (master)</div>
+
+            <label>Customer</label>
+            <input id="newCustomer" placeholder="Customer name" />
+
+            <label>Mail Customer</label>
+            <input id="newMailCustomer" placeholder="customer@email.com" />
+
+            <label>Supplier</label>
+            <select id="newSupplier">
+              <option value="">Loading suppliers…</option>
+            </select>
+
+            <label>Order ID</label>
+            <input id="newOrderId" placeholder="Order ID" />
+
+            <div class="row" style="margin-top:12px">
+              <button id="createOrderBtn" class="btn" type="button">+ Add order</button>
+            </div>
+
+            <div class="hint" id="newOrderMsg"></div>
+          </div>
+
           <div class="hint" id="msg"></div>
         </div>
       </section>
@@ -144,7 +174,7 @@
             <tr>
               <th>Customer</th>
               <th style="width:170px">Status</th>
-              <th style="width:240px">Action</th>
+              <th style="width:260px">Action</th>
             </tr>
           </thead>
           <tbody id="tbody">
@@ -157,7 +187,7 @@
 </section>
 
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbwDFanStELHRbdEsWxJ4eGhwAUZbbB5Kr_vizNIDM88DVf7ZCC-CE9tlJKANjg2pTh6xw/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbytf3hGok1FdADtNXy86GYQM0cn1ECS2cAys__Dtq5zpw7LMTk2-oSC4wnxKdAJj-zb/exec";
 const MASTER_SUPPLIER_NAME = "ALL";
 
 const $ = (id) => document.getElementById(id);
@@ -190,10 +220,21 @@ const mailCustomerBtn = $("mailCustomerBtn");
 const appleMailBtn = $("appleMailBtn");
 const msg = $("msg");
 
+// master new order UI
+const newOrderBox = $("newOrderBox");
+const newCustomer = $("newCustomer");
+const newMailCustomer = $("newMailCustomer");
+const newSupplier = $("newSupplier");
+const newOrderId = $("newOrderId");
+const createOrderBtn = $("createOrderBtn");
+const newOrderMsg = $("newOrderMsg");
+
 let supplier = "";
 let supplierKey = "";
 let orders = [];
 let selected = null;
+
+let suppliersList = []; // from Suppliers tab
 
 function escapeHTML(s){
   return String(s || "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
@@ -276,6 +317,28 @@ function openGmailOrMailto(to, subject, body){
   }
 }
 
+/* ✅ load suppliers from Apps Script (Suppliers tab) */
+async function loadSuppliers(){
+  try{
+    newSupplier.innerHTML = `<option value="">Loading suppliers…</option>`;
+    const data = await jsonp(`${API_BASE}?action=suppliers`);
+    if(!data || !data.ok){
+      newSupplier.innerHTML = `<option value="">Could not load suppliers</option>`;
+      return;
+    }
+    suppliersList = data.suppliers || [];
+    if(!suppliersList.length){
+      newSupplier.innerHTML = `<option value="">No suppliers found</option>`;
+      return;
+    }
+    newSupplier.innerHTML =
+      `<option value="">Select supplier…</option>` +
+      suppliersList.map(s => `<option value="${escapeHTML(s)}">${escapeHTML(s)}</option>`).join("");
+  }catch(e){
+    newSupplier.innerHTML = `<option value="">Could not load suppliers</option>`;
+  }
+}
+
 /* ---- Login ---- */
 async function doLogin(){
   const key = keyInput.value.trim();
@@ -302,6 +365,11 @@ async function doLogin(){
     sessionStorage.setItem("supplier_name", supplier);
 
     showPortal();
+
+    // master-only: show new order + load supplier dropdown
+    newOrderBox.classList.toggle("hidden", !isMasterLogin());
+    if(isMasterLogin()) loadSuppliers();
+
     await loadOrders();
   }catch(e){
     loginMsg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
@@ -497,7 +565,7 @@ Kind regards`;
   }
 }
 
-/* ---- Mail supplier per row (multiple suppliers) ---- */
+/* ---- Mail supplier per row ---- */
 function mailSupplierRow(rowId){
   if(!isMasterLogin()) return;
 
@@ -538,6 +606,32 @@ Thank you!`;
   openGmailOrMailto(to, subject, body);
 }
 
+/* ---- NEW ORDER (placeholder: requires Apps Script action=create) ----
+   You already asked earlier for "new order" via master.
+   This UI + dropdown is ready. When you add Apps Script create endpoint,
+   wire it here.
+*/
+async function createOrder(){
+  newOrderMsg.textContent = "";
+  if(!isMasterLogin()){
+    newOrderMsg.innerHTML = "<span style='color:var(--warn)'>Master only.</span>";
+    return;
+  }
+
+  const Customer = newCustomer.value.trim();
+  const MailCustomer = newMailCustomer.value.trim();
+  const Supplier = newSupplier.value.trim();
+  const OrderID = newOrderId.value.trim();
+
+  if(!Customer || !MailCustomer || !Supplier || !OrderID){
+    newOrderMsg.innerHTML = "<span style='color:var(--warn)'>Please fill in all fields.</span>";
+    return;
+  }
+
+  // If you already have a create endpoint, adjust action + params here.
+  newOrderMsg.innerHTML = "<span class='muted'>Create endpoint not connected yet.</span>";
+}
+
 /* ---- Logout ---- */
 function logout(){
   supplier = "";
@@ -554,12 +648,18 @@ loginBtn.addEventListener("click", doLogin);
 clearBtn.addEventListener("click", ()=>{ keyInput.value=""; loginMsg.textContent=""; keyInput.focus(); });
 keyInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") doLogin(); });
 
-reloadBtn.addEventListener("click", loadOrders);
+reloadBtn.addEventListener("click", async ()=>{
+  // master: refresh suppliers too (dropdown stays up to date)
+  if(isMasterLogin()) loadSuppliers();
+  loadOrders();
+});
+
 logoutBtn.addEventListener("click", logout);
 saveBtn.addEventListener("click", save);
 
 mailCustomerBtn.addEventListener("click", ()=> mailCustomer(false));
 appleMailBtn.addEventListener("click", ()=> mailCustomer(true));
+createOrderBtn.addEventListener("click", createOrder);
 
 (function init(){
   const k = sessionStorage.getItem("supplier_key") || "";
@@ -568,6 +668,8 @@ appleMailBtn.addEventListener("click", ()=> mailCustomer(true));
     supplierKey = k;
     supplier = s;
     showPortal();
+    newOrderBox.classList.toggle("hidden", !isMasterLogin());
+    if(isMasterLogin()) loadSuppliers();
     loadOrders();
   } else {
     showLogin();
