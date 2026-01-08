@@ -1,8 +1,6 @@
 <!doctype html>
 <html lang="en">
 <head>
-
-  
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Delivery Overview 📦</title>
@@ -13,11 +11,15 @@
       --text:#0f172a;
       --muted:#64748b;
       --border:#e2e8f0;
-      --acc:#2563eb;
-      --acc2:#7c3aed;
+
+      /* ✅ updated primary button style (less purple, calmer) */
+      --primary:#2563eb;
+      --primary2:#1d4ed8;
+
       --ok:#16a34a;
       --warn:#d97706;
       --bad:#dc2626;
+
       --soft:#f8fafc;
     }
     *{box-sizing:border-box}
@@ -60,6 +62,7 @@
       -moz-appearance:none;
       background-image:none;
     }
+
     .btn{
       border:1px solid var(--border);
       background:#fff;
@@ -68,12 +71,16 @@
       border-radius:12px;
       cursor:pointer;
       white-space:nowrap;
+      transition:transform .05s ease, box-shadow .15s ease, background .15s ease;
     }
+    .btn:active{transform:translateY(1px)}
     .btn.primary{
-      background:linear-gradient(135deg,var(--acc),var(--acc2));
+      background:linear-gradient(180deg,var(--primary),var(--primary2));
       border-color:transparent;
       color:#fff;
+      box-shadow:0 8px 16px rgba(37,99,235,.18);
     }
+    .btn.primary:hover{box-shadow:0 10px 20px rgba(37,99,235,.22)}
     .btn:disabled{opacity:.55;cursor:not-allowed}
 
     .table{
@@ -110,17 +117,17 @@
       font-size:12px;
       color:var(--muted);
       white-space:nowrap;
+      background:#fff;
     }
     .dot{width:8px;height:8px;border-radius:999px;background:var(--warn)}
     .status.ready .dot{background:var(--ok)}
     .status.missing .dot{background:var(--bad)}
 
-    /* ✅ columns same height */
     .two{
       display:grid;
       grid-template-columns: 440px 1fr;
       gap:14px;
-      align-items:stretch; /* <-- key */
+      align-items:stretch;
     }
     .colStretch{height:100%; display:flex; flex-direction:column;}
     @media (max-width: 980px){.two{grid-template-columns:1fr}}
@@ -129,7 +136,7 @@
     .center{min-height:100vh;display:grid;place-items:center;padding:18px}
     .hidden{display:none !important}
 
-    .kvRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin:10px 0 6px}
+    .kvRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin:10px 0 6px}
     .kvBlock{min-width:0}
     .kvLabel{color:var(--muted);font-size:12px}
     .kvValue{
@@ -172,16 +179,11 @@
     }
 
     .statusCell{text-align:center}
-    .statusWrap{
-      width:100%;
-      display:flex;
-      justify-content:center;
-    }
+    .statusWrap{width:100%;display:flex;justify-content:center;}
 
     .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.2px}
     .divider{height:1px;background:var(--border);margin:12px 0}
 
-    /* ✅ New order toggle */
     .toggleRow{
       display:flex;justify-content:space-between;align-items:center;gap:10px;
       padding:10px 12px;
@@ -197,8 +199,10 @@
     .flag{font-size:14px;line-height:1}
     .searchHint{color:#94a3b8;font-size:12px;margin-top:4px}
 
-    /* ✅ status must not sit above new order (we show it next to customer in form) */
     .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end}
+
+    /* ✅ Completed title bold */
+    .completedTitle{font-weight:800;color:var(--text);font-size:13px}
   </style>
 </head>
 <body>
@@ -240,9 +244,6 @@
     <div class="two">
       <!-- LEFT -->
       <section class="card colStretch">
-        <!-- ✅ Removed “Master view” text -->
-        <div class="sectionTitle" id="whoAmI" style="display:none"></div>
-
         <!-- NEW ORDER (master only) -->
         <div id="newOrderWrap" class="hidden">
           <div class="toggleRow" id="newOrderToggle">
@@ -276,8 +277,7 @@
         <div id="noSelection" class="hint">Open an order from the table.</div>
 
         <div id="form" class="hidden" style="flex:1; display:flex; flex-direction:column;">
-          <!-- ✅ STATUS moved here (next to customer), not above new order -->
-          <div class="kvRow" style="align-items:center">
+          <div class="kvRow" style="align-items:flex-start">
             <div class="kvBlock" style="flex:1; min-width:0">
               <div class="kvLabel">Customer</div>
               <div class="kvValue" id="customerLabel">—</div>
@@ -285,13 +285,11 @@
               <div id="orderLine" class="smallLine hidden"></div>
             </div>
 
-            <div class="kvBlock" style="flex:0 0 auto">
-              <div class="kvLabel" style="text-align:right">Status</div>
-              <div style="display:flex;justify-content:flex-end">
-                <span id="statusBadge" class="status missing">
-                  <span class="dot"></span><span id="statusText">No selection</span>
-                </span>
-              </div>
+            <div class="kvBlock" style="flex:0 0 auto; display:flex; align-items:flex-start">
+              <!-- ✅ removed "Status" text -->
+              <span id="statusBadge" class="status missing">
+                <span class="dot"></span><span id="statusText">No selection</span>
+              </span>
             </div>
           </div>
 
@@ -345,7 +343,7 @@
 
           <div class="row" style="justify-content:space-between;align-items:flex-end">
             <div>
-              <div class="sectionTitle">Completed orders</div>
+              <div class="completedTitle">Completed orders</div>
               <div class="searchHint">Search by customer or order id…</div>
             </div>
             <input id="completedSearch" placeholder="Search…" style="max-width:340px" />
@@ -367,7 +365,6 @@
           </table>
         </div>
 
-        <!-- spacer to equalize height nicely -->
         <div style="flex:1"></div>
       </section>
     </div>
@@ -379,12 +376,13 @@
   position:fixed;inset:0;background:rgba(15,23,42,.35);
   display:grid;place-items:center;padding:18px;z-index:9999">
   <div class="card" style="max-width:420px;width:100%">
-    <div style="font-weight:650;font-size:14px">Choose mail app</div>
+    <div style="font-weight:700;font-size:14px">Choose mail app</div>
     <div class="sub" style="margin-top:6px">We open a draft. Choose your “From” inside your mail app.</div>
 
-    <div class="row" style="margin-top:12px">
+    <!-- ✅ center buttons -->
+    <div class="row" style="margin-top:12px; justify-content:center">
       <button id="pickGmail" class="btn primary" type="button">Gmail</button>
-      <button id="pickApple" class="btn" type="button"> Apple Mail</button>
+      <button id="pickApple" class="btn" type="button">Apple Mail</button>
       <button id="pickCancel" class="btn" type="button">Cancel</button>
     </div>
 
@@ -393,7 +391,7 @@
 </div>
 
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbxeso6YYeuj9QVnvIDr_-O-tnpOO_7XzjGBZacXF7LXrrDvPwsua_FGesQDFDINss-tmw/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbz1gFMihzIhsuapAKy1hMVmKlj6sLpcln4xaGYB4eWG-eGebJlsXFJ9aV0nJ5jWEiHCzw/exec";
 const MASTER_SUPPLIER_NAME = "ALL";
 
 const $ = (id) => document.getElementById(id);
@@ -502,7 +500,7 @@ function showLogin(){
   portalView.classList.add("hidden");
   loginView.classList.remove("hidden");
   loginMsg.textContent = "";
-  keyInput.value = ""; // ✅ always empty
+  keyInput.value = "";
   setTimeout(()=> keyInput.focus(), 50);
 }
 function showPortal(){
@@ -576,30 +574,20 @@ pickApple.addEventListener("click", openViaApple);
 pickCancel.addEventListener("click", closeMailPicker);
 mailPicker.addEventListener("click", (e)=>{ if(e.target === mailPicker) closeMailPicker(); });
 
-/* Completed: best-effort */
+/* Completed: uses your new endpoint */
 async function setCompleted(rowId, val){
   if(!isMasterLogin()) return { ok:false, error:"Not master" };
 
   const completedValue = val ? "TRUE" : "FALSE";
-  const attempts = [
-    `${API_BASE}?action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&Completed=${encodeURIComponent(completedValue)}`,
-    `${API_BASE}?action=setcompleted&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&Completed=${encodeURIComponent(completedValue)}`,
-    `${API_BASE}?action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&completed=${encodeURIComponent(completedValue)}`,
-    `${API_BASE}?action=setcompleted&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&completed=${encodeURIComponent(completedValue)}`,
-    `${API_BASE}?action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&${encodeURIComponent("Completed ")}=${encodeURIComponent(completedValue)}`,
-    `${API_BASE}?action=setcompleted&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&${encodeURIComponent("Completed ")}=${encodeURIComponent(completedValue)}`
-  ];
+  const url = `${API_BASE}?action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&Completed=${encodeURIComponent(completedValue)}`;
 
-  for(const url of attempts){
-    try{
-      const data = await jsonp(url);
-      if(data && data.ok) return { ok:true };
-      const err = (data && data.error) ? String(data.error) : "";
-      if(err.toLowerCase().includes("unknown action")) continue;
-      if(err) return { ok:false, error: err };
-    }catch(_){}
+  try{
+    const data = await jsonp(url);
+    if(data && data.ok) return { ok:true };
+    return { ok:false, error: (data && data.error) ? String(data.error) : "Unknown" };
+  }catch(_){
+    return { ok:false, error:"Could not reach server" };
   }
-  return { ok:false, error:"Completed endpoint not available (Unknown action)" };
 }
 
 /* login */
@@ -682,7 +670,7 @@ async function loadOrders(){
   }
 
   orders = (data.orders || []).slice();
-  orders.sort((a,b)=> Number(b.rowId||0) - Number(a.rowId||0)); // newest first
+  orders.sort((a,b)=> Number(b.rowId||0) - Number(a.rowId||0));
   renderOrders();
 }
 
@@ -999,7 +987,7 @@ Kind regards`
   };
 }
 
-/* mail supplier: language -> picker */
+/* mail supplier */
 function mailSupplierRow(rowId, lang){
   if(!isMasterLogin()) return;
 
@@ -1023,7 +1011,7 @@ function mailSupplierRow(rowId, lang){
   openMailPicker({ to, subject: tpl.subject, body: tpl.body });
 }
 
-/* mail customer: language -> picker -> open -> save completed */
+/* mail customer */
 async function mailCustomer(lang){
   if(!isMasterLogin() || !selected) return;
 
@@ -1118,7 +1106,7 @@ function logout(){
   showLogin();
 }
 
-/* ✅ No auto-prefill from URL anymore */
+/* init */
 (function init(){
   const k = sessionStorage.getItem("supplier_key") || "";
   const s = sessionStorage.getItem("supplier_name") || "";
@@ -1153,39 +1141,6 @@ newOrderToggle.addEventListener("click", ()=>{
   newOrderPlus.textContent = isHidden ? "+" : "–";
 });
 createBtn.addEventListener("click", createOrder);
-
-async function doLogin(withKey){ return await window.__doLogin__(withKey); } // placeholder to keep call order
-window.__doLogin__ = async function(withKey){
-  const key = (withKey ?? keyInput.value).trim();
-  if(!key){
-    loginMsg.innerHTML = "<span style='color:var(--warn)'>Please enter key.</span>";
-    return;
-  }
-
-  loginBtn.disabled = true;
-  loginMsg.textContent = "Checking…";
-
-  try{
-    const data = await jsonp(`${API_BASE}?action=auth&supplierKey=${encodeURIComponent(key)}`);
-    if(!data || !data.ok || !data.supplier){
-      loginMsg.innerHTML = "<span style='color:var(--bad)'>Invalid key.</span>";
-      return;
-    }
-
-    supplierKey = key;
-    supplier = String(data.supplier).trim();
-
-    sessionStorage.setItem("supplier_key", supplierKey);
-    sessionStorage.setItem("supplier_name", supplier);
-
-    showPortal();
-    await bootstrapAfterLogin_();
-  }catch(_){
-    loginMsg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
-  }finally{
-    loginBtn.disabled = false;
-  }
-};
 </script>
 </body>
 </html>
