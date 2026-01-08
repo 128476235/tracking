@@ -73,6 +73,7 @@
       color:#fff;
     }
     .btn:disabled{opacity:.55;cursor:not-allowed}
+
     .table{
       width:100%;
       border-collapse:separate;
@@ -107,13 +108,19 @@
       font-size:12px;
       color:var(--muted);
       white-space:nowrap;
-      justify-content:flex-start;
     }
     .dot{width:8px;height:8px;border-radius:999px;background:var(--warn)}
     .status.ready .dot{background:var(--ok)}
     .status.missing .dot{background:var(--bad)}
 
-    .two{display:grid;grid-template-columns: 440px 1fr;gap:14px;align-items:start}
+    /* ✅ columns same height */
+    .two{
+      display:grid;
+      grid-template-columns: 440px 1fr;
+      gap:14px;
+      align-items:stretch; /* <-- key */
+    }
+    .colStretch{height:100%; display:flex; flex-direction:column;}
     @media (max-width: 980px){.two{grid-template-columns:1fr}}
 
     .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.5}
@@ -150,7 +157,7 @@
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      max-width:520px;
+      max-width:560px;
     }
 
     .actionsCell{
@@ -162,23 +169,17 @@
       flex-wrap:nowrap;
     }
 
-    .statusCell{ text-align:center; }
-    .statusRightWrap{
+    .statusCell{text-align:center}
+    .statusWrap{
       width:100%;
       display:flex;
       justify-content:center;
     }
 
-    .leftTopRow{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:8px
-    }
     .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.2px}
     .divider{height:1px;background:var(--border);margin:12px 0}
 
+    /* ✅ New order toggle */
     .toggleRow{
       display:flex;justify-content:space-between;align-items:center;gap:10px;
       padding:10px 12px;
@@ -193,6 +194,9 @@
 
     .flag{font-size:14px;line-height:1}
     .searchHint{color:#94a3b8;font-size:12px;margin-top:4px}
+
+    /* ✅ status must not sit above new order (we show it next to customer in form) */
+    .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end}
   </style>
 </head>
 <body>
@@ -225,7 +229,7 @@
         <h1>Delivery Overview 📦</h1>
         <div class="sub">Open an order to enter / check shipment details</div>
       </div>
-      <div class="row">
+      <div class="row topRightTools">
         <button id="reloadBtn" class="btn" type="button">Reload</button>
         <button id="logoutBtn" class="btn" type="button">Logout</button>
       </div>
@@ -233,11 +237,9 @@
 
     <div class="two">
       <!-- LEFT -->
-      <section class="card">
-        <div class="leftTopRow">
-          <div class="sectionTitle" id="whoAmI">—</div>
-          <span id="statusBadge" class="status missing"><span class="dot"></span><span id="statusText">No selection</span></span>
-        </div>
+      <section class="card colStretch">
+        <!-- ✅ Removed “Master view” text -->
+        <div class="sectionTitle" id="whoAmI" style="display:none"></div>
 
         <!-- NEW ORDER (master only) -->
         <div id="newOrderWrap" class="hidden">
@@ -271,17 +273,26 @@
 
         <div id="noSelection" class="hint">Open an order from the table.</div>
 
-        <div id="form" class="hidden">
-          <div class="kvRow">
-            <div class="kvBlock" style="flex:1">
+        <div id="form" class="hidden" style="flex:1; display:flex; flex-direction:column;">
+          <!-- ✅ STATUS moved here (next to customer), not above new order -->
+          <div class="kvRow" style="align-items:center">
+            <div class="kvBlock" style="flex:1; min-width:0">
               <div class="kvLabel">Customer</div>
-              <div id="customerLabel" class="kvValue">—</div>
+              <div class="kvValue" id="customerLabel">—</div>
               <div id="supplierLine" class="smallLine hidden"></div>
               <div id="orderLine" class="smallLine hidden"></div>
             </div>
+
+            <div class="kvBlock" style="flex:0 0 auto">
+              <div class="kvLabel" style="text-align:right">Status</div>
+              <div style="display:flex;justify-content:flex-end">
+                <span id="statusBadge" class="status missing">
+                  <span class="dot"></span><span id="statusText">No selection</span>
+                </span>
+              </div>
+            </div>
           </div>
 
-          <!-- Tracking inputs -->
           <label>Carrier</label>
           <input id="carrier" />
 
@@ -307,18 +318,18 @@
             <div class="hint" style="margin-top:8px" id="mailMsg"></div>
           </div>
 
-          <div class="hint" id="msg"></div>
+          <div class="hint" id="msg" style="margin-top:auto"></div>
         </div>
       </section>
 
       <!-- RIGHT -->
-      <section class="card">
+      <section class="card colStretch">
         <table class="table">
           <thead>
             <tr>
               <th style="width:60%">Customer</th>
               <th style="width:170px;text-align:center">Status</th>
-              <th style="width:260px">Action</th>
+              <th style="width:300px">Action</th>
             </tr>
           </thead>
           <tbody id="tbody">
@@ -327,7 +338,7 @@
         </table>
 
         <!-- COMPLETED (master only) -->
-        <div id="completedWrap" class="hidden">
+        <div id="completedWrap" class="hidden" style="margin-top:12px">
           <div class="divider"></div>
 
           <div class="row" style="justify-content:space-between;align-items:flex-end">
@@ -345,7 +356,7 @@
               <tr>
                 <th style="width:60%">Customer</th>
                 <th style="width:170px;text-align:center">Status</th>
-                <th style="width:260px">Action</th>
+                <th style="width:300px">Action</th>
               </tr>
             </thead>
             <tbody id="tbodyCompleted">
@@ -353,13 +364,34 @@
             </tbody>
           </table>
         </div>
+
+        <!-- spacer to equalize height nicely -->
+        <div style="flex:1"></div>
       </section>
     </div>
   </div>
 </section>
 
+<!-- ✅ Mail picker modal -->
+<div id="mailPicker" class="hidden" style="
+  position:fixed;inset:0;background:rgba(15,23,42,.35);
+  display:grid;place-items:center;padding:18px;z-index:9999">
+  <div class="card" style="max-width:420px;width:100%">
+    <div style="font-weight:650;font-size:14px">Choose mail app</div>
+    <div class="sub" style="margin-top:6px">We open a draft. Choose your “From” inside your mail app.</div>
+
+    <div class="row" style="margin-top:12px">
+      <button id="pickGmail" class="btn primary" type="button">Gmail</button>
+      <button id="pickApple" class="btn" type="button"> Apple Mail</button>
+      <button id="pickCancel" class="btn" type="button">Cancel</button>
+    </div>
+
+    <div class="hint" id="pickHint"></div>
+  </div>
+</div>
+
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbzALMRvlDV4HdEEpB39QUzh5YJdh-BBFEJmLGLfsWdNIegibLKVSZm3SZeSl0xLBgD4JA/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbz1gFMihzIhsuapAKy1hMVmKlj6sLpcln4xaGYB4eWG-eGebJlsXFJ9aV0nJ5jWEiHCzw/exec";
 const MASTER_SUPPLIER_NAME = "ALL";
 
 const $ = (id) => document.getElementById(id);
@@ -374,7 +406,6 @@ const loginMsg = $("loginMsg");
 const reloadBtn = $("reloadBtn");
 const logoutBtn = $("logoutBtn");
 
-const whoAmI = $("whoAmI");
 const tbody = $("tbody");
 const statusBadge = $("statusBadge");
 const statusText = $("statusText");
@@ -388,9 +419,11 @@ const orderLine = $("orderLine");
 const carrier = $("carrier");
 const trackingNumber = $("trackingNumber");
 const trackingLink = $("trackingLink");
+
 const saveBtn = $("saveBtn");
 const msg = $("msg");
 
+/* mail customer */
 const mailCustomerWrap = $("mailCustomerWrap");
 const mailMsg = $("mailMsg");
 const mc_en = $("mc_en");
@@ -398,6 +431,7 @@ const mc_nl = $("mc_nl");
 const mc_de = $("mc_de");
 const mc_fr = $("mc_fr");
 
+/* completed */
 const completedWrap = $("completedWrap");
 const completedSearch = $("completedSearch");
 const tbodyCompleted = $("tbodyCompleted");
@@ -414,12 +448,22 @@ const newOrderId = $("newOrderId");
 const createBtn = $("createBtn");
 const createMsg = $("createMsg");
 
+/* mail picker */
+const mailPicker = $("mailPicker");
+const pickGmail = $("pickGmail");
+const pickApple = $("pickApple");
+const pickCancel = $("pickCancel");
+const pickHint = $("pickHint");
+
 /* state */
 let supplier = "";
 let supplierKey = "";
 let orders = [];
 let selected = null;
 let suppliersList = [];
+
+/* mail picker state */
+let pendingMail = null;
 
 /* utils */
 function escapeHTML(s){
@@ -456,7 +500,7 @@ function showLogin(){
   portalView.classList.add("hidden");
   loginView.classList.remove("hidden");
   loginMsg.textContent = "";
-  keyInput.value = "";
+  keyInput.value = ""; // ✅ always empty
   setTimeout(()=> keyInput.focus(), 50);
 }
 function showPortal(){
@@ -485,36 +529,61 @@ function jsonp(url){
   });
 }
 
-function openGmailOrMailto(to, subject, body){
+function openGmailCompose(to, subject, body){
   const gmailUrl =
     "https://mail.google.com/mail/?view=cm&fs=1" +
     `&to=${encodeURIComponent(to)}` +
     `&su=${encodeURIComponent(subject)}` +
     `&body=${encodeURIComponent(body)}`;
-
-  const w = window.open(gmailUrl, "_blank", "noopener,noreferrer");
-  if (!w) {
-    const mailtoUrl =
-      "mailto:" + encodeURIComponent(to) +
-      `?subject=${encodeURIComponent(subject)}` +
-      `&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoUrl;
-  }
+  window.open(gmailUrl, "_blank", "noopener,noreferrer");
+}
+function openAppleMail(to, subject, body){
+  const mailtoUrl =
+    "mailto:" + encodeURIComponent(to) +
+    `?subject=${encodeURIComponent(subject)}` +
+    `&body=${encodeURIComponent(body)}`;
+  window.location.href = mailtoUrl;
 }
 
-/* Completed: best-effort (tries multiple endpoints + param spellings). */
+/* mail picker */
+function openMailPicker(payload){
+  pendingMail = payload;
+  pickHint.textContent = "";
+  mailPicker.classList.remove("hidden");
+}
+function closeMailPicker(){
+  pendingMail = null;
+  mailPicker.classList.add("hidden");
+}
+function openViaGmail(){
+  if(!pendingMail) return;
+  openGmailCompose(pendingMail.to, pendingMail.subject, pendingMail.body);
+  const cb = pendingMail.afterOpen;
+  closeMailPicker();
+  if(typeof cb === "function") cb();
+}
+function openViaApple(){
+  if(!pendingMail) return;
+  openAppleMail(pendingMail.to, pendingMail.subject, pendingMail.body);
+  const cb = pendingMail.afterOpen;
+  closeMailPicker();
+  if(typeof cb === "function") cb();
+}
+pickGmail.addEventListener("click", openViaGmail);
+pickApple.addEventListener("click", openViaApple);
+pickCancel.addEventListener("click", closeMailPicker);
+mailPicker.addEventListener("click", (e)=>{ if(e.target === mailPicker) closeMailPicker(); });
+
+/* Completed: best-effort */
 async function setCompleted(rowId, val){
   if(!isMasterLogin()) return { ok:false, error:"Not master" };
 
   const completedValue = val ? "TRUE" : "FALSE";
-
   const attempts = [
-    // common variants
     `${API_BASE}?action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&Completed=${encodeURIComponent(completedValue)}`,
     `${API_BASE}?action=setcompleted&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&Completed=${encodeURIComponent(completedValue)}`,
     `${API_BASE}?action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&completed=${encodeURIComponent(completedValue)}`,
     `${API_BASE}?action=setcompleted&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&completed=${encodeURIComponent(completedValue)}`,
-    // param key with trailing space (rare, but you mentioned "Completed ")
     `${API_BASE}?action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&${encodeURIComponent("Completed ")}=${encodeURIComponent(completedValue)}`,
     `${API_BASE}?action=setcompleted&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&${encodeURIComponent("Completed ")}=${encodeURIComponent(completedValue)}`
   ];
@@ -526,9 +595,7 @@ async function setCompleted(rowId, val){
       const err = (data && data.error) ? String(data.error) : "";
       if(err.toLowerCase().includes("unknown action")) continue;
       if(err) return { ok:false, error: err };
-    }catch(_){
-      // ignore and try next
-    }
+    }catch(_){}
   }
   return { ok:false, error:"Completed endpoint not available (Unknown action)" };
 }
@@ -573,7 +640,6 @@ async function loadSuppliers_(){
   }catch(_){
     suppliersList = [];
   }
-
   newSupplier.innerHTML = "";
   for(const s of suppliersList){
     const opt = document.createElement("option");
@@ -588,9 +654,11 @@ async function loadOrders(){
   selected = null;
   form.classList.add("hidden");
   noSelection.classList.remove("hidden");
+
   customerLabel.textContent = "—";
   supplierLine.classList.add("hidden");
   orderLine.classList.add("hidden");
+
   setStatus("No selection", false);
   msg.textContent = "";
   mailMsg.textContent = "";
@@ -631,7 +699,6 @@ function renderOrders(){
   const openList = master ? orders.filter(o => !Boolean(o.Completed)) : orders.slice();
   const doneList = master ? orders.filter(o => Boolean(o.Completed)).filter(searchMatch) : [];
 
-  // OPEN
   tbody.innerHTML = "";
   if(!openList.length){
     tbody.innerHTML = `<tr><td colspan="3" class="muted">No orders found.</td></tr>`;
@@ -661,7 +728,7 @@ function renderOrders(){
           ${orderLineHtml}
         </td>
         <td class="statusCell">
-          <div class="statusRightWrap">
+          <div class="statusWrap">
             <span class="status ${ok ? "ready":"missing"}">
               <span class="dot"></span>${ok ? "Complete" : "Missing tracking"}
             </span>
@@ -678,7 +745,6 @@ function renderOrders(){
     }
   }
 
-  // COMPLETED (open only)
   if(master){
     tbodyCompleted.innerHTML = "";
     if(!doneList.length){
@@ -701,7 +767,7 @@ function renderOrders(){
             ${orderLineHtml}
           </td>
           <td class="statusCell">
-            <div class="statusRightWrap">
+            <div class="statusWrap">
               <span class="status ${ok ? "ready":"missing"}">
                 <span class="dot"></span>${ok ? "Complete" : "Missing tracking"}
               </span>
@@ -718,10 +784,10 @@ function renderOrders(){
     }
   }
 
-  // bind open
   tbody.querySelectorAll("button[data-open]").forEach(btn=>{
     btn.addEventListener("click", ()=> openRow(Number(btn.dataset.open)));
   });
+
   if(master){
     tbodyCompleted.querySelectorAll("button[data-open]").forEach(btn=>{
       btn.addEventListener("click", ()=> openRow(Number(btn.dataset.open)));
@@ -820,7 +886,7 @@ async function save(){
   }
 }
 
-/* supplier mail templates */
+/* templates */
 function supplierMailTemplate(lang, supplierName, customerName, orderId){
   if(lang === "nl"){
     return {
@@ -860,31 +926,6 @@ Thank you!`
   };
 }
 
-/* supplier mail per row */
-function mailSupplierRow(rowId, lang){
-  if(!isMasterLogin()) return;
-
-  const row = orders.find(x => Number(x.rowId) === rowId);
-  if(!row){
-    msg.innerHTML = "<span style='color:var(--warn)'>Row not found.</span>";
-    return;
-  }
-
-  const to = getAny(row, ["Mail Supplier","MailSupplier"]);
-  const supplierName = getAny(row, ["Supplier"]);
-  const customerName = getAny(row, ["Customer"]);
-  const orderId = getAny(row, ["Order ID","OrderID"]);
-
-  if(!to){
-    msg.innerHTML = "<span style='color:var(--warn)'>No supplier email found.</span>";
-    return;
-  }
-
-  const tpl = supplierMailTemplate(lang, supplierName, customerName, orderId);
-  openGmailOrMailto(to, tpl.subject, tpl.body);
-}
-
-/* customer mail templates */
 function customerMailTemplate(lang){
   const c = getAny(selected,["Customer"]) || "there";
   const oid = getAny(selected,["Order ID","OrderID"]) || "-";
@@ -956,7 +997,31 @@ Kind regards`
   };
 }
 
-/* mail customer: ALWAYS open mail; best-effort save completed afterwards */
+/* mail supplier: language -> picker */
+function mailSupplierRow(rowId, lang){
+  if(!isMasterLogin()) return;
+
+  const row = orders.find(x => Number(x.rowId) === rowId);
+  if(!row){
+    msg.innerHTML = "<span style='color:var(--warn)'>Row not found.</span>";
+    return;
+  }
+
+  const to = getAny(row, ["Mail Supplier","MailSupplier"]);
+  const supplierName = getAny(row, ["Supplier"]);
+  const customerName = getAny(row, ["Customer"]);
+  const orderId = getAny(row, ["Order ID","OrderID"]);
+
+  if(!to){
+    msg.innerHTML = "<span style='color:var(--warn)'>No supplier email found.</span>";
+    return;
+  }
+
+  const tpl = supplierMailTemplate(lang, supplierName, customerName, orderId);
+  openMailPicker({ to, subject: tpl.subject, body: tpl.body });
+}
+
+/* mail customer: language -> picker -> open -> save completed */
 async function mailCustomer(lang){
   if(!isMasterLogin() || !selected) return;
 
@@ -967,19 +1032,25 @@ async function mailCustomer(lang){
   }
 
   const tpl = customerMailTemplate(lang);
-  openGmailOrMailto(to, tpl.subject, tpl.body);
 
-  mailMsg.textContent = "Mail opened. Saving Completed…";
-  const res = await setCompleted(selected.rowId, true);
+  openMailPicker({
+    to,
+    subject: tpl.subject,
+    body: tpl.body,
+    afterOpen: async () => {
+      mailMsg.textContent = "Mail opened. Saving Completed…";
+      const res = await setCompleted(selected.rowId, true);
 
-  if(!res.ok){
-    mailMsg.innerHTML =
-      `<span style="color:var(--warn)">Mail opened ✓ (could not save Completed: ${escapeHTML(res.error || "Unknown")})</span>`;
-    return;
-  }
+      if(!res.ok){
+        mailMsg.innerHTML =
+          `<span style="color:var(--warn)">Mail opened ✓ (could not save Completed: ${escapeHTML(res.error || "Unknown")})</span>`;
+        return;
+      }
 
-  mailMsg.innerHTML = `<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>`;
-  await loadOrders();
+      mailMsg.innerHTML = `<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>`;
+      await loadOrders();
+    }
+  });
 }
 
 /* create order */
@@ -1027,8 +1098,6 @@ async function createOrder(){
 }
 
 async function bootstrapAfterLogin_(){
-  whoAmI.textContent = isMasterLogin() ? "Master view" : `Supplier: ${supplier}`;
-
   newOrderWrap.classList.toggle("hidden", !isMasterLogin());
   mailCustomerWrap.classList.toggle("hidden", !isMasterLogin());
   completedWrap.classList.toggle("hidden", !isMasterLogin());
@@ -1047,17 +1116,19 @@ function logout(){
   showLogin();
 }
 
-function tryAutoKeyFromUrl_(){
-  const pathSeg = (location.pathname || "").split("/").filter(Boolean);
-  const last = pathSeg[pathSeg.length - 1] || "";
-  const qs = new URLSearchParams(location.search);
-  const qk = qs.get("key") || qs.get("k") || "";
-  const candidate = (qk || last || "").trim();
-  if(!candidate) return "";
-  if(candidate.toLowerCase().includes(".html")) return "";
-  if(/^[A-Za-z0-9_-]{3,}$/.test(candidate)) return candidate;
-  return "";
-}
+/* ✅ No auto-prefill from URL anymore */
+(function init(){
+  const k = sessionStorage.getItem("supplier_key") || "";
+  const s = sessionStorage.getItem("supplier_name") || "";
+  if(k && s){
+    supplierKey = k;
+    supplier = s;
+    showPortal();
+    bootstrapAfterLogin_();
+  } else {
+    showLogin();
+  }
+})();
 
 /* events */
 loginBtn.addEventListener("click", ()=> doLogin());
@@ -1081,29 +1152,38 @@ newOrderToggle.addEventListener("click", ()=>{
 });
 createBtn.addEventListener("click", createOrder);
 
-/* init */
-(async function init(){
-  const autoKey = tryAutoKeyFromUrl_();
+async function doLogin(withKey){ return await window.__doLogin__(withKey); } // placeholder to keep call order
+window.__doLogin__ = async function(withKey){
+  const key = (withKey ?? keyInput.value).trim();
+  if(!key){
+    loginMsg.innerHTML = "<span style='color:var(--warn)'>Please enter key.</span>";
+    return;
+  }
 
-  const k = autoKey || sessionStorage.getItem("supplier_key") || "";
-  const s = sessionStorage.getItem("supplier_name") || "";
+  loginBtn.disabled = true;
+  loginMsg.textContent = "Checking…";
 
-  if(k && !autoKey && s){
-    supplierKey = k;
-    supplier = s;
+  try{
+    const data = await jsonp(`${API_BASE}?action=auth&supplierKey=${encodeURIComponent(key)}`);
+    if(!data || !data.ok || !data.supplier){
+      loginMsg.innerHTML = "<span style='color:var(--bad)'>Invalid key.</span>";
+      return;
+    }
+
+    supplierKey = key;
+    supplier = String(data.supplier).trim();
+
+    sessionStorage.setItem("supplier_key", supplierKey);
+    sessionStorage.setItem("supplier_name", supplier);
+
     showPortal();
     await bootstrapAfterLogin_();
-    return;
+  }catch(_){
+    loginMsg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
+  }finally{
+    loginBtn.disabled = false;
   }
-
-  if(autoKey){
-    keyInput.value = autoKey;
-    await doLogin(autoKey);
-    return;
-  }
-
-  showLogin();
-})();
+};
 </script>
 </body>
 </html>
