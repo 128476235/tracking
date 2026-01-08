@@ -58,14 +58,14 @@
       -moz-appearance:none;
       background-image:none;
     }
-
     .btn{
       border:1px solid var(--border);
       background:#fff;
       color:var(--text);
       padding:10px 12px;
       border-radius:12px;
-      cursor:pointer
+      cursor:pointer;
+      white-space:nowrap;
     }
     .btn.primary{
       background:linear-gradient(135deg,var(--acc),var(--acc2));
@@ -73,7 +73,6 @@
       color:#fff;
     }
     .btn:disabled{opacity:.55;cursor:not-allowed}
-
     .table{
       width:100%;
       border-collapse:separate;
@@ -300,7 +299,7 @@
           <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
             <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
             <div class="row">
-              <button class="btn" id="mc_en">EN</button>
+              <button class="btn" id="mc_en"><span class="flag">🇬🇧</span> EN</button>
               <button class="btn" id="mc_nl"><span class="flag">🇳🇱</span> NL</button>
               <button class="btn" id="mc_de"><span class="flag">🇩🇪</span> DE</button>
               <button class="btn" id="mc_fr"><span class="flag">🇫🇷</span> FR</button>
@@ -503,21 +502,35 @@ function openGmailOrMailto(to, subject, body){
   }
 }
 
-/* completed save: robust error reporting */
+/* Completed: best-effort (tries multiple endpoints + param spellings). */
 async function setCompleted(rowId, val){
   if(!isMasterLogin()) return { ok:false, error:"Not master" };
-  try{
-    const url =
-      `${API_BASE}?action=complete` +
-      `&supplierKey=${encodeURIComponent(supplierKey)}` +
-      `&rowId=${encodeURIComponent(rowId)}` +
-      `&Completed=${encodeURIComponent(val ? "TRUE" : "FALSE")}`;
-    const data = await jsonp(url);
-    if(data && data.ok) return { ok:true };
-    return { ok:false, error: (data && data.error) || "Unknown response" };
-  }catch(e){
-    return { ok:false, error: "Could not reach server" };
+
+  const completedValue = val ? "TRUE" : "FALSE";
+
+  const attempts = [
+    // common variants
+    `${API_BASE}?action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&Completed=${encodeURIComponent(completedValue)}`,
+    `${API_BASE}?action=setcompleted&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&Completed=${encodeURIComponent(completedValue)}`,
+    `${API_BASE}?action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&completed=${encodeURIComponent(completedValue)}`,
+    `${API_BASE}?action=setcompleted&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&completed=${encodeURIComponent(completedValue)}`,
+    // param key with trailing space (rare, but you mentioned "Completed ")
+    `${API_BASE}?action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&${encodeURIComponent("Completed ")}=${encodeURIComponent(completedValue)}`,
+    `${API_BASE}?action=setcompleted&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&${encodeURIComponent("Completed ")}=${encodeURIComponent(completedValue)}`
+  ];
+
+  for(const url of attempts){
+    try{
+      const data = await jsonp(url);
+      if(data && data.ok) return { ok:true };
+      const err = (data && data.error) ? String(data.error) : "";
+      if(err.toLowerCase().includes("unknown action")) continue;
+      if(err) return { ok:false, error: err };
+    }catch(_){
+      // ignore and try next
+    }
   }
+  return { ok:false, error:"Completed endpoint not available (Unknown action)" };
 }
 
 /* login */
@@ -556,11 +569,7 @@ async function doLogin(withKey){
 async function loadSuppliers_(){
   try{
     const data = await jsonp(`${API_BASE}?action=suppliers`);
-    if(data && data.ok){
-      suppliersList = data.suppliers || [];
-    } else {
-      suppliersList = [];
-    }
+    suppliersList = (data && data.ok) ? (data.suppliers || []) : [];
   }catch(_){
     suppliersList = [];
   }
@@ -637,7 +646,7 @@ function renderOrders(){
 
       const mailSupplierBtns = master
         ? `
-          <button class="btn" data-mailsupplier-en="${escapeHTML(o.rowId)}">EN</button>
+          <button class="btn" data-mailsupplier-en="${escapeHTML(o.rowId)}"><span class="flag">🇬🇧</span> EN</button>
           <button class="btn" data-mailsupplier-nl="${escapeHTML(o.rowId)}"><span class="flag">🇳🇱</span> NL</button>
         `
         : "";
@@ -718,11 +727,9 @@ function renderOrders(){
       btn.addEventListener("click", ()=> openRow(Number(btn.dataset.open)));
     });
 
-    // supplier mail EN
     tbody.querySelectorAll("button[data-mailsupplier-en]").forEach(btn=>{
       btn.addEventListener("click", ()=> mailSupplierRow(Number(btn.dataset.mailsupplierEn), "en"));
     });
-    // supplier mail NL
     tbody.querySelectorAll("button[data-mailsupplier-nl]").forEach(btn=>{
       btn.addEventListener("click", ()=> mailSupplierRow(Number(btn.dataset.mailsupplierNl), "nl"));
     });
@@ -834,7 +841,6 @@ Graag terugkoppelen met:
 Dank!`
     };
   }
-  // default EN
   return {
     subject: `Tracking needed – Order ${orderId || ""}`.trim(),
     body:
@@ -950,7 +956,7 @@ Kind regards`
   };
 }
 
-/* mail customer: save completed THEN refresh (no optimistic move) */
+/* mail customer: ALWAYS open mail; best-effort save completed afterwards */
 async function mailCustomer(lang){
   if(!isMasterLogin() || !selected) return;
 
@@ -960,20 +966,19 @@ async function mailCustomer(lang){
     return;
   }
 
-  // 1) save completed first (so it always sticks)
-  mailMsg.textContent = "Saving completed…";
-  const res = await setCompleted(selected.rowId, true);
-  if(!res.ok){
-    mailMsg.innerHTML = `<span style="color:var(--bad)">Could not save Completed: ${escapeHTML(res.error || "Unknown")}</span>`;
-    return;
-  }
-
-  // 2) open mail
   const tpl = customerMailTemplate(lang);
   openGmailOrMailto(to, tpl.subject, tpl.body);
 
-  // 3) reload orders so it moves to completed
-  mailMsg.innerHTML = `<span style="color:var(--ok)">Completed ✓</span>`;
+  mailMsg.textContent = "Mail opened. Saving Completed…";
+  const res = await setCompleted(selected.rowId, true);
+
+  if(!res.ok){
+    mailMsg.innerHTML =
+      `<span style="color:var(--warn)">Mail opened ✓ (could not save Completed: ${escapeHTML(res.error || "Unknown")})</span>`;
+    return;
+  }
+
+  mailMsg.innerHTML = `<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>`;
   await loadOrders();
 }
 
