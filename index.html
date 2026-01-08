@@ -14,7 +14,6 @@
       --ok:#16a34a;
       --warn:#d97706;
       --bad:#dc2626;
-
       --border: rgba(15, 23, 42, .12);
       --border2: rgba(15, 23, 42, .10);
       --fieldBg:#ffffff;
@@ -30,7 +29,7 @@
       color:var(--text);
       min-height:100vh
     }
-    .wrap{max-width:1100px;margin:0 auto;padding:22px 14px}
+    .wrap{max-width:1120px;margin:0 auto;padding:22px 14px}
     header{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
     h1{font-size:18px;margin:0}
     .sub{color:var(--muted);font-size:13px;line-height:1.4}
@@ -65,7 +64,7 @@
       box-shadow:0 0 0 4px rgba(37,99,235,.12)
     }
 
-    /* ✅ Fix yellow autofill in email fields */
+    /* ✅ Fix yellow autofill */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus,
@@ -77,7 +76,7 @@
       transition: background-color 9999s ease-in-out 0s;
     }
 
-    /* dropdown: no arrow */
+    /* dropdown: remove arrow */
     select{background-image:none !important;padding-right:12px}
 
     .btn{
@@ -88,6 +87,7 @@
       border-radius:12px;
       cursor:pointer;
       transition: transform .05s ease, box-shadow .12s ease, border-color .12s ease;
+      white-space:nowrap;
     }
     .btn:hover{border-color:rgba(15,23,42,.18)}
     .btn:active{transform: translateY(1px)}
@@ -139,7 +139,7 @@
     .status.ready .dot{background:var(--ok)}
     .status.missing .dot{background:var(--bad)}
 
-    .two{display:grid;grid-template-columns: 420px 1fr;gap:14px}
+    .two{display:grid;grid-template-columns: 430px 1fr;gap:14px}
     @media (max-width: 980px){.two{grid-template-columns:1fr}}
 
     .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.5}
@@ -160,23 +160,27 @@
     .loginMsg{text-align:center;min-height:18px}
 
     .supplierSmall{margin-top:3px;font-size:12px}
+
     .divider{height:1px;background:var(--border2);margin:14px 0;width:100%}
 
     .sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .toggleBtn{
       padding:6px 10px;
       border-radius:10px;
-      font-weight:700;
+      font-weight:800;
       background:var(--fieldBg2);
     }
     .mini{font-size:12px;color:var(--muted)}
 
-    .cellActions{white-space:nowrap;display:flex;gap:8px;justify-content:flex-start;align-items:center;flex-wrap:nowrap}
+    .cellActions{display:flex;gap:8px;justify-content:flex-start;align-items:center;flex-wrap:nowrap}
     .custOneLine{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 
-    /* ✅ FIX: status aligned + borders aligned */
-    .tdStatus{padding:10px 12px;text-align:right}
+    .tdStatus{text-align:right}
     .statusWrap{display:flex;justify-content:flex-end;align-items:center}
+
+    /* flags */
+    .flagBtn{padding:8px 10px;line-height:1}
+    .flagBtn:active{transform: translateY(1px)}
 
     /* completed search less visible */
     #completedSearch{
@@ -184,7 +188,7 @@
       border-color:rgba(15,23,42,.10);
       color:rgba(15,23,42,.86);
     }
-    #completedSearch::placeholder{color:rgba(100,116,139,.45)}
+    #completedSearch::placeholder{color:rgba(100,116,139,.42)}
   </style>
 </head>
 <body>
@@ -228,7 +232,7 @@
         <div id="newOrderCard" class="hidden">
           <div class="sectionTitle">
             <div>
-              <div style="font-weight:800">New order</div>
+              <div style="font-weight:900">New order</div>
               <div class="mini">Add a new order row</div>
             </div>
             <button id="toggleNewOrderBtn" class="btn toggleBtn" type="button" aria-expanded="false">+</button>
@@ -288,8 +292,15 @@
 
           <div class="row" style="margin-top:12px">
             <button id="saveBtn" class="btn primary" type="button">Save</button>
-            <button id="mailCustomerBtn" class="btn hidden" type="button">Mail customer</button>
-            <button id="appleMailBtn" class="btn hidden" type="button"> Mail customer</button>
+
+            <!-- ✅ Mail customer (one button) + flags -->
+            <div id="mailCustomerGroup" class="row hidden" style="gap:8px">
+              <button id="mailCustomerBtn" class="btn" type="button">Mail customer</button>
+              <button class="btn flagBtn" type="button" data-custlang="en" title="English">🇬🇧</button>
+              <button class="btn flagBtn" type="button" data-custlang="nl" title="Nederlands">🇳🇱</button>
+              <button class="btn flagBtn" type="button" data-custlang="de" title="Deutsch">🇩🇪</button>
+              <button class="btn flagBtn" type="button" data-custlang="fr" title="Français">🇫🇷</button>
+            </div>
           </div>
 
           <div class="hint" id="msg"></div>
@@ -314,7 +325,7 @@
         <div id="completedWrap" class="hidden" style="margin-top:14px">
           <div class="divider"></div>
 
-          <div style="font-weight:800;margin-bottom:8px">Completed orders</div>
+          <div style="font-weight:900;margin-bottom:8px">Completed orders</div>
           <input id="completedSearch" placeholder="Search by customer or order id…" />
 
           <div style="height:10px"></div>
@@ -367,8 +378,8 @@ const trackingNumber = $("trackingNumber");
 const trackingLink = $("trackingLink");
 
 const saveBtn = $("saveBtn");
+const mailCustomerGroup = $("mailCustomerGroup");
 const mailCustomerBtn = $("mailCustomerBtn");
-const appleMailBtn = $("appleMailBtn");
 const msg = $("msg");
 
 /* new order */
@@ -394,6 +405,9 @@ let selected = null;
 
 let completedRowIds = new Set();
 let completedOrders = [];
+
+let customerLang = "en"; // 🇬🇧 default
+let supplierLang = "en"; // 🇬🇧 default
 
 function escapeHTML(s){
   return String(s || "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
@@ -462,7 +476,8 @@ function sortNewestFirst(arr){
   return (arr || []).slice().sort((a,b)=> Number(b.rowId||0) - Number(a.rowId||0));
 }
 
-function openGmailOrMailto(to, subject, body){
+/* Gmail first, fallback to mailto (Apple Mail / default client) */
+function openGmailThenMailto(to, subject, body){
   const gmailUrl =
     "https://mail.google.com/mail/?view=cm&fs=1" +
     `&to=${encodeURIComponent(to)}` +
@@ -471,11 +486,10 @@ function openGmailOrMailto(to, subject, body){
 
   const w = window.open(gmailUrl, "_blank", "noopener,noreferrer");
   if (!w) {
-    const mailtoUrl =
+    window.location.href =
       "mailto:" + encodeURIComponent(to) +
       `?subject=${encodeURIComponent(subject)}` +
       `&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoUrl;
   }
 }
 
@@ -484,7 +498,7 @@ function getSupplierKeyFromUrl(){
   return parts.length ? parts[parts.length - 1] : "";
 }
 
-/* Completed storage */
+/* ===== Completed storage (local) ===== */
 function completedStorageKey(){ return "completed_rows_master"; }
 function loadCompletedFromStorage(){
   completedRowIds = new Set();
@@ -519,7 +533,110 @@ function markRowCompleted(row){
   renderCompleted();
 }
 
-/* ---- Login ---- */
+/* ===== Templates ===== */
+function customerTemplate(lang, { customerName, orderId, Carrier, Trackingnumber, Trackinglink }){
+  const vars = {
+    en: {
+      subject: `Tracking details – Order ${orderId || ""}`.trim(),
+      body:
+`Hi ${customerName || "there"},
+
+Here are your shipment details:
+
+Order ID: ${orderId || "-"}
+Carrier: ${Carrier || "-"}
+Tracking number: ${Trackingnumber || "-"}
+Tracking link: ${Trackinglink || "-"}
+
+Kind regards`
+    },
+    nl: {
+      subject: `Track & trace – Bestelling ${orderId || ""}`.trim(),
+      body:
+`Hoi ${customerName || "daar"},
+
+Hierbij je verzendgegevens:
+
+Order ID: ${orderId || "-"}
+Vervoerder: ${Carrier || "-"}
+Track & trace nummer: ${Trackingnumber || "-"}
+Track & trace link: ${Trackinglink || "-"}
+
+Met vriendelijke groet`
+    },
+    de: {
+      subject: `Sendungsverfolgung – Bestellung ${orderId || ""}`.trim(),
+      body:
+`Hallo ${customerName || "da"},
+
+Hier sind die Versanddetails:
+
+Bestellnummer: ${orderId || "-"}
+Versanddienstleister: ${Carrier || "-"}
+Sendungsnummer: ${Trackingnumber || "-"}
+Tracking-Link: ${Trackinglink || "-"}
+
+Mit freundlichen Grüßen`
+    },
+    fr: {
+      subject: `Suivi colis – Commande ${orderId || ""}`.trim(),
+      body:
+`Bonjour ${customerName || ""},
+
+Voici les informations d’expédition :
+
+N° de commande : ${orderId || "-"}
+Transporteur : ${Carrier || "-"}
+N° de suivi : ${Trackingnumber || "-"}
+Lien de suivi : ${Trackinglink || "-"}
+
+Cordialement`
+    },
+  };
+  return vars[lang] || vars.en;
+}
+
+function supplierTemplate(lang, { supplierName, customerName, orderId }){
+  const vars = {
+    en: {
+      subject: `Tracking needed – Order ${orderId || ""}`.trim(),
+      body:
+`Hi ${supplierName || "there"},
+
+Could you please provide the shipment details for the order below?
+
+Customer: ${customerName || "-"}
+Order ID: ${orderId || "-"}
+
+Please reply with:
+- Carrier
+- Tracking number
+- Tracking link
+
+Thank you!`
+    },
+    nl: {
+      subject: `Track & trace nodig – Bestelling ${orderId || ""}`.trim(),
+      body:
+`Hoi ${supplierName || "daar"},
+
+Kun je de verzendgegevens aanleveren voor onderstaande bestelling?
+
+Klant: ${customerName || "-"}
+Order ID: ${orderId || "-"}
+
+Graag terugkoppelen met:
+- Vervoerder
+- Track & trace nummer
+- Track & trace link
+
+Dankjewel!`
+    },
+  };
+  return vars[lang] || vars.en;
+}
+
+/* ===== Login ===== */
 async function doLogin(){
   const key = keyInput.value.trim();
   if(!key){
@@ -567,7 +684,7 @@ async function loginWithKey(key, showErrors){
   }
 }
 
-/* suppliers */
+/* ===== Suppliers dropdown ===== */
 async function loadSuppliers(){
   newSupplier.innerHTML = "";
   try{
@@ -584,7 +701,7 @@ async function loadSuppliers(){
   }catch(_){}
 }
 
-/* ---- Load orders ---- */
+/* ===== Load orders ===== */
 async function loadOrders(){
   selected = null;
   form.classList.add("hidden");
@@ -645,8 +762,12 @@ function renderOrders(){
     const supplierLine = master && supplierName ? `<div class="muted supplierSmall">${escapeHTML(supplierName)}</div>` : "";
     const orderIdLine = orderId ? `<div class="muted supplierSmall">${escapeHTML(orderId)}</div>` : "";
 
-    const mailSupplierBtnHtml = master
-      ? `<button class="btn" data-mailsupplier="${escapeHTML(o.rowId)}">Mail supplier</button>`
+    const mailSupplierBtns = master
+      ? `
+        <button class="btn" data-mailsupplier="${escapeHTML(o.rowId)}" data-suplang="en">Mail supplier</button>
+        <button class="btn flagBtn" data-mailsupplier="${escapeHTML(o.rowId)}" data-suplang="en" title="English">🇬🇧</button>
+        <button class="btn flagBtn" data-mailsupplier="${escapeHTML(o.rowId)}" data-suplang="nl" title="Nederlands">🇳🇱</button>
+      `
       : "";
 
     const tr = document.createElement("tr");
@@ -666,7 +787,7 @@ function renderOrders(){
       <td>
         <div class="cellActions">
           <button class="btn" data-open="${escapeHTML(o.rowId)}">Open</button>
-          ${mailSupplierBtnHtml}
+          ${mailSupplierBtns}
         </div>
       </td>
     `;
@@ -678,12 +799,19 @@ function renderOrders(){
   });
 
   tbody.querySelectorAll("button[data-mailsupplier]").forEach(btn=>{
-    btn.addEventListener("click", ()=> mailSupplierRow(Number(btn.dataset.mailsupplier)));
+    btn.addEventListener("click", ()=>{
+      supplierLang = btn.dataset.suplang || "en";
+      mailSupplierRow(Number(btn.dataset.mailsupplier));
+    });
   });
 }
 
 function openRow(rowId){
-  selected = orders.find(x => Number(x.rowId) === rowId) || completedOrders.find(x => Number(x.rowId) === rowId) || null;
+  selected =
+    orders.find(x => Number(x.rowId) === rowId) ||
+    completedOrders.find(x => Number(x.rowId) === rowId) ||
+    null;
+
   if(!selected) return;
 
   customerLabel.textContent = getAny(selected, ["Customer"]) || "—";
@@ -700,12 +828,11 @@ function openRow(rowId){
   const ok = isComplete(selected);
   setStatus(ok ? "Complete" : "Missing tracking", ok);
 
-  const master = isMasterLogin();
-  mailCustomerBtn.classList.toggle("hidden", !master);
-  appleMailBtn.classList.toggle("hidden", !master);
+  /* master-only mail customer group */
+  mailCustomerGroup.classList.toggle("hidden", !isMasterLogin());
 }
 
-/* completed */
+/* ===== Completed ===== */
 function renderCompleted(){
   if(!isMasterLogin()) return;
 
@@ -748,7 +875,7 @@ function renderCompleted(){
   });
 }
 
-/* save */
+/* ===== Save ===== */
 async function save(){
   if(!selected) return;
 
@@ -793,8 +920,8 @@ async function save(){
   }
 }
 
-/* mail customer */
-function mailCustomer(useApple){
+/* ===== Mail customer: one button -> Gmail, fallback -> mailto ===== */
+function mailCustomer(){
   if(!isMasterLogin() || !selected) return;
 
   const to = getAny(selected, ["Mail Customer","MailCustomer"]);
@@ -810,36 +937,19 @@ function mailCustomer(useApple){
   const Trackingnumber = trackingNumber.value.trim() || getAny(selected, ["Trackingnumber","Tracking Number"]);
   const Trackinglink = trackingLink.value.trim() || getAny(selected, ["Trackinglink","Tracking Link"]);
 
-  const subject = `Tracking details – Order ${orderId || ""}`.trim();
-  const body =
-`Hi ${customerName || "there"},
+  const { subject, body } = customerTemplate(customerLang, { customerName, orderId, Carrier, Trackingnumber, Trackinglink });
 
-Here are your shipment details:
-
-Order ID: ${orderId || "-"}
-Carrier: ${Carrier || "-"}
-Tracking number: ${Trackingnumber || "-"}
-Tracking link: ${Trackinglink || "-"}
-
-Kind regards`;
-
-  if(!completedRowIds.has(Number(selected.rowId))){
+  if(isMasterLogin() && selected && !completedRowIds.has(Number(selected.rowId))){
     markRowCompleted({ ...selected });
   }
 
-  if(useApple){
-    window.location.href =
-      "mailto:" + encodeURIComponent(to) +
-      `?subject=${encodeURIComponent(subject)}` +
-      `&body=${encodeURIComponent(body)}`;
-  } else {
-    openGmailOrMailto(to, subject, body);
-  }
+  openGmailThenMailto(to, subject, body);
 }
 
-/* mail supplier */
+/* ===== Mail supplier per row ===== */
 function mailSupplierRow(rowId){
   if(!isMasterLogin()) return;
+
   const row = orders.find(x => Number(x.rowId) === Number(rowId));
   if(!row){
     msg.innerHTML = "<span style='color:var(--warn)'>Row not found.</span>";
@@ -856,26 +966,12 @@ function mailSupplierRow(rowId){
     return;
   }
 
-  const subject = `Tracking needed – Order ${orderId || ""}`.trim();
-  const body =
-`Hi ${supplierName || "there"},
+  const { subject, body } = supplierTemplate(supplierLang, { supplierName, customerName, orderId });
 
-Could you please provide the shipment details for the order below?
-
-Customer: ${customerName || "-"}
-Order ID: ${orderId || "-"}
-
-Please reply with:
-- Carrier
-- Tracking number
-- Tracking link
-
-Thank you!`;
-
-  openGmailOrMailto(to, subject, body);
+  openGmailThenMailto(to, subject, body);
 }
 
-/* new order */
+/* ===== New order toggle + create ===== */
 function expandNewOrder(open){
   newOrderBody.classList.toggle("hidden", !open);
   toggleNewOrderBtn.textContent = open ? "–" : "+";
@@ -929,7 +1025,7 @@ async function createOrder(){
   }
 }
 
-/* logout */
+/* ===== Logout ===== */
 function logout(){
   supplier = "";
   supplierKey = "";
@@ -940,7 +1036,7 @@ function logout(){
   showLogin();
 }
 
-/* events */
+/* ===== Events ===== */
 loginBtn.addEventListener("click", doLogin);
 clearBtn.addEventListener("click", ()=>{ keyInput.value=""; loginMsg.textContent=""; keyInput.focus(); });
 keyInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") doLogin(); });
@@ -949,17 +1045,22 @@ reloadBtn.addEventListener("click", loadOrders);
 logoutBtn.addEventListener("click", logout);
 saveBtn.addEventListener("click", save);
 
-mailCustomerBtn.addEventListener("click", ()=> mailCustomer(false));
-appleMailBtn.addEventListener("click", ()=> mailCustomer(true));
+mailCustomerBtn.addEventListener("click", mailCustomer);
+
+document.querySelectorAll("button[data-custlang]").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    customerLang = b.dataset.custlang || "en";
+    mailCustomer();
+  });
+});
 
 createBtn && createBtn.addEventListener("click", createOrder);
 completedSearch && completedSearch.addEventListener("input", renderCompleted);
 
-/* init */
+/* ===== Init ===== */
 (async function init(){
   const keyFromPath = getSupplierKeyFromUrl();
 
-  // if URL ends with supplierKey (KB26 etc), auto-login silently
   if(keyFromPath && keyFromPath.toLowerCase() !== "tracking" && keyFromPath.toLowerCase() !== "index.html"){
     const ok = await loginWithKey(keyFromPath, false);
     if(ok) return;
