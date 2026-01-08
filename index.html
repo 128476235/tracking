@@ -52,6 +52,21 @@
 
     /* supplier small line under customer (master only) */
     .supplierSmall{margin-top:3px;font-size:12px}
+
+    /* icon text helpers */
+    .icon{display:inline-flex;align-items:center;gap:8px}
+    .gmailBadge{
+      width:18px;height:18px;border-radius:6px;
+      display:inline-grid;place-items:center;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      font-weight:700;font-size:11px;line-height:1;
+    }
+    .appleBadge{
+      font-size:14px;line-height:1;
+      opacity:.9;
+      margin-right:2px;
+    }
   </style>
 </head>
 <body>
@@ -118,12 +133,17 @@
           <label>Tracking link</label>
           <input id="trackingLink" />
 
-          <!-- ✅ buttons together -->
+          <!-- ✅ mail supplier removed from left card -->
           <div class="row" style="margin-top:12px">
             <button id="saveBtn" class="btn primary" type="button">Save</button>
-            <button id="mailCustomerBtn" class="btn hidden" type="button">Mail customer</button>
-            <button id="mailSupplierBtn" class="btn hidden" type="button">Mail supplier</button>
-            <button id="appleMailBtn" class="btn hidden" type="button">Apple Mail</button>
+
+            <button id="mailCustomerBtn" class="btn hidden" type="button">
+              <span class="icon"><span class="gmailBadge">M</span><span>Mail customer</span></span>
+            </button>
+
+            <button id="appleMailBtn" class="btn hidden" type="button">
+              <span class="icon"><span class="appleBadge"></span><span>Mail customer</span></span>
+            </button>
           </div>
 
           <div class="hint" id="msg"></div>
@@ -131,6 +151,11 @@
       </section>
 
       <section class="card">
+        <!-- ✅ Mail supplier moved to right card header -->
+        <div class="row" style="justify-content:flex-end;margin-bottom:10px">
+          <button id="mailSupplierBtn" class="btn hidden" type="button">Mail supplier</button>
+        </div>
+
         <table class="table">
           <thead>
             <tr>
@@ -179,7 +204,7 @@ const trackingLink = $("trackingLink");
 
 const saveBtn = $("saveBtn");
 const mailCustomerBtn = $("mailCustomerBtn");
-const mailSupplierBtn = $("mailSupplierBtn");
+const mailSupplierBtn = $("mailSupplierBtn");  // now in right card
 const appleMailBtn = $("appleMailBtn");
 const msg = $("msg");
 
@@ -235,7 +260,6 @@ function jsonp(url){
   });
 }
 
-/* ✅ tolerant key lookup: handles "Mail Supplier" exactly + other variants */
 function normalizeKey(k){
   return String(k || "").trim().toLowerCase().replace(/\s+/g," ");
 }
@@ -270,7 +294,6 @@ function openGmailOrMailto(to, subject, body){
   }
 }
 
-/* ---- Login ---- */
 async function doLogin(){
   const key = keyInput.value.trim();
   if(!key){
@@ -304,7 +327,6 @@ async function doLogin(){
   }
 }
 
-/* ---- Load / render ---- */
 async function loadOrders(){
   selected = null;
   form.classList.add("hidden");
@@ -391,11 +413,10 @@ function openRow(rowId){
 
   const master = isMasterLogin();
   mailCustomerBtn.classList.toggle("hidden", !master);
-  mailSupplierBtn.classList.toggle("hidden", !master);
   appleMailBtn.classList.toggle("hidden", !master);
+  mailSupplierBtn.classList.toggle("hidden", !master); // now right card
 }
 
-/* ---- Save ---- */
 async function save(){
   if(!selected) return;
 
@@ -440,7 +461,6 @@ async function save(){
   }
 }
 
-/* ---- Mail customer (uses "Mail Customer" from sheet) ---- */
 function mailCustomer(useApple){
   if(!isMasterLogin() || !selected) return;
 
@@ -448,7 +468,6 @@ function mailCustomer(useApple){
   const customerName = getAny(selected, ["Customer"]);
   const orderId = getAny(selected, ["Order ID","OrderID"]);
 
-  // debug
   msg.innerHTML = `<span class="muted">Mail customer to: ${escapeHTML(to || "(not found)")}</span>`;
 
   if(!to){
@@ -484,7 +503,6 @@ Kind regards`;
   }
 }
 
-/* ---- Mail supplier (uses "Mail Supplier" from sheet) ---- */
 function mailSupplier(){
   if(!isMasterLogin() || !selected) return;
 
@@ -493,7 +511,6 @@ function mailSupplier(){
   const customerName = getAny(selected, ["Customer"]);
   const orderId = getAny(selected, ["Order ID","OrderID"]);
 
-  // debug
   msg.innerHTML = `<span class="muted">Mail supplier to: ${escapeHTML(to || "(not found)")}</span>`;
 
   if(!to){
@@ -520,7 +537,6 @@ Thank you!`;
   openGmailOrMailto(to, subject, body);
 }
 
-/* ---- Logout ---- */
 function logout(){
   supplier = "";
   supplierKey = "";
@@ -531,7 +547,6 @@ function logout(){
   showLogin();
 }
 
-/* ---- Events ---- */
 loginBtn.addEventListener("click", doLogin);
 clearBtn.addEventListener("click", ()=>{ keyInput.value=""; loginMsg.textContent=""; keyInput.focus(); });
 keyInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") doLogin(); });
