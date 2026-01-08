@@ -52,7 +52,6 @@
       border-color:rgba(37,99,235,.55);
       box-shadow:0 0 0 4px rgba(37,99,235,.12)
     }
-    /* dropdown: remove glossy / keep consistent */
     select{
       appearance:none;
       -webkit-appearance:none;
@@ -122,13 +121,7 @@
     .center{min-height:100vh;display:grid;place-items:center;padding:18px}
     .hidden{display:none !important}
 
-    .kvRow{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:flex-end;
-      margin:10px 0 6px
-    }
+    .kvRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin:10px 0 6px}
     .kvBlock{min-width:0}
     .kvLabel{color:var(--muted);font-size:12px}
     .kvValue{
@@ -139,14 +132,12 @@
       text-overflow:ellipsis
     }
 
-    /* login UX */
     .loginCard{max-width:520px;width:100%;padding:18px}
     .loginHeader{text-align:center;margin-bottom:10px}
     .loginForm{max-width:380px;margin:0 auto}
     .loginActions{justify-content:center}
     .loginMsg{text-align:center;min-height:18px}
 
-    /* table customer lines */
     .smallLine{
       margin-top:3px;
       font-size:12px;
@@ -155,8 +146,6 @@
       overflow:hidden;
       text-overflow:ellipsis;
     }
-
-    /* make customer single line in table */
     .customerOneLine{
       font-weight:650;
       white-space:nowrap;
@@ -165,7 +154,6 @@
       max-width:520px;
     }
 
-    /* right column actions */
     .actionsCell{
       white-space:nowrap;
       display:flex;
@@ -175,7 +163,6 @@
       flex-wrap:nowrap;
     }
 
-    /* status column centered + one line, right-aligned inside pill if needed */
     .statusCell{ text-align:center; }
     .statusRightWrap{
       width:100%;
@@ -183,7 +170,6 @@
       justify-content:center;
     }
 
-    /* left card header row */
     .leftTopRow{
       display:flex;
       justify-content:space-between;
@@ -192,10 +178,8 @@
       margin-bottom:8px
     }
     .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.2px}
-
     .divider{height:1px;background:var(--border);margin:12px 0}
 
-    /* collapsible new order */
     .toggleRow{
       display:flex;justify-content:space-between;align-items:center;gap:10px;
       padding:10px 12px;
@@ -208,16 +192,7 @@
     .plus{font-weight:800;font-size:18px;line-height:1;color:var(--muted)}
     .newOrderBody{margin-top:10px}
 
-    /* mail variants */
-    .flagBtn{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
     .flag{font-size:14px;line-height:1}
-    .appleBadge{font-size:14px;line-height:1;opacity:.9}
-
-    /* completed search label less prominent */
     .searchHint{color:#94a3b8;font-size:12px;margin-top:4px}
   </style>
 </head>
@@ -307,6 +282,7 @@
             </div>
           </div>
 
+          <!-- Tracking inputs -->
           <label>Carrier</label>
           <input id="carrier" />
 
@@ -324,11 +300,10 @@
           <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
             <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
             <div class="row">
-              <button class="btn" id="mc_en">Gmail / Mail</button>
+              <button class="btn" id="mc_en">EN</button>
               <button class="btn" id="mc_nl"><span class="flag">🇳🇱</span> NL</button>
               <button class="btn" id="mc_de"><span class="flag">🇩🇪</span> DE</button>
               <button class="btn" id="mc_fr"><span class="flag">🇫🇷</span> FR</button>
-              <button class="btn" id="mc_apple"><span class="appleBadge"></span> Apple Mail</button>
             </div>
             <div class="hint" style="margin-top:8px" id="mailMsg"></div>
           </div>
@@ -385,11 +360,9 @@
 </section>
 
 <script>
-/* ✅ Your current Apps Script */
 const API_BASE = "https://script.google.com/macros/s/AKfycbz1gFMihzIhsuapAKy1hMVmKlj6sLpcln4xaGYB4eWG-eGebJlsXFJ9aV0nJ5jWEiHCzw/exec";
 const MASTER_SUPPLIER_NAME = "ALL";
 
-/* --- DOM --- */
 const $ = (id) => document.getElementById(id);
 
 const loginView = $("loginView");
@@ -398,6 +371,7 @@ const keyInput = $("keyInput");
 const loginBtn = $("loginBtn");
 const clearBtn = $("clearBtn");
 const loginMsg = $("loginMsg");
+
 const reloadBtn = $("reloadBtn");
 const logoutBtn = $("logoutBtn");
 
@@ -411,6 +385,7 @@ const form = $("form");
 const customerLabel = $("customerLabel");
 const supplierLine = $("supplierLine");
 const orderLine = $("orderLine");
+
 const carrier = $("carrier");
 const trackingNumber = $("trackingNumber");
 const trackingLink = $("trackingLink");
@@ -423,7 +398,6 @@ const mc_en = $("mc_en");
 const mc_nl = $("mc_nl");
 const mc_de = $("mc_de");
 const mc_fr = $("mc_fr");
-const mc_apple = $("mc_apple");
 
 const completedWrap = $("completedWrap");
 const completedSearch = $("completedSearch");
@@ -441,15 +415,14 @@ const newOrderId = $("newOrderId");
 const createBtn = $("createBtn");
 const createMsg = $("createMsg");
 
-/* --- State --- */
+/* state */
 let supplier = "";
 let supplierKey = "";
 let orders = [];
 let selected = null;
 let suppliersList = [];
-let supplierMailMap = {};
 
-/* --- Utils --- */
+/* utils */
 function escapeHTML(s){
   return String(s || "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
 }
@@ -513,7 +486,6 @@ function jsonp(url){
   });
 }
 
-/* Gmail -> fallback mailto */
 function openGmailOrMailto(to, subject, body){
   const gmailUrl =
     "https://mail.google.com/mail/?view=cm&fs=1" +
@@ -531,15 +503,9 @@ function openGmailOrMailto(to, subject, body){
   }
 }
 
-/* For customer: open a "choice" like supplier (gmail or apple). */
-function openMailChoice(to, subject, body){
-  // Try Gmail in new tab; if blocked, fallback to mailto (Apple Mail / default)
-  openGmailOrMailto(to, subject, body);
-}
-
-/* --- Persist Completed TRUE/FALSE --- */
+/* completed save: robust error reporting */
 async function setCompleted(rowId, val){
-  if(!isMasterLogin()) return false;
+  if(!isMasterLogin()) return { ok:false, error:"Not master" };
   try{
     const url =
       `${API_BASE}?action=complete` +
@@ -547,13 +513,14 @@ async function setCompleted(rowId, val){
       `&rowId=${encodeURIComponent(rowId)}` +
       `&Completed=${encodeURIComponent(val ? "TRUE" : "FALSE")}`;
     const data = await jsonp(url);
-    return !!(data && data.ok);
-  }catch(_){
-    return false;
+    if(data && data.ok) return { ok:true };
+    return { ok:false, error: (data && data.error) || "Unknown response" };
+  }catch(e){
+    return { ok:false, error: "Could not reach server" };
   }
 }
 
-/* --- Auth --- */
+/* login */
 async function doLogin(withKey){
   const key = (withKey ?? keyInput.value).trim();
   if(!key){
@@ -579,30 +546,25 @@ async function doLogin(withKey){
 
     showPortal();
     await bootstrapAfterLogin_();
-  }catch(e){
+  }catch(_){
     loginMsg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
   }finally{
     loginBtn.disabled = false;
   }
 }
 
-/* --- Suppliers list for dropdown + mail map --- */
 async function loadSuppliers_(){
   try{
     const data = await jsonp(`${API_BASE}?action=suppliers`);
     if(data && data.ok){
       suppliersList = data.suppliers || [];
-      supplierMailMap = data.mailMap || {};
     } else {
       suppliersList = [];
-      supplierMailMap = {};
     }
   }catch(_){
     suppliersList = [];
-    supplierMailMap = {};
   }
 
-  // Fill dropdown (master only)
   newSupplier.innerHTML = "";
   for(const s of suppliersList){
     const opt = document.createElement("option");
@@ -612,7 +574,7 @@ async function loadSuppliers_(){
   }
 }
 
-/* --- Orders --- */
+/* orders */
 async function loadOrders(){
   selected = null;
   form.classList.add("hidden");
@@ -634,16 +596,14 @@ async function loadOrders(){
   const data = await jsonp(url);
 
   if(!data || !data.ok){
-    tbody.innerHTML = `<tr><td colspan="3" class="muted">${escapeHTML((data && data.error) || "Error")}</td></tr>`;
-    tbodyCompleted.innerHTML = `<tr><td colspan="3" class="muted">${escapeHTML((data && data.error) || "Error")}</td></tr>`;
+    const err = escapeHTML((data && data.error) || "Error");
+    tbody.innerHTML = `<tr><td colspan="3" class="muted">${err}</td></tr>`;
+    tbodyCompleted.innerHTML = `<tr><td colspan="3" class="muted">${err}</td></tr>`;
     return;
   }
 
   orders = (data.orders || []).slice();
-
-  // newest first: rowId desc
-  orders.sort((a,b)=> Number(b.rowId||0) - Number(a.rowId||0));
-
+  orders.sort((a,b)=> Number(b.rowId||0) - Number(a.rowId||0)); // newest first
   renderOrders();
 }
 
@@ -662,7 +622,7 @@ function renderOrders(){
   const openList = master ? orders.filter(o => !Boolean(o.Completed)) : orders.slice();
   const doneList = master ? orders.filter(o => Boolean(o.Completed)).filter(searchMatch) : [];
 
-  // OPEN table
+  // OPEN
   tbody.innerHTML = "";
   if(!openList.length){
     tbody.innerHTML = `<tr><td colspan="3" class="muted">No orders found.</td></tr>`;
@@ -672,12 +632,14 @@ function renderOrders(){
       const sup = getAny(o,["Supplier"]);
       const oid = getAny(o,["Order ID","OrderID"]);
 
-      // show supplier small under customer (master only); no separate column
       const supplierLineHtml = (master && sup) ? `<div class="smallLine">${escapeHTML(sup)}</div>` : "";
       const orderLineHtml = (oid) ? `<div class="smallLine">Order ID: ${escapeHTML(oid)}</div>` : "";
 
-      const mailSupplierBtn = master
-        ? `<button class="btn" data-mailsupplier="${escapeHTML(o.rowId)}">Mail supplier</button>`
+      const mailSupplierBtns = master
+        ? `
+          <button class="btn" data-mailsupplier-en="${escapeHTML(o.rowId)}">EN</button>
+          <button class="btn" data-mailsupplier-nl="${escapeHTML(o.rowId)}"><span class="flag">🇳🇱</span> NL</button>
+        `
         : "";
 
       const tr = document.createElement("tr");
@@ -699,7 +661,7 @@ function renderOrders(){
         <td>
           <div class="actionsCell">
             <button class="btn" data-open="${escapeHTML(o.rowId)}">Open</button>
-            ${mailSupplierBtn}
+            ${mailSupplierBtns}
           </div>
         </td>
       `;
@@ -707,7 +669,7 @@ function renderOrders(){
     }
   }
 
-  // COMPLETED table (master only) - open only
+  // COMPLETED (open only)
   if(master){
     tbodyCompleted.innerHTML = "";
     if(!doneList.length){
@@ -717,8 +679,8 @@ function renderOrders(){
         const ok = trackingComplete(o);
         const sup = getAny(o,["Supplier"]);
         const oid = getAny(o,["Order ID","OrderID"]);
-        const supplierLineHtml = (sup) ? `<div class="smallLine">${escapeHTML(sup)}</div>` : "";
-        const orderLineHtml = (oid) ? `<div class="smallLine">Order ID: ${escapeHTML(oid)}</div>` : "";
+        const supplierLineHtml = sup ? `<div class="smallLine">${escapeHTML(sup)}</div>` : "";
+        const orderLineHtml = oid ? `<div class="smallLine">Order ID: ${escapeHTML(oid)}</div>` : "";
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -747,16 +709,22 @@ function renderOrders(){
     }
   }
 
-  // bind events
+  // bind open
   tbody.querySelectorAll("button[data-open]").forEach(btn=>{
     btn.addEventListener("click", ()=> openRow(Number(btn.dataset.open)));
   });
   if(master){
-    tbody.querySelectorAll("button[data-mailsupplier]").forEach(btn=>{
-      btn.addEventListener("click", ()=> mailSupplierRow(Number(btn.dataset.mailsupplier)));
-    });
     tbodyCompleted.querySelectorAll("button[data-open]").forEach(btn=>{
       btn.addEventListener("click", ()=> openRow(Number(btn.dataset.open)));
+    });
+
+    // supplier mail EN
+    tbody.querySelectorAll("button[data-mailsupplier-en]").forEach(btn=>{
+      btn.addEventListener("click", ()=> mailSupplierRow(Number(btn.dataset.mailsupplierEn), "en"));
+    });
+    // supplier mail NL
+    tbody.querySelectorAll("button[data-mailsupplier-nl]").forEach(btn=>{
+      btn.addEventListener("click", ()=> mailSupplierRow(Number(btn.dataset.mailsupplierNl), "nl"));
     });
   }
 }
@@ -771,7 +739,6 @@ function openRow(rowId){
 
   customerLabel.textContent = c;
 
-  // show supplier + order id under customer in left panel
   if(isMasterLogin() && sup){
     supplierLine.textContent = sup;
     supplierLine.classList.remove("hidden");
@@ -796,13 +763,12 @@ function openRow(rowId){
   const ok = trackingComplete(selected);
   setStatus(ok ? "Complete" : "Missing tracking", ok);
 
-  // master only: show mail customer variants
   mailCustomerWrap.classList.toggle("hidden", !isMasterLogin());
   mailMsg.textContent = "";
   msg.textContent = "";
 }
 
-/* --- Update tracking --- */
+/* save */
 async function save(){
   if(!selected) return;
 
@@ -840,15 +806,56 @@ async function save(){
     } else {
       msg.innerHTML = "<span style='color:var(--bad)'>Save failed.</span>";
     }
-  }catch(e){
+  }catch(_){
     msg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
   }finally{
     saveBtn.disabled = false;
   }
 }
 
-/* --- Mail supplier per row (master) --- */
-function mailSupplierRow(rowId){
+/* supplier mail templates */
+function supplierMailTemplate(lang, supplierName, customerName, orderId){
+  if(lang === "nl"){
+    return {
+      subject: `Tracking nodig – Order ${orderId || ""}`.trim(),
+      body:
+`Hi ${supplierName || "daar"},
+
+Kun je de verzendgegevens aanleveren voor onderstaande order?
+
+Customer: ${customerName || "-"}
+Order ID: ${orderId || "-"}
+
+Graag terugkoppelen met:
+- Carrier
+- Tracking number
+- Tracking link
+
+Dank!`
+    };
+  }
+  // default EN
+  return {
+    subject: `Tracking needed – Order ${orderId || ""}`.trim(),
+    body:
+`Hi ${supplierName || "there"},
+
+Could you please provide the shipment details for the order below?
+
+Customer: ${customerName || "-"}
+Order ID: ${orderId || "-"}
+
+Please reply with:
+- Carrier
+- Tracking number
+- Tracking link
+
+Thank you!`
+  };
+}
+
+/* supplier mail per row */
+function mailSupplierRow(rowId, lang){
   if(!isMasterLogin()) return;
 
   const row = orders.find(x => Number(x.rowId) === rowId);
@@ -867,27 +874,11 @@ function mailSupplierRow(rowId){
     return;
   }
 
-  // Supplier email: NL + EN (keep it simple: EN default in subject/body)
-  const subject = `Tracking needed – Order ${orderId || ""}`.trim();
-  const body =
-`Hi ${supplierName || "there"},
-
-Could you please provide the shipment details for the order below?
-
-Customer: ${customerName || "-"}
-Order ID: ${orderId || "-"}
-
-Please reply with:
-- Carrier
-- Tracking number
-- Tracking link
-
-Thank you!`;
-
-  openMailChoice(to, subject, body);
+  const tpl = supplierMailTemplate(lang, supplierName, customerName, orderId);
+  openGmailOrMailto(to, tpl.subject, tpl.body);
 }
 
-/* --- Mail customer variants (master) --- */
+/* customer mail templates */
 function customerMailTemplate(lang){
   const c = getAny(selected,["Customer"]) || "there";
   const oid = getAny(selected,["Order ID","OrderID"]) || "-";
@@ -943,7 +934,6 @@ Tracking link: ${TL}
 Cordialement`
     };
   }
-  // default EN
   return {
     subject: `Tracking details – Order ${oid}`,
     body:
@@ -960,25 +950,8 @@ Kind regards`
   };
 }
 
-async function afterMailCustomer_(){
-  if(!isMasterLogin() || !selected) return;
-
-  // optimistic UI
-  selected.Completed = true;
-  renderOrders();
-
-  const ok = await setCompleted(selected.rowId, true);
-  if(ok){
-    mailMsg.innerHTML = "<span style='color:var(--ok)'>Completed ✓</span>";
-  } else {
-    // revert if failed
-    selected.Completed = false;
-    renderOrders();
-    mailMsg.innerHTML = "<span style='color:var(--warn)'>Mail opened, but could not save Completed.</span>";
-  }
-}
-
-async function mailCustomer(lang, forceApple){
+/* mail customer: save completed THEN refresh (no optimistic move) */
+async function mailCustomer(lang){
   if(!isMasterLogin() || !selected) return;
 
   const to = getAny(selected, ["Mail Customer","MailCustomer"]);
@@ -987,24 +960,24 @@ async function mailCustomer(lang, forceApple){
     return;
   }
 
-  const tpl = customerMailTemplate(lang);
-
-  if(forceApple){
-    const mailtoUrl =
-      "mailto:" + encodeURIComponent(to) +
-      `?subject=${encodeURIComponent(tpl.subject)}` +
-      `&body=${encodeURIComponent(tpl.body)}`;
-    window.location.href = mailtoUrl;
-  } else {
-    openMailChoice(to, tpl.subject, tpl.body);
+  // 1) save completed first (so it always sticks)
+  mailMsg.textContent = "Saving completed…";
+  const res = await setCompleted(selected.rowId, true);
+  if(!res.ok){
+    mailMsg.innerHTML = `<span style="color:var(--bad)">Could not save Completed: ${escapeHTML(res.error || "Unknown")}</span>`;
+    return;
   }
 
-  // mark completed
-  mailMsg.textContent = "Marking completed…";
-  await afterMailCustomer_();
+  // 2) open mail
+  const tpl = customerMailTemplate(lang);
+  openGmailOrMailto(to, tpl.subject, tpl.body);
+
+  // 3) reload orders so it moves to completed
+  mailMsg.innerHTML = `<span style="color:var(--ok)">Completed ✓</span>`;
+  await loadOrders();
 }
 
-/* --- Create order (master) --- */
+/* create order */
 async function createOrder(){
   if(!isMasterLogin()) return;
 
@@ -1041,30 +1014,24 @@ async function createOrder(){
     } else {
       createMsg.innerHTML = "<span style='color:var(--bad)'>Failed: " + escapeHTML((data && data.error) || "Unknown") + "</span>";
     }
-  }catch(e){
+  }catch(_){
     createMsg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
   }finally{
     createBtn.disabled = false;
   }
 }
 
-/* --- Bootstrap after login --- */
 async function bootstrapAfterLogin_(){
   whoAmI.textContent = isMasterLogin() ? "Master view" : `Supplier: ${supplier}`;
 
-  // master-only sections
   newOrderWrap.classList.toggle("hidden", !isMasterLogin());
   mailCustomerWrap.classList.toggle("hidden", !isMasterLogin());
   completedWrap.classList.toggle("hidden", !isMasterLogin());
 
-  if(isMasterLogin()){
-    await loadSuppliers_();
-  }
-
+  if(isMasterLogin()) await loadSuppliers_();
   await loadOrders();
 }
 
-/* --- Logout --- */
 function logout(){
   supplier = "";
   supplierKey = "";
@@ -1075,28 +1042,19 @@ function logout(){
   showLogin();
 }
 
-/* --- Optional: auto-login from URL like /KB26 or ?key=KB26 --- */
 function tryAutoKeyFromUrl_(){
-  // /tracking/KB26 -> last path segment
   const pathSeg = (location.pathname || "").split("/").filter(Boolean);
   const last = pathSeg[pathSeg.length - 1] || "";
-  // allow query key
   const qs = new URLSearchParams(location.search);
   const qk = qs.get("key") || qs.get("k") || "";
-
-  // If last looks like a key (short-ish, alnum), prefer it
   const candidate = (qk || last || "").trim();
   if(!candidate) return "";
-
-  // ignore common filenames
   if(candidate.toLowerCase().includes(".html")) return "";
-
-  // simple heuristic
   if(/^[A-Za-z0-9_-]{3,}$/.test(candidate)) return candidate;
   return "";
 }
 
-/* --- Events --- */
+/* events */
 loginBtn.addEventListener("click", ()=> doLogin());
 clearBtn.addEventListener("click", ()=>{ keyInput.value=""; loginMsg.textContent=""; keyInput.focus(); });
 keyInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") doLogin(); });
@@ -1107,11 +1065,10 @@ saveBtn.addEventListener("click", save);
 
 completedSearch.addEventListener("input", renderOrders);
 
-mc_en.addEventListener("click", ()=> mailCustomer("en", false));
-mc_nl.addEventListener("click", ()=> mailCustomer("nl", false));
-mc_de.addEventListener("click", ()=> mailCustomer("de", false));
-mc_fr.addEventListener("click", ()=> mailCustomer("fr", false));
-mc_apple.addEventListener("click", ()=> mailCustomer("en", true));
+mc_en.addEventListener("click", ()=> mailCustomer("en"));
+mc_nl.addEventListener("click", ()=> mailCustomer("nl"));
+mc_de.addEventListener("click", ()=> mailCustomer("de"));
+mc_fr.addEventListener("click", ()=> mailCustomer("fr"));
 
 newOrderToggle.addEventListener("click", ()=>{
   const isHidden = newOrderBody.classList.toggle("hidden");
@@ -1119,7 +1076,7 @@ newOrderToggle.addEventListener("click", ()=>{
 });
 createBtn.addEventListener("click", createOrder);
 
-/* --- Init --- */
+/* init */
 (async function init(){
   const autoKey = tryAutoKeyFromUrl_();
 
@@ -1127,7 +1084,6 @@ createBtn.addEventListener("click", createOrder);
   const s = sessionStorage.getItem("supplier_name") || "";
 
   if(k && !autoKey && s){
-    // session login
     supplierKey = k;
     supplier = s;
     showPortal();
@@ -1136,7 +1092,6 @@ createBtn.addEventListener("click", createOrder);
   }
 
   if(autoKey){
-    // auto-login through URL key
     keyInput.value = autoKey;
     await doLogin(autoKey);
     return;
