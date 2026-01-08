@@ -105,12 +105,12 @@
           <span id="statusBadge" class="status missing"><span class="dot"></span><span id="statusText">No selection</span></span>
         </div>
 
-        <!-- ✅ Master: New order block (collapsible) -->
+        <!-- Master: New order block (collapsible) -->
         <div id="newOrderCard" class="hidden" style="margin-top:10px">
           <div class="sectionTitle">
             <div>
               <div style="font-weight:600">New order</div>
-              <div class="mini">Add a new order row (master only)</div>
+              <div class="mini">Add a new order row</div>
             </div>
             <button id="toggleNewOrderBtn" class="btn toggleBtn" type="button" aria-expanded="false">+</button>
           </div>
@@ -164,10 +164,10 @@
           <div class="row" style="margin-top:12px">
             <button id="saveBtn" class="btn primary" type="button">Save</button>
 
-            <!-- ✅ Gmail/default button: NO logo -->
+            <!-- Gmail/default button: NO logo -->
             <button id="mailCustomerBtn" class="btn hidden" type="button">Mail customer</button>
 
-            <!-- ✅ Apple button: keep Apple logo -->
+            <!-- Apple button: keep Apple logo -->
             <button id="appleMailBtn" class="btn hidden" type="button">
               <span class="icon"><span class="appleBadge"></span><span>Mail customer</span></span>
             </button>
@@ -178,6 +178,7 @@
       </section>
 
       <section class="card">
+        <!-- OPEN ORDERS -->
         <table class="table">
           <thead>
             <tr>
@@ -190,13 +191,34 @@
             <tr><td colspan="3" class="muted">Loading…</td></tr>
           </tbody>
         </table>
+
+        <!-- COMPLETED (master only) -->
+        <div id="completedWrap" class="hidden" style="margin-top:14px">
+          <div class="divider"></div>
+
+          <div style="font-weight:600;margin-bottom:8px">Completed orders</div>
+          <input id="completedSearch" placeholder="Search by customer or order id…" />
+
+          <div style="height:10px"></div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width:70%">Customer</th>
+                <th style="width:30%">Order ID</th>
+              </tr>
+            </thead>
+            <tbody id="completedTbody">
+              <tr><td colspan="2" class="muted">No completed orders yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   </div>
 </section>
 
 <script>
-/* ✅ UPDATED API */
 const API_BASE = "https://script.google.com/macros/s/AKfycbz1gFMihzIhsuapAKy1hMVmKlj6sLpcln4xaGYB4eWG-eGebJlsXFJ9aV0nJ5jWEiHCzw/exec";
 const MASTER_SUPPLIER_NAME = "ALL";
 
@@ -241,13 +263,22 @@ const newOrderId = $("newOrderId");
 const createBtn = $("createBtn");
 const createMsg = $("createMsg");
 
+/* completed (master only) */
+const completedWrap = $("completedWrap");
+const completedSearch = $("completedSearch");
+const completedTbody = $("completedTbody");
+
 let supplier = "";
 let supplierKey = "";
 let orders = [];
 let selected = null;
 
-let supplierMailMap = {}; // lower supplier -> mail
-let suppliersList = [];   // list of supplier names
+let suppliersList = [];   // dropdown
+let supplierMailMap = {}; // not required here but kept
+
+// ✅ Completed tracking (master only) stored locally so it survives refresh
+let completedRowIds = new Set();
+let completedOrders = []; // cached objects (rows) for rendering
 
 function escapeHTML(s){
   return String(s || "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
@@ -332,8 +363,57 @@ function openGmailOrMailto(to, subject, body){
 
 /* ✅ magic link key from path: /tracking/<SUPPLIERKEY> */
 function getSupplierKeyFromUrl(){
-  const parts = window.location.pathname.split("/").filter(Boolean);
+  let path = window.location.pathname;
+
+  // deep-link support via 404.html (optional)
+  const deep = sessionStorage.getItem("deep_link_path");
+  if(deep){
+    path = deep;
+    sessionStorage.removeItem("deep_link_path");
+  }
+
+  const parts = path.split("/").filter(Boolean);
   return parts.length ? parts[parts.length - 1] : "";
+}
+
+/* ===== Completed storage (master only) ===== */
+function completedStorageKey(){
+  return "completed_rows_master"; // one master view
+}
+function loadCompletedFromStorage(){
+  completedRowIds = new Set();
+  completedOrders = [];
+  try{
+    const raw = localStorage.getItem(completedStorageKey()) || "[]";
+    const arr = JSON.parse(raw);
+    if(Array.isArray(arr)){
+      for(const n of arr){
+        const id = Number(n);
+        if(id) completedRowIds.add(id);
+      }
+    }
+  }catch(_){}
+}
+function saveCompletedToStorage(){
+  try{
+    localStorage.setItem(completedStorageKey(), JSON.stringify(Array.from(completedRowIds)));
+  }catch(_){}
+}
+function markRowCompleted(row){
+  if(!row || !row.rowId) return;
+
+  completedRowIds.add(Number(row.rowId));
+  saveCompletedToStorage();
+
+  // remove from open orders list
+  orders = orders.filter(x => Number(x.rowId) !== Number(row.rowId));
+
+  // keep in completed list (upsert)
+  const exists = completedOrders.some(x => Number(x.rowId) === Number(row.rowId));
+  if(!exists) completedOrders.unshift(row);
+
+  renderOrders();
+  renderCompleted();
 }
 
 /* ---- Login / Auto login ---- */
@@ -365,8 +445,12 @@ async function loginWithKey(key, showErrors){
 
     showPortal();
 
+    // master-only UI
     newOrderCard.classList.toggle("hidden", !isMasterLogin());
+    completedWrap.classList.toggle("hidden", !isMasterLogin());
+
     if(isMasterLogin()){
+      loadCompletedFromStorage();
       await loadSuppliers();
       expandNewOrder(true);
     }
@@ -381,10 +465,10 @@ async function loginWithKey(key, showErrors){
   }
 }
 
-/* ---- Suppliers (dropdown + mail map) ---- */
+/* ---- Suppliers (dropdown) ---- */
 async function loadSuppliers(){
-  supplierMailMap = {};
   suppliersList = [];
+  supplierMailMap = {};
   newSupplier.innerHTML = "";
 
   try{
@@ -426,8 +510,27 @@ async function loadOrders(){
     return;
   }
 
-  orders = data.orders || [];
-  renderOrders();
+  const all = data.orders || [];
+
+  // split open vs completed (master only)
+  if(isMasterLogin()){
+    const open = [];
+    const done = [];
+
+    for(const o of all){
+      const id = Number(o.rowId);
+      if(completedRowIds.has(id)) done.push(o);
+      else open.push(o);
+    }
+
+    orders = open;
+    completedOrders = done; // refresh list from sheet
+    renderOrders();
+    renderCompleted();
+  }else{
+    orders = all;
+    renderOrders();
+  }
 }
 
 function renderOrders(){
@@ -447,7 +550,6 @@ function renderOrders(){
       ? `<div class="muted supplierSmall">${escapeHTML(supplierName)}</div>`
       : "";
 
-    // master-only: mail supplier button per row
     const mailSupplierBtnHtml = master
       ? `<button class="btn" data-mailsupplier="${escapeHTML(o.rowId)}">Mail supplier</button>`
       : "";
@@ -505,6 +607,38 @@ function openRow(rowId){
   appleMailBtn.classList.toggle("hidden", !master);
 }
 
+/* ---- Completed rendering + search ---- */
+function renderCompleted(){
+  if(!isMasterLogin()) return;
+
+  const q = (completedSearch.value || "").trim().toLowerCase();
+  const filtered = completedOrders.filter(o=>{
+    const c = getAny(o, ["Customer"]).toLowerCase();
+    const id = getAny(o, ["Order ID","OrderID"]).toLowerCase();
+    return !q || c.includes(q) || id.includes(q);
+  });
+
+  if(!filtered.length){
+    completedTbody.innerHTML = `<tr><td colspan="2" class="muted">No completed orders yet.</td></tr>`;
+    return;
+  }
+
+  completedTbody.innerHTML = "";
+  for(const o of filtered){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">
+          ${escapeHTML(getAny(o, ["Customer"]))}
+        </div>
+        <div class="muted supplierSmall">${escapeHTML(getAny(o, ["Supplier"]))}</div>
+      </td>
+      <td>${escapeHTML(getAny(o, ["Order ID","OrderID"]) || "—")}</td>
+    `;
+    completedTbody.appendChild(tr);
+  }
+}
+
 /* ---- Save ---- */
 async function save(){
   if(!selected) return;
@@ -550,7 +684,7 @@ async function save(){
   }
 }
 
-/* ---- Mail customer ---- */
+/* ---- Mail customer (and then move to Completed) ---- */
 function mailCustomer(useApple){
   if(!isMasterLogin() || !selected) return;
 
@@ -579,6 +713,10 @@ Tracking number: ${Trackingnumber || "-"}
 Tracking link: ${Trackinglink || "-"}
 
 Kind regards`;
+
+  // ✅ Mark completed immediately after click
+  // (we keep the row object, so it appears in completed list)
+  markRowCompleted({ ...selected });
 
   if(useApple){
     window.location.href =
@@ -708,10 +846,10 @@ mailCustomerBtn.addEventListener("click", ()=> mailCustomer(false));
 appleMailBtn.addEventListener("click", ()=> mailCustomer(true));
 
 createBtn.addEventListener("click", createOrder);
+completedSearch.addEventListener("input", renderCompleted);
 
 /* ---- Init: auto-login via path slug ---- */
 (async function init(){
-  // Magic link: /tracking/<SUPPLIERKEY>
   const keyFromPath = getSupplierKeyFromUrl();
 
   // If you are on /tracking/ (no slug), keyFromPath will be "tracking" => ignore
@@ -733,7 +871,10 @@ createBtn.addEventListener("click", createOrder);
     showPortal();
 
     newOrderCard.classList.toggle("hidden", !isMasterLogin());
+    completedWrap.classList.toggle("hidden", !isMasterLogin());
+
     if(isMasterLogin()){
+      loadCompletedFromStorage();
       await loadSuppliers();
       expandNewOrder(true);
     }
