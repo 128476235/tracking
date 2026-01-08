@@ -8,7 +8,12 @@
     :root{--bg:#0b1220;--card:#111a2e;--text:#e7eeff;--muted:#93a4c7;--acc:#4f8cff;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444}
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);min-height:100vh}
-    .wrap{max-width:1100px;margin:0 auto;padding:22px 14px}
+
+    /* ✅ slightly narrower + centered portal */
+    .wrap{max-width:980px;margin:0 auto;padding:22px 14px}
+    .portalCenter{display:flex;justify-content:center}
+    .portalInner{width:100%;max-width:980px}
+
     header{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
     h1{font-size:18px;margin:0}
     .sub{color:var(--muted);font-size:13px;line-height:1.4}
@@ -32,8 +37,11 @@
     .dot{width:8px;height:8px;border-radius:999px;background:var(--warn)}
     .status.ready .dot{background:var(--ok)}
     .status.missing .dot{background:var(--bad)}
-    .two{display:grid;grid-template-columns: 420px 1fr;gap:14px}
+
+    /* ✅ slightly narrower columns for centered look */
+    .two{display:grid;grid-template-columns: 400px 1fr;gap:14px}
     @media (max-width: 980px){.two{grid-template-columns:1fr}}
+
     .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.5}
     .center{min-height:100vh;display:grid;place-items:center}
     .hidden{display:none !important}
@@ -57,14 +65,14 @@
     .icon{display:inline-flex;align-items:center;gap:8px}
     .appleBadge{font-size:14px;line-height:1;opacity:.9;margin-right:2px}
 
-    /* master new order card */
+    /* new order card */
     .cardHeaderRow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
     .cardTitle{font-weight:700;font-size:13px;color:var(--muted);margin:0}
     .togglePlus{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:10px;border:1px solid rgba(34,49,88,.9);background:#0f1730;color:var(--text);cursor:pointer}
     .togglePlus:active{transform:translateY(1px)}
     .sectionDivider{height:1px;background:rgba(34,49,88,.7);margin:10px 0}
 
-    /* table section labels */
+    /* completed section label */
     .sectionRow td{background:#0d1429;color:var(--muted);font-weight:700}
   </style>
 </head>
@@ -91,112 +99,110 @@
 </section>
 
 <section id="portalView" class="hidden">
-  <div class="wrap">
-    <header>
-      <div>
-        <h1>Delivery Overview 📦</h1>
-        <div class="sub">Open an order to enter / check shipment details</div>
-      </div>
-      <div class="row">
-        <button id="reloadBtn" class="btn" type="button">Reload</button>
-        <button id="logoutBtn" class="btn" type="button">Logout</button>
-      </div>
-    </header>
-
-    <div class="two">
-      <!-- LEFT column -->
-      <section class="card">
-        <div class="row" style="justify-content:flex-end">
-          <span id="statusBadge" class="status missing"><span class="dot"></span><span id="statusText">No selection</span></span>
+  <div class="wrap portalCenter">
+    <div class="portalInner">
+      <header>
+        <div>
+          <h1>Delivery Overview 📦</h1>
+          <div class="sub">Open an order to enter / check shipment details</div>
         </div>
+        <div class="row">
+          <button id="reloadBtn" class="btn" type="button">Reload</button>
+          <button id="logoutBtn" class="btn" type="button">Logout</button>
+        </div>
+      </header>
 
-        <div id="noSelection" class="hint">Open an order from the table.</div>
-
-        <div id="form" class="hidden">
-          <div class="kvRow">
-            <div class="kvBlock" style="flex:1">
-              <div class="kvLabel">Customer</div>
-              <div id="customerLabel" class="kvValue">—</div>
-            </div>
-            <div class="kvBlock" style="flex:0 0 auto">
-              <div class="kvLabel" style="text-align:right">Order ID</div>
-              <div id="orderIdLabel" class="kvValue right">—</div>
-            </div>
+      <div class="two">
+        <!-- LEFT column -->
+        <section class="card">
+          <div class="row" style="justify-content:flex-end">
+            <span id="statusBadge" class="status missing"><span class="dot"></span><span id="statusText">No selection</span></span>
           </div>
 
-          <label>Carrier</label>
-          <input id="carrier" />
+          <div id="noSelection" class="hint">Open an order from the table.</div>
 
-          <label>Tracking number</label>
-          <input id="trackingNumber" />
+          <div id="form" class="hidden">
+            <div class="kvRow">
+              <div class="kvBlock" style="flex:1">
+                <div class="kvLabel">Customer</div>
+                <div id="customerLabel" class="kvValue">—</div>
+              </div>
+              <div class="kvBlock" style="flex:0 0 auto">
+                <div class="kvLabel" style="text-align:right">Order ID</div>
+                <div id="orderIdLabel" class="kvValue right">—</div>
+              </div>
+            </div>
 
-          <label>Tracking link</label>
-          <input id="trackingLink" />
+            <label>Carrier</label>
+            <input id="carrier" />
 
-          <div class="row" style="margin-top:12px">
-            <button id="saveBtn" class="btn primary" type="button">Save</button>
-            <button id="mailCustomerBtn" class="btn hidden" type="button">Mail customer</button>
-            <button id="appleMailBtn" class="btn hidden" type="button">
-              <span class="icon"><span class="appleBadge"></span><span>Mail customer</span></span>
-            </button>
-          </div>
+            <label>Tracking number</label>
+            <input id="trackingNumber" />
 
-          <div class="hint" id="msg"></div>
-        </div>
-      </section>
+            <label>Tracking link</label>
+            <input id="trackingLink" />
 
-      <!-- RIGHT column -->
-      <section class="card">
-        <!-- ✅ New order (title WITHOUT “(master)”) -->
-        <div id="newOrderCard" class="hidden" style="margin-bottom:12px">
-          <div class="card" style="padding:12px">
-            <div class="cardHeaderRow">
-              <div class="cardTitle">New order</div>
-              <button id="toggleNewOrderBtn" class="togglePlus" type="button" aria-expanded="true" title="Toggle new order">
-                –
+            <div class="row" style="margin-top:12px">
+              <button id="saveBtn" class="btn primary" type="button">Save</button>
+              <button id="mailCustomerBtn" class="btn hidden" type="button">Mail customer</button>
+              <button id="appleMailBtn" class="btn hidden" type="button">
+                <span class="icon"><span class="appleBadge"></span><span>Mail customer</span></span>
               </button>
             </div>
 
-            <!-- ✅ default OPEN for master -->
-            <div id="newOrderBody">
-              <div class="sectionDivider"></div>
+            <div class="hint" id="msg"></div>
+          </div>
+        </section>
 
-              <label>Customer</label>
-              <input id="newCustomer" placeholder="Customer name" />
-
-              <label>Mail Customer</label>
-              <input id="newMailCustomer" placeholder="customer@email.com" />
-
-              <label>Supplier</label>
-              <select id="newSupplier">
-                <option value="">Loading suppliers…</option>
-              </select>
-
-              <label>Order ID</label>
-              <input id="newOrderId" placeholder="Order ID" />
-
-              <div class="row" style="margin-top:12px">
-                <button id="createOrderBtn" class="btn" type="button">+ Add order</button>
+        <!-- RIGHT column -->
+        <section class="card">
+          <div id="newOrderCard" class="hidden" style="margin-bottom:12px">
+            <div class="card" style="padding:12px">
+              <div class="cardHeaderRow">
+                <div class="cardTitle">New order</div>
+                <button id="toggleNewOrderBtn" class="togglePlus" type="button" aria-expanded="true" title="Toggle new order">–</button>
               </div>
 
-              <div class="hint" id="newOrderMsg"></div>
+              <div id="newOrderBody">
+                <div class="sectionDivider"></div>
+
+                <label>Customer</label>
+                <input id="newCustomer" placeholder="Customer name" />
+
+                <label>Mail Customer</label>
+                <input id="newMailCustomer" placeholder="customer@email.com" />
+
+                <label>Supplier</label>
+                <select id="newSupplier">
+                  <option value="">Loading suppliers…</option>
+                </select>
+
+                <label>Order ID</label>
+                <input id="newOrderId" placeholder="Order ID" />
+
+                <div class="row" style="margin-top:12px">
+                  <button id="createOrderBtn" class="btn" type="button">+ Add order</button>
+                </div>
+
+                <div class="hint" id="newOrderMsg"></div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Customer</th>
-              <th style="width:170px">Status</th>
-              <th style="width:260px">Action</th>
-            </tr>
-          </thead>
-          <tbody id="tbody">
-            <tr><td colspan="3" class="muted">Loading…</td></tr>
-          </tbody>
-        </table>
-      </section>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th style="width:170px">Status</th>
+                <th style="width:260px">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbody">
+              <tr><td colspan="3" class="muted">Loading…</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
     </div>
   </div>
 </section>
@@ -391,7 +397,6 @@ async function doLogin(){
 
     showPortal();
 
-    // master new order visible + open by default
     newOrderCard.classList.toggle("hidden", !isMasterLogin());
     if(isMasterLogin()){
       loadSuppliers();
@@ -444,10 +449,16 @@ function renderOrders(){
   const master = isMasterLogin();
   tbody.innerHTML = "";
 
+  // ✅ Completed split ONLY for master
   const active = [];
   const completed = [];
-  for (const o of orders){
-    (isRowCompletedUI(o) ? completed : active).push(o);
+  if(master){
+    for (const o of orders){
+      (isRowCompletedUI(o) ? completed : active).push(o);
+    }
+  } else {
+    // supplier portal: no completed section at all
+    active.push(...orders);
   }
 
   function renderList(list, sectionLabel){
@@ -490,7 +501,7 @@ function renderOrders(){
   }
 
   renderList(active, null);
-  if(completed.length){
+  if(master && completed.length){
     renderList(completed, "Completed");
   }
 
@@ -615,7 +626,6 @@ Kind regards`;
   }
 }
 
-/* ---- Mail supplier per row ---- */
 function mailSupplierRow(rowId){
   if(!isMasterLogin()) return;
 
@@ -704,7 +714,6 @@ async function createOrder(){
   }
 }
 
-/* ---- Toggle new order ---- */
 function toggleNewOrder(){
   const isOpen = !newOrderBody.classList.contains("hidden");
   newOrderBody.classList.toggle("hidden", isOpen);
@@ -712,7 +721,6 @@ function toggleNewOrder(){
   toggleNewOrderBtn.setAttribute("aria-expanded", String(!isOpen));
 }
 
-/* ---- Logout ---- */
 function logout(){
   supplier = "";
   supplierKey = "";
