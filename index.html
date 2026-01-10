@@ -41,6 +41,7 @@
       box-shadow:0 10px 22px rgba(2,6,23,.06);
     }
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .row.nowrap{flex-wrap:nowrap}
     label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
     input, select, textarea{
       width:100%;
@@ -86,6 +87,11 @@
     .btn.icon{
       width:42px;
       padding:10px 0;
+    }
+    .btn.small{
+      padding:8px 10px;
+      border-radius:10px;
+      font-size:12px;
     }
 
     .table{
@@ -218,30 +224,30 @@
     @media (max-width:520px){.grid2{grid-template-columns:1fr}}
     .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end}
 
-    .sentCell{ text-align:center; width:80px; }
-    .sentPill{
+    /* ✅ Completed column instead of Sent */
+    .completedCell{ text-align:center; width:110px; }
+    .completedPill{
       display:inline-flex;align-items:center;justify-content:center;
-      min-width:34px;height:26px;
+      min-width:52px;height:26px;
       border-radius:999px;
       border:1px solid var(--border);
       background:#fff;
       color:var(--muted);
-      font-size:14px;
+      font-size:12px;
+      font-weight:700;
+      padding:0 10px;
     }
-    .sentPill.yes{ border-color:rgba(22,163,74,.35); background:rgba(22,163,74,.08); color:var(--ok); }
-    .sentPill.no{ border-color:rgba(220,38,38,.25); background:rgba(220,38,38,.06); color:var(--bad); }
+    .completedPill.yes{ border-color:rgba(22,163,74,.35); background:rgba(22,163,74,.08); color:var(--ok); }
+    .completedPill.no{ border-color:rgba(220,38,38,.25); background:rgba(220,38,38,.06); color:var(--bad); }
 
-    .logItem{
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:10px 12px;
+    .mailGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      align-items:start;
       margin-top:10px;
-      background:#fff;
-      font-size:13px;
     }
-    .logTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .logTitle{font-weight:800}
-    .logMeta{color:var(--muted);font-size:12px;margin-top:3px}
+    @media (max-width:520px){.mailGrid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -298,7 +304,6 @@
             <label>Mail Customer</label>
             <input id="newMailCustomer" type="email" />
 
-            <!-- ✅ dropdown supplier again -->
             <label>Supplier</label>
             <select id="newSupplier"></select>
 
@@ -323,8 +328,13 @@
               <div class="kvLabel">Customer</div>
               <div class="kvValue" id="customerLabel">—</div>
               <div id="customerMailLine" class="smallLine hidden"></div>
+
+              <div class="divider" style="margin:10px 0"></div>
+
+              <div class="kvLabel">Supplier</div>
               <div id="supplierLine" class="smallLine hidden"></div>
-              <div id="supplierKeyLine" class="smallLine hidden"></div><!-- ✅ new -->
+              <div id="supplierMailLine" class="smallLine hidden"></div>
+              <div id="supplierKeyLine" class="smallLine"></div><!-- ✅ always show -->
               <div id="orderLine" class="smallLine hidden"></div>
             </div>
 
@@ -350,14 +360,28 @@
 
           <!-- MASTER ONLY -->
           <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
-            <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
+            <div class="sectionTitle" style="margin-bottom:8px">Mail</div>
 
-            <!-- flags only -->
-            <div class="row">
-              <button class="btn icon" id="mc_en" title="EN"><span class="flag">🇬🇧</span></button>
-              <button class="btn icon" id="mc_nl" title="NL"><span class="flag">🇳🇱</span></button>
-              <button class="btn icon" id="mc_de" title="DE"><span class="flag">🇩🇪</span></button>
-              <button class="btn icon" id="mc_fr" title="FR"><span class="flag">🇫🇷</span></button>
+            <!-- ✅ Mail customer + Mail supplier side-by-side -->
+            <div class="mailGrid">
+              <div>
+                <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
+                <div class="row nowrap">
+                  <button class="btn icon" id="mc_en" title="EN"><span class="flag">🇬🇧</span></button>
+                  <button class="btn icon" id="mc_nl" title="NL"><span class="flag">🇳🇱</span></button>
+                  <button class="btn icon" id="mc_de" title="DE"><span class="flag">🇩🇪</span></button>
+                  <button class="btn icon" id="mc_fr" title="FR"><span class="flag">🇫🇷</span></button>
+                </div>
+              </div>
+
+              <div>
+                <div class="sectionTitle" style="margin-bottom:8px">Mail supplier</div>
+                <div class="row nowrap">
+                  <button class="btn icon" id="ms_en" title="EN"><span class="flag">🇬🇧</span></button>
+                  <button class="btn icon" id="ms_nl" title="NL"><span class="flag">🇳🇱</span></button>
+                </div>
+                <div class="hint" id="mailSupplierMsg"></div>
+              </div>
             </div>
 
             <!-- Saved templates under flags -->
@@ -365,48 +389,6 @@
             <div class="sectionTitle">Mail templates</div>
             <div id="indepList" class="muted" style="font-size:13px;margin-top:6px">Loading…</div>
             <div class="hint" id="indepMsg"></div>
-
-            <!-- Order details -->
-            <div class="divider"></div>
-            <div class="toggleRow" id="orderDetailsToggle">
-              <div class="sectionTitle">Order details</div>
-              <div class="plus" id="orderDetailsPlus">+</div>
-            </div>
-            <div id="orderDetailsBody" class="hidden" style="margin-top:10px">
-              <div class="hint" style="margin-top:0">
-                <div>{{Customer}} <span id="tvCustomerFull"></span></div>
-                <div>{{OrderID}} <span id="tvOrderID"></span></div>
-                <div>{{Carrier}} <span id="tvCarrier"></span></div>
-                <div>{{Trackingnumber}} <span id="tvTrackingnumber"></span></div>
-                <div>{{Trackinglink}} <span id="tvTrackinglink"></span></div>
-              </div>
-
-              <!-- ✅ new info for templates: Supplier + Supplier KEY -->
-              <div class="divider"></div>
-              <div class="hint" style="margin-top:0">
-                <div>Supplier <span id="tvSupplier"></span></div>
-                <div>Supplier KEY <span id="tvSupplierKey"></span></div>
-              </div>
-
-              <div id="tokenBar" class="row" style="margin-top:10px;gap:8px">
-                <button class="btn" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                <button class="btn" type="button" data-token="{{OrderID}}">{{OrderID}}</button>
-                <button class="btn" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
-                <button class="btn" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
-                <button class="btn" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
-              </div>
-            </div>
-
-            <!-- Mail log (collapsible) -->
-            <div class="divider"></div>
-            <div class="toggleRow" id="mailLogToggle">
-              <div class="sectionTitle">Mail log</div>
-              <div class="plus" id="mailLogPlus">+</div>
-            </div>
-            <div id="mailLogBody" class="hidden" style="margin-top:10px">
-              <!-- This is UI-only for now (no script update). You can later wire it up. -->
-              <div id="mailLogList" class="muted" style="font-size:13px">No log yet.</div>
-            </div>
 
             <!-- Add template (independent) -->
             <div class="divider"></div>
@@ -436,6 +418,15 @@
 
               <label>Body</label>
               <textarea id="indepBody" rows="7" placeholder="Body…"></textarea>
+
+              <!-- ✅ Token buttons directly under Body -->
+              <div class="row" style="margin-top:10px;gap:8px">
+                <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                <button class="btn small" type="button" data-token="{{OrderID}}">{{OrderID}}</button>
+                <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+              </div>
 
               <div class="row" style="margin-top:10px;justify-content:flex-end">
                 <button id="indepSave" class="btn primary" type="button">Save</button>
@@ -471,6 +462,16 @@
               <input id="custSubject" placeholder="Subject…" />
               <label>Body</label>
               <textarea id="custBody" rows="7" placeholder="Body…"></textarea>
+
+              <!-- ✅ Token buttons under Body -->
+              <div class="row" style="margin-top:10px;gap:8px">
+                <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                <button class="btn small" type="button" data-token="{{OrderID}}">{{OrderID}}</button>
+                <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+              </div>
+
               <div class="hint" id="custMsg"></div>
             </div>
 
@@ -499,6 +500,16 @@
               <input id="supSubject" placeholder="Subject…" />
               <label>Body</label>
               <textarea id="supBody" rows="7" placeholder="Body…"></textarea>
+
+              <!-- ✅ Token buttons under Body -->
+              <div class="row" style="margin-top:10px;gap:8px">
+                <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                <button class="btn small" type="button" data-token="{{OrderID}}">{{OrderID}}</button>
+                <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+              </div>
+
               <div class="hint" id="supMsg"></div>
             </div>
 
@@ -517,7 +528,7 @@
               <th style="width:55%">Customer</th>
               <th style="width:170px;text-align:center">Status</th>
               <th style="width:300px">Action</th>
-              <th class="sentCell" title="Customer received shipping info">Sent</th>
+              <th class="completedCell" title="Based on Completed TRUE/FALSE">Completed</th>
             </tr>
           </thead>
           <tbody id="tbody">
@@ -550,9 +561,8 @@
 
 <script>
 /* CONFIG */
-const API_BASE = "https://script.google.com/macros/s/AKfycbxlg1sx6v0O6HfPUqbfxhB0qsALyFFrIelYrAuKk6KAJC8mlB1SjTS9vcuxE0QKWyjTTA/exec";
+const API_BASE = "PASTE_YOUR_SCRIPT_EXEC_URL_HERE";
 const MASTER_SUPPLIER_NAME = "ALL";
-const DEFAULT_LABEL = "DEFAULT";
 const $ = (id)=>document.getElementById(id);
 
 /* utils */
@@ -618,21 +628,8 @@ let indepTemplates = [];
 let customerTemplates = [];
 let supplierTemplates = [];
 let suppliersList = [];
-let suppliersMailMap = {}; // supplier -> mail
-let suppliersKeyMap = {};  // supplier -> key (best-effort)
-
-/* views */
-function showLogin(){
-  $("portalView").classList.add("hidden");
-  $("loginView").classList.remove("hidden");
-  $("loginMsg").textContent = "";
-  $("keyInput").value = "";
-  setTimeout(()=> $("keyInput").focus(), 50);
-}
-function showPortal(){
-  $("loginView").classList.add("hidden");
-  $("portalView").classList.remove("hidden");
-}
+let suppliersMailMap = {}; // supplier->mail
+let suppliersKeyMap = {};  // supplier->key (best-effort)
 
 /* tokens */
 function firstNameFromCustomer_(full){
@@ -657,34 +654,6 @@ function applyTokens(txt){
   return out;
 }
 
-/* update details preview */
-function updateTokenPreview_(){
-  if(!selected){
-    ["tvCustomerFull","tvOrderID","tvCarrier","tvTrackingnumber","tvTrackinglink","tvSupplier","tvSupplierKey"].forEach(id=>{
-      const el=$(id); if(el) el.textContent=" —";
-    });
-    return;
-  }
-  const fullCustomer = getAny(selected, ["Customer"]) || "";
-  const m = tokenMap();
-
-  const sup = getAny(selected, ["Supplier"]) || "";
-  const supKey = suppliersKeyMap[String(sup||"").toLowerCase()] || ""; // best-effort from suppliers endpoint
-
-  const set = (id, val)=>{
-    const el = $(id);
-    if(el) el.textContent = String(val||"") ? (" " + String(val||"")) : " —";
-  };
-
-  set("tvCustomerFull", fullCustomer);
-  set("tvOrderID", m["{{OrderID}}"]);
-  set("tvCarrier", m["{{Carrier}}"]);
-  set("tvTrackingnumber", m["{{Trackingnumber}}"]);
-  set("tvTrackinglink", m["{{Trackinglink}}"]);
-  set("tvSupplier", sup);
-  set("tvSupplierKey", supKey);
-}
-
 /* token insert buttons */
 let lastFocusedField = null;
 document.addEventListener("focusin", (e)=>{
@@ -705,9 +674,7 @@ function insertAtCursor_(el, text){
   if(el.focus) el.focus();
 }
 function bindTokenButtons_(){
-  const bar = $("tokenBar");
-  if(!bar) return;
-  bar.querySelectorAll("button[data-token]").forEach(btn=>{
+  document.querySelectorAll("button[data-token]").forEach(btn=>{
     btn.addEventListener("click", ()=>{
       const token = btn.getAttribute("data-token");
       const fallback = $("indepBody") || $("custBody") || $("supBody");
@@ -717,12 +684,6 @@ function bindTokenButtons_(){
     });
   });
 }
-
-/* live token updates for tracking fields */
-["carrier","trackingNumber","trackingLink"].forEach(id=>{
-  const el = $(id);
-  if(el) el.addEventListener("input", updateTokenPreview_);
-});
 
 /* mail picker */
 const mailPicker = $("mailPicker");
@@ -806,7 +767,7 @@ function findTemplate(list, lang, label){
   ) || null;
 }
 
-/* load suppliers (for dropdown) */
+/* load suppliers (for dropdown + supplier mail map) */
 async function loadSuppliers_(){
   if(!isMasterLogin()) return;
   const data = await jsonp(`${API_BASE}?action=suppliers&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
@@ -818,11 +779,9 @@ async function loadSuppliers_(){
   }
   suppliersList = Array.isArray(data.suppliers) ? data.suppliers : [];
   suppliersMailMap = (data.mailMap && typeof data.mailMap === "object") ? data.mailMap : {};
-  // NOTE: supplier keys are not returned by current suppliers endpoint.
-  // We keep suppliersKeyMap empty unless you later add it.
+  // keys are not returned by current suppliers endpoint, so this remains empty unless you add it later.
   suppliersKeyMap = {};
 
-  // fill dropdown
   const sel = $("newSupplier");
   sel.innerHTML = "";
   for(const s of suppliersList){
@@ -851,9 +810,7 @@ async function loadAllTemplates_(){
   renderIndepList_();
 }
 
-/* render indep list under flags
-   ✅ also hides Send for supplier-login (only master sees this whole block anyway)
-*/
+/* render independent templates list (send -> customer email) */
 function renderIndepList_(){
   const wrap = $("indepList");
   const msg = $("indepMsg");
@@ -1062,6 +1019,30 @@ async function mailCustomer(lang){
   });
 }
 
+/* ✅ mail supplier (master only) */
+async function mailSupplier(lang){
+  if(!isMasterLogin() || !selected) return;
+
+  const sup = getAny(selected, ["Supplier"]);
+  const to = getAny(selected, ["Mail Supplier","MailSupplier"]) || suppliersMailMap[String(sup||"").toLowerCase()] || "";
+
+  if(!to){
+    $("mailSupplierMsg").innerHTML = `<span style="color:var(--warn)">No supplier email found.</span>`;
+    return;
+  }
+
+  const t = findTemplate(supplierTemplates, lang, "DEFAULT") || { subject:"", body:"" };
+
+  openMailPicker({
+    to,
+    subject: applyTokens(t.subject||""),
+    body: applyTokens(t.body||""),
+    afterOpen: async () => {
+      $("mailSupplierMsg").innerHTML = `<span style="color:var(--ok)">Mail opened ✓</span>`;
+    }
+  });
+}
+
 /* create order (master) */
 async function createOrder(){
   if(!isMasterLogin()) return;
@@ -1147,6 +1128,19 @@ async function save(){
   }
 }
 
+/* views */
+function showLogin(){
+  $("portalView").classList.add("hidden");
+  $("loginView").classList.remove("hidden");
+  $("loginMsg").textContent = "";
+  $("keyInput").value = "";
+  setTimeout(()=> $("keyInput").focus(), 50);
+}
+function showPortal(){
+  $("loginView").classList.add("hidden");
+  $("portalView").classList.remove("hidden");
+}
+
 /* orders */
 async function loadOrders(){
   selected = null;
@@ -1156,12 +1150,17 @@ async function loadOrders(){
   $("customerLabel").textContent = "—";
   $("customerMailLine").classList.add("hidden");
   $("supplierLine").classList.add("hidden");
-  $("supplierKeyLine").classList.add("hidden");
+  $("supplierMailLine").classList.add("hidden");
   $("orderLine").classList.add("hidden");
+
+  // ✅ supplier key line always visible; show empty but no dash
+  $("supplierKeyLine").textContent = "Supplier KEY:";
+
   setStatus("No selection", false);
 
   $("msg").textContent = "";
   $("mailMsg").textContent = "";
+  $("mailSupplierMsg").textContent = "";
   $("indepMsg").textContent = "";
 
   $("tbody").innerHTML = "<tr><td colspan='4' class='muted'>Loading…</td></tr>";
@@ -1202,11 +1201,10 @@ function renderOrders(){
     const orderLineHtml = (oid) ? `<div class="smallLine">Order ID: ${escapeHTML(oid)}</div>` : "";
     const mailLineHtml = mailC ? `<div class="smallLine">${escapeHTML(mailC)}</div>` : "";
 
-    // ✅ supplier login: NO send / checkmark column stays but does not reveal anything new
     const completed = Boolean(o.Completed);
-    const sentHtml = isMasterLogin()
-      ? `<span class="sentPill ${completed ? "yes":"no"}" title="${completed ? "Customer received shipping info":"Not sent yet"}">${completed ? "✓" : "—"}</span>`
-      : `<span class="sentPill" title="Only visible for master">—</span>`;
+    const completedHtml = isMasterLogin()
+      ? `<span class="completedPill ${completed ? "yes":"no"}">${completed ? "TRUE" : "FALSE"}</span>`
+      : `<span class="completedPill">—</span>`;
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -1230,7 +1228,7 @@ function renderOrders(){
           <button class="btn" data-open="${escapeHTML(o.rowId)}">Open</button>
         </div>
       </td>
-      <td class="sentCell">${sentHtml}</td>
+      <td class="completedCell">${completedHtml}</td>
     `;
     tb.appendChild(tr);
   }
@@ -1265,14 +1263,18 @@ function openRow(rowId){
     $("supplierLine").classList.add("hidden");
   }
 
-  // Supplier KEY line (best-effort)
-  const supKey = suppliersKeyMap[String(sup||"").toLowerCase()] || "";
-  if(isMasterLogin() && supKey){
-    $("supplierKeyLine").textContent = "Supplier KEY: " + supKey;
-    $("supplierKeyLine").classList.remove("hidden");
+  // supplier mail (from order or suppliers endpoint)
+  const supMail = getAny(selected, ["Mail Supplier","MailSupplier"]) || suppliersMailMap[String(sup||"").toLowerCase()] || "";
+  if(isMasterLogin() && supMail){
+    $("supplierMailLine").textContent = supMail;
+    $("supplierMailLine").classList.remove("hidden");
   } else {
-    $("supplierKeyLine").classList.add("hidden");
+    $("supplierMailLine").classList.add("hidden");
   }
+
+  // supplier key: show label only if not available; no dash
+  const supKey = suppliersKeyMap[String(sup||"").toLowerCase()] || "";
+  $("supplierKeyLine").textContent = supKey ? ("Supplier KEY: " + supKey) : "Supplier KEY:";
 
   if(oid){
     $("orderLine").textContent = "Order ID: " + oid;
@@ -1293,9 +1295,9 @@ function openRow(rowId){
 
   $("mailCustomerWrap").classList.toggle("hidden", !isMasterLogin());
   $("mailMsg").textContent = "";
+  $("mailSupplierMsg").textContent = "";
   $("msg").textContent = "";
 
-  updateTokenPreview_();
   renderIndepList_();
 }
 
@@ -1329,7 +1331,7 @@ async function doLogin(withKey){
     $("mailCustomerWrap").classList.toggle("hidden", !isMasterLogin());
 
     if(isMasterLogin()){
-      await loadSuppliers_();      // ✅ dropdown supplier
+      await loadSuppliers_();
       await loadAllTemplates_();
     }
     await loadOrders();
@@ -1369,8 +1371,6 @@ function setupToggle(toggleId, bodyId, plusId){
 setupToggle("indepAddToggle","indepAddBody","indepAddPlus");
 setupToggle("custEditToggle","custEditBody","custEditPlus");
 setupToggle("supEditToggle","supEditBody","supEditPlus");
-setupToggle("orderDetailsToggle","orderDetailsBody","orderDetailsPlus");
-setupToggle("mailLogToggle","mailLogBody","mailLogPlus");
 setupToggle("newOrderToggle","newOrderBody","newOrderPlus");
 
 /* events */
@@ -1394,6 +1394,9 @@ $("mc_nl").addEventListener("click", ()=> mailCustomer("nl"));
 $("mc_de").addEventListener("click", ()=> mailCustomer("de"));
 $("mc_fr").addEventListener("click", ()=> mailCustomer("fr"));
 
+$("ms_en").addEventListener("click", ()=> mailSupplier("en"));
+$("ms_nl").addEventListener("click", ()=> mailSupplier("nl"));
+
 $("indepSave").addEventListener("click", indepSave_);
 $("indepDelete").addEventListener("click", indepDelete_);
 $("custLoad").addEventListener("click", custLoad_);
@@ -1404,7 +1407,6 @@ $("supSave").addEventListener("click", supSave_);
 $("createBtn").addEventListener("click", createOrder);
 
 bindTokenButtons_();
-updateTokenPreview_();
 
 /* init */
 (function init(){
@@ -1424,7 +1426,6 @@ updateTokenPreview_();
         await loadAllTemplates_();
       }
       await loadOrders();
-      updateTokenPreview_();
     })();
   } else {
     showLogin();
