@@ -203,7 +203,6 @@
 
     .completedTitle{font-weight:800;color:var(--text);font-size:13px}
 
-    /* small list card */
     .miniCard{
       border:1px solid var(--border);
       border-radius:12px;
@@ -454,7 +453,7 @@
 </div>
 
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbx7qHo1iEopZaHm2fXWJx4sgZQA8rfZqxlf_VDMY9Fs5XnR8TnoqUcGXrBwr7qI9eVT5w/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbwaya1-6P3EkiEuOP02THoCVI10vGyVYU9_pOcNaKqx7j0tfjaZUhamLSJ41R5Jw_qcHg/exec";
 const MASTER_SUPPLIER_NAME = "ALL";
 
 const $ = (id) => document.getElementById(id);
@@ -916,7 +915,6 @@ function openRow(rowId){
   msg.textContent = "";
 
   if(isMasterLogin()){
-    // keep templates collapsed; just refresh list data for selected order
     renderTemplatesUI();
   }
 }
@@ -1078,57 +1076,53 @@ Kind regards`
 }
 
 /* =========================
-   Templates (localStorage for now)
-   - list view: label left, send right
-   - editor: save button only
-   - collapsed by default
+   Templates (SERVER via Apps Script)
+   Actions used:
+   - mailTemplates
+   - upsertMailTemplate
+   - deleteMailTemplate
    ========================= */
 const TMPL_LANGS = ["en","nl","de","fr"];
 const TMPL_MAX = 5;
 
-let tmplStore = null;  // { en:[{id,label,subject,body}], ... }
+let tmplStore = { en:[], nl:[], de:[], fr:[] };
 let tmplEditingId = null;
-
-function tmplStorageKey(){
-  return `customerTemplatesShared:v1:${normalizeKey(supplierKey || "public")}`;
-}
-
-function storageLoad(){
-  try{
-    const raw = localStorage.getItem(tmplStorageKey());
-    const parsed = raw ? JSON.parse(raw) : null;
-    const out = {};
-    for(const lang of TMPL_LANGS){
-      const arr = (parsed && Array.isArray(parsed[lang])) ? parsed[lang] : [];
-      out[lang] = arr.slice(0, TMPL_MAX).map(t => ({
-        id: String(t?.id || crypto.randomUUID()),
-        label: String(t?.label || "Template"),
-        subject: String(t?.subject || ""),
-        body: String(t?.body || "")
-      }));
-    }
-    return out;
-  }catch(_){
-    const out = {};
-    for(const lang of TMPL_LANGS) out[lang] = [];
-    return out;
-  }
-}
-
-function storageSave(){
-  localStorage.setItem(tmplStorageKey(), JSON.stringify(tmplStore));
-}
 
 function curLang(){
   return tmplLang2?.value || "en";
 }
-
 function listFor(lang){
-  return tmplStore?.[lang] || [];
+  return (tmplStore && tmplStore[lang]) ? tmplStore[lang] : [];
 }
-
 function findTemplate(lang, id){
   return listFor(lang).find(t => t.id === id) || null;
+}
+
+async function storageLoad(){
+  const out = { en:[], nl:[], de:[], fr:[] };
+  if(!isMasterLogin()) return out;
+
+  try{
+    const data = await jsonp(
+      `${API_BASE}?action=mailTemplates&supplierKey=${encodeURIComponent(supplierKey)}`
+    );
+    if(!data || !data.ok) return out;
+
+    const list = Array.isArray(data.templates) ? data.templates : [];
+    for(const t of list){
+      const lang = String(t.language || "").toLowerCase();
+      if(!out[lang]) continue;
+      out[lang].push({
+        id: String(t.id || ""),
+        label: String(t.label || ""),
+        subject: String(t.subject || ""),
+        body: String(t.body || "")
+      });
+    }
+    return out;
+  }catch(_){
+    return out;
+  }
 }
 
 function renderTemplateList(){
@@ -1272,30 +1266,44 @@ function newTemplate(){
   tmplMsg.innerHTML = "<span class='muted'>New template (not saved yet).</span>";
 }
 
-function deleteTemplate(){
-  const lang = curLang();
+async function deleteTemplate(){
   const id = tmplEditingId;
   if(!id) return;
 
-  const arr = listFor(lang);
-  const idx = arr.findIndex(t => t.id === id);
-  if(idx < 0) return;
+  tmplDelete.disabled = true;
+  tmplMsg.textContent = "Deleting…";
 
-  arr.splice(idx, 1);
-  tmplStore[lang] = arr;
-  storageSave();
+  try{
+    const url =
+      `${API_BASE}?action=deleteMailTemplate` +
+      `&supplierKey=${encodeURIComponent(supplierKey)}` +
+      `&id=${encodeURIComponent(id)}`;
 
-  tmplEditingId = null;
-  tmplSelect2.value = "";
-  tmplLabel2.value = "";
-  tmplSubject2.value = "";
-  tmplText2.value = "";
+    const data = await jsonp(url);
 
-  tmplMsg.innerHTML = "<span style='color:var(--ok)'>Deleted ✓</span>";
-  renderTemplatesUI();
+    if(!data || !data.ok || !data.deleted){
+      tmplMsg.innerHTML = "<span style='color:var(--bad)'>Delete failed.</span>";
+      return;
+    }
+
+    tmplEditingId = null;
+    tmplSelect2.value = "";
+    tmplLabel2.value = "";
+    tmplSubject2.value = "";
+    tmplText2.value = "";
+
+    tmplStore = await storageLoad();
+
+    tmplMsg.innerHTML = "<span style='color:var(--ok)'>Deleted ✓</span>";
+    renderTemplatesUI();
+  }catch(_){
+    tmplMsg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
+  }finally{
+    tmplDelete.disabled = false;
+  }
 }
 
-function saveTemplate(){
+async function saveTemplate(){
   const lang = curLang();
   const label = (tmplLabel2.value || "").trim();
   const subject = (tmplSubject2.value || "").trim();
@@ -1310,33 +1318,46 @@ function saveTemplate(){
     return;
   }
 
+  // soft max guard (server doesn't enforce it)
   const arr = listFor(lang);
-
-  // update existing
-  if(tmplEditingId && arr.some(t => t.id === tmplEditingId)){
-    const idx = arr.findIndex(t => t.id === tmplEditingId);
-    arr[idx] = { ...arr[idx], label, subject, body };
-    tmplStore[lang] = arr;
-    storageSave();
-    tmplMsg.innerHTML = "<span style='color:var(--ok)'>Saved ✓</span>";
-    renderTemplatesUI();
-    return;
-  }
-
-  // create new
-  if(arr.length >= TMPL_MAX){
+  const isNew = !tmplEditingId;
+  if(isNew && arr.length >= TMPL_MAX){
     tmplMsg.innerHTML = `<span style='color:var(--warn)'>Max ${TMPL_MAX} templates reached.</span>`;
     return;
   }
 
-  const id = crypto.randomUUID();
-  arr.push({ id, label, subject, body });
-  tmplStore[lang] = arr;
-  storageSave();
+  tmplSave.disabled = true;
+  tmplMsg.textContent = "Saving…";
 
-  tmplEditingId = id;
-  tmplMsg.innerHTML = "<span style='color:var(--ok)'>Saved ✓</span>";
-  renderTemplatesUI();
+  try{
+    const url =
+      `${API_BASE}?action=upsertMailTemplate` +
+      `&supplierKey=${encodeURIComponent(supplierKey)}` +
+      (tmplEditingId ? `&id=${encodeURIComponent(tmplEditingId)}` : "") +
+      `&language=${encodeURIComponent(lang)}` +
+      `&label=${encodeURIComponent(label)}` +
+      `&subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(body)}`;
+
+    const data = await jsonp(url);
+
+    if(!data || !data.ok){
+      tmplMsg.innerHTML = "<span style='color:var(--bad)'>Save failed.</span>";
+      return;
+    }
+
+    const saved = data.template || {};
+    tmplEditingId = String(saved.id || tmplEditingId || "");
+
+    tmplStore = await storageLoad();
+
+    tmplMsg.innerHTML = "<span style='color:var(--ok)'>Saved ✓</span>";
+    renderTemplatesUI();
+  }catch(_){
+    tmplMsg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
+  }finally{
+    tmplSave.disabled = false;
+  }
 }
 
 async function sendTemplate(lang, id){
@@ -1482,13 +1503,12 @@ async function bootstrapAfterLogin_(){
   if(isMasterLogin()) await loadSuppliers_();
   await loadOrders();
 
-  // init templates (master only)
   if(isMasterLogin()){
-    tmplStore = storageLoad();
+    tmplStore = await storageLoad();
     if(tmplLang2) tmplLang2.value = "en";
     renderTemplatesUI();
 
-    // keep collapsed by default
+    // keep templates collapsed by default
     if(tmplBodyWrap) tmplBodyWrap.classList.add("hidden");
     if(tmplPlus) tmplPlus.textContent = "+";
   }
