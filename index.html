@@ -143,9 +143,23 @@
       display:flex;justify-content:space-between;align-items:center;gap:10px;
       padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;
     }
-    .savedLeft{min-width:0;display:flex;gap:10px;align-items:center}
-    .tplName{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .tplMeta{color:var(--muted);font-size:12px;white-space:nowrap}
+    .savedLeft{min-width:0;display:flex;gap:10px;align-items:flex-start}
+    .tplName{
+      font-weight:700;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:520px;
+    }
+    /* ✅ Mail log text stays inside card (wrap) */
+    .tplMeta{
+      color:var(--muted);
+      font-size:12px;
+      white-space:normal;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+      max-width:520px;
+    }
 
     /* ✅ more spacing between mail templates */
     #indepTemplatesList{display:flex;flex-direction:column;gap:10px}
@@ -235,7 +249,7 @@
             <button id="saveBtn" class="btn primary" type="button">Save</button>
           </div>
 
-          <!-- MASTER ONLY: mail + templates + log -->
+          <!-- MASTER ONLY -->
           <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
             <div class="mailGrid">
               <div>
@@ -261,7 +275,6 @@
 
             <div class="divider"></div>
 
-            <!-- General templates -->
             <div class="sectionTitle" style="margin-bottom:10px">Mail templates</div>
             <div id="indepTemplatesList">
               <div class="muted" style="font-size:13px">No templates.</div>
@@ -270,7 +283,6 @@
 
             <div class="divider"></div>
 
-            <!-- Add template -->
             <div class="toggleRow" id="addIndepToggle">
               <div class="sectionTitle">Add template</div>
               <div class="plusSym" id="addIndepPlus">+</div>
@@ -318,7 +330,6 @@
 
             <div class="divider"></div>
 
-            <!-- Edit Mail customer -->
             <div class="toggleRow" id="editCustomerToggle">
               <div class="sectionTitle">Edit Mail customer</div>
               <div class="plusSym" id="editCustomerPlus">+</div>
@@ -367,7 +378,6 @@
 
             <div class="divider"></div>
 
-            <!-- Edit Mail supplier -->
             <div class="toggleRow" id="editSupplierToggle">
               <div class="sectionTitle">Edit Mail supplier</div>
               <div class="plusSym" id="editSupplierPlus">+</div>
@@ -414,7 +424,6 @@
 
             <div class="divider"></div>
 
-            <!-- Mail log -->
             <div class="toggleRow" id="mailLogToggle">
               <div class="sectionTitle">Mail log</div>
               <div class="plusSym" id="mailLogPlus">+</div>
@@ -789,10 +798,11 @@ function renderIndepTemplates_(){
         <div class="flag" title="${escapeHTML(String(t.language||"").toUpperCase())}">${langFlag_(t.language)}</div>
         <div style="min-width:0">
           <div class="tplName" title="${escapeHTML(t.label||"")}">${escapeHTML(t.label||"")}</div>
-          <div class="tplMeta">${escapeHTML(String(t.language||"").toUpperCase())}</div>
+          <div class="tplMeta">${escapeHTML(String(t.subject||"") || "")}</div>
         </div>
       </div>
       <div class="row" style="flex-wrap:nowrap;gap:8px">
+        <button class="btn" type="button" data-indep-edit="${escapeHTML(t.id)}">Edit</button>
         <button class="btn" type="button" data-indep-send="${escapeHTML(t.id)}">Send</button>
       </div>
     `;
@@ -805,6 +815,25 @@ function renderIndepTemplates_(){
       const tpl = indepTemplates.find(x => String(x.id)===String(id));
       if(!tpl) return;
       sendIndependentTemplate_(tpl);
+    });
+  });
+
+  wrap.querySelectorAll("button[data-indep-edit]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.getAttribute("data-indep-edit");
+      const tpl = indepTemplates.find(x => String(x.id)===String(id));
+      if(!tpl) return;
+
+      $("addIndepBody").classList.remove("hidden");
+      $("addIndepPlus").textContent = "–";
+
+      $("indepLang").value = (tpl.language || "en").toLowerCase();
+      $("indepLabel").value = tpl.label || "";
+      $("indepSubject").value = tpl.subject || "";
+      $("indepBodyText").value = tpl.body || "";
+
+      $("indepSave").dataset.editId = String(tpl.id || "");
+      $("indepSaveMsg").textContent = "";
     });
   });
 }
@@ -839,8 +868,11 @@ async function saveIndepTemplate_(){
   }
 
   msg.textContent = "Saving…";
+
+  const editId = $("indepSave").dataset.editId || "";
   const data = await api_(
     `action=indep_upsert&supplierKey=${encodeURIComponent(supplierKey)}` +
+    (editId ? `&id=${encodeURIComponent(editId)}` : "") +
     `&language=${encodeURIComponent(lang)}` +
     `&label=${encodeURIComponent(label)}` +
     `&subject=${encodeURIComponent(subject)}` +
@@ -853,9 +885,12 @@ async function saveIndepTemplate_(){
   }
 
   msg.innerHTML = `<span style="color:var(--ok)">Saved ✓</span>`;
+
+  delete $("indepSave").dataset.editId;
   $("indepLabel").value = "";
   $("indepSubject").value = "";
   $("indepBodyText").value = "";
+
   await loadAllTemplates_();
 }
 
