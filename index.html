@@ -43,7 +43,7 @@
     }
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
-    input, select{
+    input, select, textarea{
       width:100%;
       border:1px solid var(--border);
       background:#fff;
@@ -52,7 +52,7 @@
       border-radius:12px;
       outline:none
     }
-    input:focus, select:focus{
+    input:focus, select:focus, textarea:focus{
       border-color:rgba(37,99,235,.55);
       box-shadow:0 0 0 4px rgba(37,99,235,.12)
     }
@@ -303,14 +303,86 @@
             <button id="saveBtn" class="btn primary" type="button">Save</button>
           </div>
 
+          <!-- MAIL CUSTOMER (MASTER ONLY) -->
           <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
             <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
+
+            <!-- ✅ Existing fixed templates (still 4 buttons) -->
             <div class="row">
               <button class="btn" id="mc_en"><span class="flag">🇬🇧</span> EN</button>
               <button class="btn" id="mc_nl"><span class="flag">🇳🇱</span> NL</button>
               <button class="btn" id="mc_de"><span class="flag">🇩🇪</span> DE</button>
               <button class="btn" id="mc_fr"><span class="flag">🇫🇷</span> FR</button>
             </div>
+
+            <!-- ✅ Edit the 4 "top templates" (master only) -->
+            <div class="divider"></div>
+            <div class="sectionTitle" style="margin-bottom:8px">Edit top templates (EN/NL/DE/FR)</div>
+
+            <div class="row" style="align-items:flex-end">
+              <div style="min-width:160px;flex:0 0 auto">
+                <label style="margin-top:0">Language</label>
+                <select id="top_lang">
+                  <option value="en">EN</option>
+                  <option value="nl">NL</option>
+                  <option value="de">DE</option>
+                  <option value="fr">FR</option>
+                </select>
+              </div>
+              <div style="flex:1;min-width:240px">
+                <div class="searchHint" id="top_hint" style="margin-top:0"></div>
+              </div>
+            </div>
+
+            <label>Mail subject</label>
+            <input id="top_subject" placeholder="Subject…" />
+
+            <label>Mail body</label>
+            <textarea id="top_body" rows="7" placeholder="Body…"></textarea>
+
+            <div class="row" style="margin-top:10px">
+              <button id="top_fill" class="btn" type="button">Fill from current order</button>
+              <button id="top_reset" class="btn" type="button">Reset this language</button>
+            </div>
+
+            <!-- ✅ Extra templates (max 5 per language) -->
+            <div class="divider"></div>
+            <div id="extraTplWrap">
+              <div class="sectionTitle" style="margin-bottom:8px">Extra templates (saved)</div>
+
+              <div class="row" style="align-items:flex-end">
+                <div style="min-width:160px;flex:0 0 auto">
+                  <label style="margin-top:0">Language</label>
+                  <select id="xt_lang">
+                    <option value="en">EN</option>
+                    <option value="nl">NL</option>
+                    <option value="de">DE</option>
+                    <option value="fr">FR</option>
+                  </select>
+                </div>
+
+                <div style="min-width:260px;flex:1">
+                  <label style="margin-top:0">Template</label>
+                  <div class="row" style="gap:8px;flex-wrap:nowrap">
+                    <select id="xt_select" style="flex:1"></select>
+                    <button id="xt_add" class="btn" type="button" title="Add template">+</button>
+                    <button id="xt_del" class="btn" type="button" title="Delete template">🗑</button>
+                  </div>
+                  <div id="xt_hint" class="searchHint" style="margin-top:6px"></div>
+                </div>
+              </div>
+
+              <label>Mail subject</label>
+              <input id="xt_subject" placeholder="Subject…" />
+
+              <label>Mail body</label>
+              <textarea id="xt_body" rows="7" placeholder="Body…"></textarea>
+
+              <div class="row" style="margin-top:10px">
+                <button id="xt_send" class="btn primary" type="button">Send this template</button>
+              </div>
+            </div>
+
             <div class="hint" style="margin-top:8px" id="mailMsg"></div>
           </div>
 
@@ -373,7 +445,6 @@
   <div class="card" style="max-width:420px;width:100%">
     <div style="font-weight:700;font-size:14px">Choose mail app</div>
 
-    <!-- ✅ center buttons + ONLY Cancel is blue -->
     <div class="row" style="margin-top:12px; justify-content:center">
       <button id="pickGmail" class="btn" type="button">Gmail</button>
       <button id="pickApple" class="btn" type="button">Apple Mail</button>
@@ -424,6 +495,25 @@ const mc_en = $("mc_en");
 const mc_nl = $("mc_nl");
 const mc_de = $("mc_de");
 const mc_fr = $("mc_fr");
+
+/* top templates editor */
+const top_lang = $("top_lang");
+const top_subject = $("top_subject");
+const top_body = $("top_body");
+const top_fill = $("top_fill");
+const top_reset = $("top_reset");
+const top_hint = $("top_hint");
+
+/* extra templates */
+const extraTplWrap = $("extraTplWrap");
+const xt_lang = $("xt_lang");
+const xt_select = $("xt_select");
+const xt_add = $("xt_add");
+const xt_del = $("xt_del");
+const xt_hint = $("xt_hint");
+const xt_subject = $("xt_subject");
+const xt_body = $("xt_body");
+const xt_send = $("xt_send");
 
 /* completed */
 const completedWrap = $("completedWrap");
@@ -823,6 +913,9 @@ function openRow(rowId){
   mailCustomerWrap.classList.toggle("hidden", !isMasterLogin());
   mailMsg.textContent = "";
   msg.textContent = "";
+
+  // refresh “fill from order” preview fields
+  if(isMasterLogin()) topRender();
 }
 
 /* save */
@@ -870,7 +963,7 @@ async function save(){
   }
 }
 
-/* templates */
+/* templates (supplier mail unchanged) */
 function supplierMailTemplate(lang, supplierName, customerName, orderId){
   if(lang === "nl"){
     return {
@@ -910,6 +1003,7 @@ Thank you!`
   };
 }
 
+/* ===== Original fixed customer generator (kept) ===== */
 function customerMailTemplate(lang){
   const c = getAny(selected,["Customer"]) || "there";
   const oid = getAny(selected,["Order ID","OrderID"]) || "-";
@@ -981,6 +1075,256 @@ Kind regards`
   };
 }
 
+/* =========================
+   Editable TOP templates (EN/NL/DE/FR)
+   - If user edited: use stored text
+   - Else: fallback to customerMailTemplate(lang)
+   ========================= */
+const TOP_LANGS = ["en","nl","de","fr"];
+let topStore = null; // {en:{subject,body,edited}, ...}
+
+function topStorageKey(){
+  return `topCustomerTemplates:v1:${normalizeKey(supplierKey || "public")}`;
+}
+function topLoad(){
+  let parsed=null;
+  try{ parsed = JSON.parse(localStorage.getItem(topStorageKey()) || "null"); }catch(_){ parsed=null; }
+  const out = {};
+  for(const lang of TOP_LANGS){
+    const p = parsed && parsed[lang] ? parsed[lang] : null;
+    out[lang] = {
+      subject: String(p?.subject || ""),
+      body: String(p?.body || ""),
+      edited: Boolean(p?.edited || false)
+    };
+  }
+  return out;
+}
+function topSave(){
+  localStorage.setItem(topStorageKey(), JSON.stringify(topStore));
+}
+function topCurLang(){ return top_lang?.value || "en"; }
+
+function topRender(){
+  if(!isMasterLogin()) return;
+  if(!topStore) topStore = topLoad();
+
+  const lang = topCurLang();
+  const s = topStore[lang];
+
+  const usingEdited = s?.edited && (s.subject || s.body);
+  const generated = customerMailTemplate(lang);
+
+  top_subject.value = usingEdited ? s.subject : generated.subject;
+  top_body.value = usingEdited ? s.body : generated.body;
+
+  top_hint.textContent = usingEdited
+    ? "Using your edited version for the top button."
+    : "Not edited yet. The top button uses the default (auto-filled from order).";
+}
+
+function topUpdateEdited(){
+  const lang = topCurLang();
+  topStore[lang] = {
+    subject: top_subject.value || "",
+    body: top_body.value || "",
+    edited: true
+  };
+  topSave();
+  top_hint.textContent = "Saved ✓ (top button will use this text)";
+}
+
+function topResetLang(){
+  const lang = topCurLang();
+  topStore[lang] = { subject:"", body:"", edited:false };
+  topSave();
+  topRender();
+  top_hint.textContent = "Reset ✓ (top button uses default again)";
+}
+
+function topFillFromOrder(){
+  const lang = topCurLang();
+  const generated = customerMailTemplate(lang);
+  top_subject.value = generated.subject;
+  top_body.value = generated.body;
+  topUpdateEdited();
+}
+
+/* =========================
+   Extra saved templates (MASTER only)
+   ========================= */
+const XT_LANGS = ["en","nl","de","fr"];
+const XT_MAX = 5;
+
+let xt_store = null; // { en:[...], nl:[...], ... }
+let xt_selectedId = { en:null, nl:null, de:null, fr:null };
+
+function xtStorageKey(){
+  return `extraCustomerMailTemplates:v1:${normalizeKey(supplierKey || "public")}`;
+}
+
+function xtLoad(){
+  let parsed = null;
+  try{ parsed = JSON.parse(localStorage.getItem(xtStorageKey()) || "null"); }catch(_){ parsed = null; }
+
+  const out = {};
+  for(const lang of XT_LANGS){
+    const arr = (parsed && Array.isArray(parsed[lang])) ? parsed[lang] : [];
+    out[lang] = arr.slice(0, XT_MAX).map(x => ({
+      id: String(x?.id || crypto.randomUUID()),
+      name: String(x?.name || "Template"),
+      subject: String(x?.subject || ""),
+      body: String(x?.body || "")
+    }));
+  }
+  return out;
+}
+
+function xtSave(){
+  localStorage.setItem(xtStorageKey(), JSON.stringify(xt_store));
+}
+
+function xtList(lang){
+  return xt_store?.[lang] || [];
+}
+
+function xtCurLang(){
+  return xt_lang?.value || "en";
+}
+
+function xtFind(lang, id){
+  return xtList(lang).find(t => t.id === id) || null;
+}
+
+function xtRender(){
+  if(!isMasterLogin()){
+    if(extraTplWrap) extraTplWrap.classList.add("hidden");
+    return;
+  }
+  if(extraTplWrap) extraTplWrap.classList.remove("hidden");
+
+  const lang = xtCurLang();
+  const list = xtList(lang);
+
+  xt_select.innerHTML = "";
+  if(list.length === 0){
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "No saved templates";
+    xt_select.appendChild(opt);
+    xt_subject.value = "";
+    xt_body.value = "";
+    xt_del.disabled = true;
+    xt_send.disabled = true;
+  }else{
+    for(const t of list){
+      const opt = document.createElement("option");
+      opt.value = t.id;
+      opt.textContent = t.name || "(Template)";
+      xt_select.appendChild(opt);
+    }
+    let cur = xt_selectedId[lang];
+    if(!cur || !list.some(t => t.id === cur)) cur = list[0].id;
+    xt_selectedId[lang] = cur;
+    xt_select.value = cur;
+
+    const t = xtFind(lang, cur);
+    xt_subject.value = t?.subject || "";
+    xt_body.value = t?.body || "";
+
+    xt_del.disabled = false;
+    xt_send.disabled = false;
+  }
+
+  const remaining = XT_MAX - list.length;
+  xt_hint.textContent = `Max ${XT_MAX} extra templates per language. Remaining: ${remaining}.`;
+  xt_add.disabled = list.length >= XT_MAX;
+}
+
+function xtUpdateCurrent(patch){
+  const lang = xtCurLang();
+  const list = xtList(lang);
+  const id = xt_selectedId[lang];
+  const idx = list.findIndex(t => t.id === id);
+  if(idx < 0) return;
+
+  list[idx] = { ...list[idx], ...patch };
+  xt_store[lang] = list;
+  xtSave();
+}
+
+function xtAdd(){
+  const lang = xtCurLang();
+  const list = xtList(lang);
+  if(list.length >= XT_MAX) return;
+
+  const t = {
+    id: crypto.randomUUID(),
+    name: `Extra template ${list.length + 1}`,
+    subject: "",
+    body: ""
+  };
+  list.push(t);
+  xt_store[lang] = list;
+  xtSave();
+
+  xt_selectedId[lang] = t.id;
+  xtRender();
+  xt_subject.focus();
+}
+
+function xtDel(){
+  const lang = xtCurLang();
+  const list = xtList(lang);
+  const id = xt_selectedId[lang];
+  const idx = list.findIndex(t => t.id === id);
+  if(idx < 0) return;
+
+  list.splice(idx, 1);
+  xt_store[lang] = list;
+  xtSave();
+
+  xt_selectedId[lang] = list[0]?.id || null;
+  xtRender();
+}
+
+async function xtSend(){
+  if(!isMasterLogin() || !selected) return;
+
+  const to = getAny(selected, ["Mail Customer","MailCustomer"]);
+  if(!to){
+    mailMsg.innerHTML = "<span style='color:var(--warn)'>No customer email found.</span>";
+    return;
+  }
+
+  const lang = xtCurLang();
+  const id = xt_selectedId[lang];
+  const t = xtFind(lang, id);
+  if(!t){
+    mailMsg.innerHTML = "<span style='color:var(--warn)'>No template selected.</span>";
+    return;
+  }
+
+  openMailPicker({
+    to,
+    subject: t.subject || "",
+    body: t.body || "",
+    afterOpen: async () => {
+      mailMsg.textContent = "Mail opened. Saving Completed…";
+      const res = await setCompleted(selected.rowId, true);
+
+      if(!res.ok){
+        mailMsg.innerHTML =
+          `<span style="color:var(--warn)">Mail opened ✓ (could not save Completed: ${escapeHTML(res.error || "Unknown")})</span>`;
+        return;
+      }
+
+      mailMsg.innerHTML = `<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>`;
+      await loadOrders();
+    }
+  });
+}
+
 /* mail supplier */
 function mailSupplierRow(rowId, lang){
   if(!isMasterLogin()) return;
@@ -1005,7 +1349,7 @@ function mailSupplierRow(rowId, lang){
   openMailPicker({ to, subject: tpl.subject, body: tpl.body });
 }
 
-/* mail customer */
+/* mail customer (TOP buttons) */
 async function mailCustomer(lang){
   if(!isMasterLogin() || !selected) return;
 
@@ -1015,12 +1359,19 @@ async function mailCustomer(lang){
     return;
   }
 
-  const tpl = customerMailTemplate(lang);
+  // ✅ use edited top template if present, otherwise fallback
+  if(!topStore) topStore = topLoad();
+  const s = topStore[lang];
+  const useEdited = s?.edited && (s.subject || s.body);
+
+  const tpl = useEdited
+    ? { subject: s.subject, body: s.body }
+    : customerMailTemplate(lang);
 
   openMailPicker({
     to,
-    subject: tpl.subject,
-    body: tpl.body,
+    subject: tpl.subject || "",
+    body: tpl.body || "",
     afterOpen: async () => {
       mailMsg.textContent = "Mail opened. Saving Completed…";
       const res = await setCompleted(selected.rowId, true);
@@ -1088,6 +1439,19 @@ async function bootstrapAfterLogin_(){
 
   if(isMasterLogin()) await loadSuppliers_();
   await loadOrders();
+
+  // init template UI for master
+  if(isMasterLogin()){
+    topStore = topLoad();
+    top_lang.value = "en";
+    topRender();
+
+    xt_store = xtLoad();
+    xt_lang.value = "en";
+    xtRender();
+  } else {
+    if(extraTplWrap) extraTplWrap.classList.add("hidden");
+  }
 }
 
 function logout(){
@@ -1135,6 +1499,25 @@ newOrderToggle.addEventListener("click", ()=>{
   newOrderPlus.textContent = isHidden ? "+" : "–";
 });
 createBtn.addEventListener("click", createOrder);
+
+/* top templates editor events */
+top_lang.addEventListener("change", topRender);
+top_subject.addEventListener("input", topUpdateEdited);
+top_body.addEventListener("input", topUpdateEdited);
+top_fill.addEventListener("click", topFillFromOrder);
+top_reset.addEventListener("click", topResetLang);
+
+/* extra templates events */
+xt_lang.addEventListener("change", xtRender);
+xt_select.addEventListener("change", ()=>{
+  xt_selectedId[xtCurLang()] = xt_select.value || null;
+  xtRender();
+});
+xt_add.addEventListener("click", xtAdd);
+xt_del.addEventListener("click", xtDel);
+xt_subject.addEventListener("input", ()=> xtUpdateCurrent({ subject: xt_subject.value }));
+xt_body.addEventListener("input", ()=> xtUpdateCurrent({ body: xt_body.value }));
+xt_send.addEventListener("click", xtSend);
 </script>
 </body>
 </html>
