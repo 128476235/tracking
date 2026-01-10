@@ -1,4 +1,3 @@
-<!-- Alleen de relevante volledige HTML (werkt standalone zoals je huidige) -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,56 +6,198 @@
   <title>Delivery Overview 📦</title>
   <style>
     :root{
-      --text:#0f172a; --muted:#64748b; --border:#e2e8f0;
-      --primary:#2563eb; --primary2:#1d4ed8;
-      --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+      --bg:#ffffff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+
+      --primary:#2563eb;
+      --primary2:#1d4ed8;
+
+      --ok:#16a34a;
+      --warn:#d97706;
+      --bad:#dc2626;
+
       --soft:#f8fafc;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,#fff 0%, #f6f7fb 100%);color:var(--text);min-height:100vh;}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      background:linear-gradient(180deg,#ffffff 0%, #f6f7fb 100%);
+      color:var(--text);
+      min-height:100vh;
+    }
     .wrap{max-width:1120px;margin:0 auto;padding:26px 16px}
-    .card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:0 10px 22px rgba(2,6,23,.06);}
     header{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
     h1{font-size:18px;margin:0}
     .sub{color:var(--muted);font-size:13px;line-height:1.4}
-    .two{display:grid;grid-template-columns:440px 1fr;gap:14px;align-items:stretch;}
-    @media (max-width: 980px){.two{grid-template-columns:1fr}}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 10px 22px rgba(2,6,23,.06);
+    }
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
     input, select, textarea{
-      width:100%;border:1px solid var(--border);background:#fff;color:var(--text);
-      padding:10px 12px;border-radius:12px;outline:none
+      width:100%;
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      outline:none
     }
-    input:focus, select:focus, textarea:focus{border-color:rgba(37,99,235,.55);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+    input:focus, select:focus, textarea:focus{
+      border-color:rgba(37,99,235,.55);
+      box-shadow:0 0 0 4px rgba(37,99,235,.12)
+    }
     textarea{resize:vertical}
-    .btn{border:1px solid var(--border);background:#fff;color:var(--text);padding:10px 12px;border-radius:12px;cursor:pointer;white-space:nowrap;}
-    .btn.primary{background:linear-gradient(180deg,var(--primary),var(--primary2));border-color:transparent;color:#fff;box-shadow:0 8px 16px rgba(37,99,235,.18);}
-    .btn:disabled{opacity:.55;cursor:not-allowed}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .hidden{display:none !important}
-    .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.5}
-    .divider{height:1px;background:var(--border);margin:12px 0}
-    .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.2px}
-    .toggleRow{
-      display:flex;justify-content:space-between;align-items:center;gap:10px;
-      padding:10px 12px;border:1px dashed var(--border);background:var(--soft);
-      border-radius:12px;cursor:pointer;user-select:none;
+
+    /* ✅ consistent select styling */
+    select{
+      appearance:none;
+      -webkit-appearance:none;
+      -moz-appearance:none;
+      background-image:none;
     }
-    .plus{font-weight:800;font-size:18px;line-height:1;color:var(--muted)}
-    .flag{font-size:14px;line-height:1}
-    .table{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:#fff;}
-    .table th,.table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;text-align:left;vertical-align:middle;}
-    .table th{color:var(--muted);font-weight:600;background:var(--soft);}
+
+    .btn{
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      white-space:nowrap;
+      transition:transform .05s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{
+      background:linear-gradient(180deg,var(--primary),var(--primary2));
+      border-color:transparent;
+      color:#fff;
+      box-shadow:0 8px 16px rgba(37,99,235,.18);
+    }
+    .btn.primary:hover{box-shadow:0 10px 20px rgba(37,99,235,.22)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+
+    .table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid var(--border);
+      background:#fff;
+    }
+    .table th,.table td{
+      padding:10px 12px;
+      border-bottom:1px solid var(--border);
+      font-size:13px;
+      vertical-align:middle;
+      text-align:left;
+    }
+    .table th{
+      color:var(--muted);
+      font-weight:600;
+      background:var(--soft);
+    }
     .table tr:last-child td{border-bottom:none}
-    .actionsCell{white-space:nowrap;display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
-    .customerOneLine{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:560px;}
-    .smallLine{margin-top:3px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .kvRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin:10px 0 6px}
-    .kvLabel{color:var(--muted);font-size:12px}
-    .kvValue{font-size:16px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .status{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--muted);background:#fff;}
+
+    .muted{color:var(--muted)}
+    .status{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      background:#fff;
+    }
     .dot{width:8px;height:8px;border-radius:999px;background:var(--warn)}
     .status.ready .dot{background:var(--ok)}
     .status.missing .dot{background:var(--bad)}
+
+    .two{
+      display:grid;
+      grid-template-columns: 440px 1fr;
+      gap:14px;
+      align-items:stretch;
+    }
+    .colStretch{height:100%; display:flex; flex-direction:column;}
+    @media (max-width: 980px){.two{grid-template-columns:1fr}}
+
+    .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.5}
+    .center{min-height:100vh;display:grid;place-items:center;padding:18px}
+    .hidden{display:none !important}
+
+    .kvRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin:10px 0 6px}
+    .kvBlock{min-width:0}
+    .kvLabel{color:var(--muted);font-size:12px}
+    .kvValue{
+      font-size:16px;
+      font-weight:650;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis
+    }
+
+    .loginCard{max-width:520px;width:100%;padding:18px}
+    .loginHeader{text-align:center;margin-bottom:10px}
+    .loginForm{max-width:380px;margin:0 auto}
+    .loginActions{justify-content:center}
+    .loginMsg{text-align:center;min-height:18px}
+
+    .smallLine{
+      margin-top:3px;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .customerOneLine{
+      font-weight:650;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:560px;
+    }
+
+    .actionsCell{
+      white-space:nowrap;
+      display:flex;
+      gap:8px;
+      justify-content:flex-start;
+      align-items:center;
+      flex-wrap:nowrap;
+    }
+
+    .statusCell{text-align:center}
+    .statusWrap{width:100%;display:flex;justify-content:center;}
+
+    .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.2px}
+    .divider{height:1px;background:var(--border);margin:12px 0}
+
+    .toggleRow{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+      padding:10px 12px;
+      border:1px dashed var(--border);
+      background:var(--soft);
+      border-radius:12px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .plus{font-weight:800;font-size:18px;line-height:1;color:var(--muted)}
+
+    .flag{font-size:14px;line-height:1}
 
     /* saved independent templates list */
     .tmplRow{
@@ -74,24 +215,28 @@
 
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     @media (max-width:520px){.grid2{grid-template-columns:1fr}}
+    .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end}
   </style>
 </head>
 <body>
 
-<section id="loginView" style="min-height:100vh;display:grid;place-items:center;padding:18px">
-  <div class="card" style="max-width:520px;width:100%;padding:18px">
-    <div style="text-align:center;margin-bottom:10px">
+<section id="loginView" class="center">
+  <div class="card loginCard">
+    <div class="loginHeader">
       <h1>Delivery Overview 📦</h1>
       <div class="sub" style="margin-top:6px">Login with your Supplier Key or Master Key.</div>
     </div>
-    <div style="max-width:380px;margin:0 auto">
+
+    <div class="loginForm">
       <label for="keyInput">Key</label>
       <input id="keyInput" type="password" autocomplete="current-password" placeholder="Enter key…" />
-      <div class="row" style="margin-top:12px;justify-content:center">
+
+      <div class="row loginActions" style="margin-top:12px">
         <button id="loginBtn" class="btn primary" type="button">Login</button>
         <button id="clearBtn" class="btn" type="button">Clear</button>
       </div>
-      <div id="loginMsg" class="hint" style="text-align:center;min-height:18px"></div>
+
+      <div id="loginMsg" class="hint loginMsg"></div>
     </div>
   </div>
 </section>
@@ -103,7 +248,7 @@
         <h1>Delivery Overview 📦</h1>
         <div class="sub">Open an order to enter / check shipment details</div>
       </div>
-      <div class="row" style="justify-content:flex-end">
+      <div class="row topRightTools">
         <button id="reloadBtn" class="btn" type="button">Reload</button>
         <button id="logoutBtn" class="btn" type="button">Logout</button>
       </div>
@@ -111,26 +256,31 @@
 
     <div class="two">
       <!-- LEFT -->
-      <section class="card" style="display:flex;flex-direction:column">
+      <section class="card colStretch">
         <div id="noSelection" class="hint">Open an order from the table.</div>
 
-        <div id="form" class="hidden" style="flex:1;display:flex;flex-direction:column">
-          <div class="kvRow">
-            <div style="flex:1;min-width:0">
+        <div id="form" class="hidden" style="flex:1; display:flex; flex-direction:column;">
+          <div class="kvRow" style="align-items:flex-start">
+            <div class="kvBlock" style="flex:1; min-width:0">
               <div class="kvLabel">Customer</div>
               <div class="kvValue" id="customerLabel">—</div>
               <div id="supplierLine" class="smallLine hidden"></div>
               <div id="orderLine" class="smallLine hidden"></div>
             </div>
-            <div>
-              <span id="statusBadge" class="status missing"><span class="dot"></span><span id="statusText">No selection</span></span>
+
+            <div class="kvBlock" style="flex:0 0 auto; display:flex; align-items:flex-start">
+              <span id="statusBadge" class="status missing">
+                <span class="dot"></span><span id="statusText">No selection</span>
+              </span>
             </div>
           </div>
 
           <label>Carrier</label>
           <input id="carrier" />
+
           <label>Tracking number</label>
           <input id="trackingNumber" />
+
           <label>Tracking link</label>
           <input id="trackingLink" />
 
@@ -148,6 +298,15 @@
               <button class="btn" id="mc_nl"><span class="flag">🇳🇱</span> NL</button>
               <button class="btn" id="mc_de"><span class="flag">🇩🇪</span> DE</button>
               <button class="btn" id="mc_fr"><span class="flag">🇫🇷</span> FR</button>
+            </div>
+
+            <!-- ✅ Tokens (live values from opened customer) -->
+            <div id="tokenBar" class="row" style="margin-top:10px;gap:8px">
+              <button class="btn" type="button" data-token="{{Customer}}">{{Customer}} <span class="muted" id="tvCustomer"></span></button>
+              <button class="btn" type="button" data-token="{{OrderID}}">{{OrderID}} <span class="muted" id="tvOrderID"></span></button>
+              <button class="btn" type="button" data-token="{{Carrier}}">{{Carrier}} <span class="muted" id="tvCarrier"></span></button>
+              <button class="btn" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}} <span class="muted" id="tvTrackingnumber"></span></button>
+              <button class="btn" type="button" data-token="{{Trackinglink}}">{{Trackinglink}} <span class="muted" id="tvTrackinglink"></span></button>
             </div>
 
             <!-- ✅ Saved independent templates under flags -->
@@ -176,7 +335,7 @@
                   </select>
                 </div>
                 <div>
-                  <label style="margin-top:0">Template name (Label)</label>
+                  <label style="margin-top:0">Template name</label>
                   <input id="indepLabel" placeholder="e.g. Shipping update" />
                 </div>
               </div>
@@ -201,7 +360,7 @@
               <div class="plus" id="custEditPlus">+</div>
             </div>
             <div id="custEditBody" class="hidden" style="margin-top:10px">
-              <div class="row" style="justify-content:space-between">
+              <div class="row" style="justify-content:space-between;align-items:flex-end">
                 <div style="flex:1;min-width:220px">
                   <label style="margin-top:0">Language</label>
                   <select id="custLang">
@@ -211,7 +370,7 @@
                     <option value="fr">FR</option>
                   </select>
                 </div>
-                <div class="row" style="justify-content:flex-end;flex-wrap:nowrap;margin-top:22px">
+                <div class="row" style="justify-content:flex-end;flex-wrap:nowrap">
                   <button id="custLoad" class="btn" type="button">Load</button>
                   <button id="custSave" class="btn primary" type="button">Save</button>
                 </div>
@@ -231,7 +390,7 @@
               <div class="plus" id="supEditPlus">+</div>
             </div>
             <div id="supEditBody" class="hidden" style="margin-top:10px">
-              <div class="row" style="justify-content:space-between">
+              <div class="row" style="justify-content:space-between;align-items:flex-end">
                 <div style="flex:1;min-width:220px">
                   <label style="margin-top:0">Language</label>
                   <select id="supLang">
@@ -239,7 +398,7 @@
                     <option value="nl">NL</option>
                   </select>
                 </div>
-                <div class="row" style="justify-content:flex-end;flex-wrap:nowrap;margin-top:22px">
+                <div class="row" style="justify-content:flex-end;flex-wrap:nowrap">
                   <button id="supLoad" class="btn" type="button">Load</button>
                   <button id="supSave" class="btn primary" type="button">Save</button>
                 </div>
@@ -260,12 +419,12 @@
       </section>
 
       <!-- RIGHT -->
-      <section class="card">
+      <section class="card colStretch">
         <table class="table">
           <thead>
             <tr>
               <th style="width:60%">Customer</th>
-              <th style="width:170px">Status</th>
+              <th style="width:170px;text-align:center">Status</th>
               <th style="width:300px">Action</th>
             </tr>
           </thead>
@@ -273,40 +432,49 @@
             <tr><td colspan="3" class="muted">Loading…</td></tr>
           </tbody>
         </table>
+
+        <div style="flex:1"></div>
       </section>
     </div>
   </div>
 </section>
 
-<!-- Mail picker modal -->
+<!-- ✅ Mail picker modal -->
 <div id="mailPicker" class="hidden" style="
   position:fixed;inset:0;background:rgba(15,23,42,.35);
   display:grid;place-items:center;padding:18px;z-index:9999">
   <div class="card" style="max-width:420px;width:100%">
     <div style="font-weight:700;font-size:14px">Choose mail app</div>
+
     <div class="row" style="margin-top:12px; justify-content:center">
       <button id="pickGmail" class="btn" type="button">Gmail</button>
       <button id="pickApple" class="btn" type="button">Apple Mail</button>
       <button id="pickCancel" class="btn primary" type="button">Cancel</button>
     </div>
+
     <div class="hint" id="pickHint"></div>
   </div>
 </div>
 
 <script>
-/* CONFIG */
-const API_BASE = "https://script.google.com/macros/s/AKfycbwABxwxQxcRcVmr_baVx626raxotU_mp-ilbj1P6ONwoNtG3A5ztZS1gGc7Oo6OeDfr8w/exec";
+/* =========================================================
+   CONFIG
+   ========================================================= */
+const API_BASE = "PASTE_YOUR_SCRIPT_EXEC_URL_HERE";
 const MASTER_SUPPLIER_NAME = "ALL";
-
-/* fixed label for customer/supplier main templates */
 const DEFAULT_LABEL = "DEFAULT";
 
-/* helper DOM */
 const $ = (id)=>document.getElementById(id);
+
+/* =========================================================
+   UTILS
+   ========================================================= */
 function escapeHTML(s){
-  return String(s||"").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+  return String(s || "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
 }
-function normalizeKey(k){ return String(k||"").trim().toLowerCase().replace(/\s+/g," "); }
+function normalizeKey(k){
+  return String(k || "").trim().toLowerCase().replace(/\s+/g," ");
+}
 function getAny(obj, wantedKeys){
   if(!obj) return "";
   const map = {};
@@ -315,77 +483,74 @@ function getAny(obj, wantedKeys){
     const hit = map[normalizeKey(want)];
     if(hit){
       const v = obj[hit];
-      if(v!==undefined && v!==null && String(v).trim()!=="") return String(v).trim();
+      if(v !== undefined && v !== null && String(v).trim() !== "") return String(v).trim();
     }
   }
   return "";
 }
-function isMasterLogin(){ return String(supplier||"").trim().toLowerCase() === "all"; }
+function isMasterLogin(){
+  return String(supplier || "").trim().toLowerCase() === String(MASTER_SUPPLIER_NAME).toLowerCase();
+}
 function jsonp(url){
   return new Promise((resolve, reject) => {
     const cb = "cb_" + Math.random().toString(36).slice(2);
     const script = document.createElement("script");
-    window[cb] = (data)=>{ try{delete window[cb];}catch(_){} script.remove(); resolve(data); };
+
+    window[cb] = (data) => {
+      try { delete window[cb]; } catch(_) {}
+      script.remove();
+      resolve(data);
+    };
+
     script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
-    script.onerror = ()=>{ try{delete window[cb];}catch(_){} script.remove(); reject(new Error("JSONP failed")); };
+    script.onerror = () => {
+      try { delete window[cb]; } catch(_) {}
+      script.remove();
+      reject(new Error("JSONP failed"));
+    };
+
     document.head.appendChild(script);
   });
 }
+function trackingComplete(o){
+  return !!(getAny(o,["Carrier"]) && getAny(o,["Trackingnumber","Tracking Number"]) && getAny(o,["Trackinglink","Tracking Link"]));
+}
+function setStatus(text, ok){
+  $("statusBadge").classList.remove("ready","missing");
+  $("statusBadge").classList.add(ok ? "ready" : "missing");
+  $("statusText").textContent = text;
+}
 
-/* mail picker */
-const mailPicker = $("mailPicker");
-const pickGmail = $("pickGmail");
-const pickApple = $("pickApple");
-const pickCancel = $("pickCancel");
-let pendingMail = null;
-
-function openGmailCompose(to, subject, body){
-  const gmailUrl =
-    "https://mail.google.com/mail/?view=cm&fs=1" +
-    `&to=${encodeURIComponent(to)}` +
-    `&su=${encodeURIComponent(subject)}` +
-    `&body=${encodeURIComponent(body)}`;
-  window.open(gmailUrl, "_blank", "noopener,noreferrer");
-}
-function openAppleMail(to, subject, body){
-  window.location.href =
-    "mailto:" + encodeURIComponent(to) +
-    `?subject=${encodeURIComponent(subject)}` +
-    `&body=${encodeURIComponent(body)}`;
-}
-function openMailPicker(payload){
-  pendingMail = payload;
-  mailPicker.classList.remove("hidden");
-}
-function closeMailPicker(){
-  pendingMail = null;
-  mailPicker.classList.add("hidden");
-}
-pickGmail.addEventListener("click", ()=>{
-  if(!pendingMail) return;
-  openGmailCompose(pendingMail.to, pendingMail.subject, pendingMail.body);
-  closeMailPicker();
-});
-pickApple.addEventListener("click", ()=>{
-  if(!pendingMail) return;
-  openAppleMail(pendingMail.to, pendingMail.subject, pendingMail.body);
-  closeMailPicker();
-});
-pickCancel.addEventListener("click", closeMailPicker);
-mailPicker.addEventListener("click", (e)=>{ if(e.target===mailPicker) closeMailPicker(); });
-
-/* state */
+/* =========================================================
+   STATE
+   ========================================================= */
 let supplier = "";
 let supplierKey = "";
 let orders = [];
 let selected = null;
 
-/* template caches */
-let indepTemplates = [];   // from "Mail templates"
-let customerTemplates = []; // from "Customer"
-let supplierTemplates = []; // from "Supplier"
+let indepTemplates = [];
+let customerTemplates = [];
+let supplierTemplates = [];
 
-/* token replacement */
+/* =========================================================
+   LOGIN VIEW
+   ========================================================= */
+function showLogin(){
+  $("portalView").classList.add("hidden");
+  $("loginView").classList.remove("hidden");
+  $("loginMsg").textContent = "";
+  $("keyInput").value = "";
+  setTimeout(()=> $("keyInput").focus(), 50);
+}
+function showPortal(){
+  $("loginView").classList.add("hidden");
+  $("portalView").classList.remove("hidden");
+}
+
+/* =========================================================
+   TOKENS (live, based on opened order + current tracking inputs)
+   ========================================================= */
 function tokenMap(){
   return {
     "{{Customer}}": getAny(selected, ["Customer"]) || "",
@@ -401,8 +566,145 @@ function applyTokens(txt){
   for(const k of Object.keys(m)) out = out.split(k).join(String(m[k]||""));
   return out;
 }
+function shortVal_(s){
+  const v = String(s || "").trim();
+  if(!v) return "—";
+  return v.length > 24 ? (v.slice(0, 24) + "…") : v;
+}
+function updateTokenPreview_(){
+  const m = selected ? tokenMap() : {
+    "{{Customer}}":"", "{{OrderID}}":"", "{{Carrier}}":"", "{{Trackingnumber}}":"", "{{Trackinglink}}":""
+  };
+  const set = (id, val)=>{
+    const el = $(id);
+    if(el) el.textContent = " " + shortVal_(val);
+  };
+  set("tvCustomer", m["{{Customer}}"]);
+  set("tvOrderID", m["{{OrderID}}"]);
+  set("tvCarrier", m["{{Carrier}}"]);
+  set("tvTrackingnumber", m["{{Trackingnumber}}"]);
+  set("tvTrackinglink", m["{{Trackinglink}}"]);
+}
 
-/* flags */
+let lastFocusedField = null;
+function bindFocusTracking_(){
+  document.addEventListener("focusin", (e)=>{
+    const el = e.target;
+    if(!el) return;
+    const tag = (el.tagName || "").toLowerCase();
+    if(tag === "input" || tag === "textarea"){
+      lastFocusedField = el;
+    }
+  });
+}
+function insertAtCursor_(el, text){
+  if(!el) return;
+  const start = (typeof el.selectionStart === "number") ? el.selectionStart : el.value.length;
+  const end = (typeof el.selectionEnd === "number") ? el.selectionEnd : el.value.length;
+  const before = el.value.slice(0, start);
+  const after = el.value.slice(end);
+  el.value = before + text + after;
+  const pos = start + text.length;
+  if(el.setSelectionRange) el.setSelectionRange(pos, pos);
+  if(el.focus) el.focus();
+}
+function bindTokenButtons_(){
+  const bar = $("tokenBar");
+  if(!bar) return;
+  bar.querySelectorAll("button[data-token]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const token = btn.getAttribute("data-token");
+      const fallback =
+        $("indepBody") || $("custBody") || $("supBody");
+      const target = lastFocusedField || fallback;
+      if(!target) return;
+      insertAtCursor_(target, token);
+    });
+  });
+}
+function bindTrackingLiveTokenUpdates_(){
+  const a = $("carrier");
+  const b = $("trackingNumber");
+  const c = $("trackingLink");
+  [a,b,c].forEach(el=>{
+    if(!el) return;
+    el.addEventListener("input", updateTokenPreview_);
+  });
+}
+
+/* =========================================================
+   MAIL PICKER (with afterOpen callback)
+   ========================================================= */
+const mailPicker = $("mailPicker");
+const pickGmail = $("pickGmail");
+const pickApple = $("pickApple");
+const pickCancel = $("pickCancel");
+let pendingMail = null;
+
+function openGmailCompose(to, subject, body){
+  const gmailUrl =
+    "https://mail.google.com/mail/?view=cm&fs=1" +
+    `&to=${encodeURIComponent(to)}` +
+    `&su=${encodeURIComponent(subject)}` +
+    `&body=${encodeURIComponent(body)}`;
+  window.open(gmailUrl, "_blank", "noopener,noreferrer");
+}
+function openAppleMail(to, subject, body){
+  const mailtoUrl =
+    "mailto:" + encodeURIComponent(to) +
+    `?subject=${encodeURIComponent(subject)}` +
+    `&body=${encodeURIComponent(body)}`;
+  window.location.href = mailtoUrl;
+}
+function openMailPicker(payload){
+  pendingMail = payload;
+  $("pickHint").textContent = "";
+  mailPicker.classList.remove("hidden");
+}
+function closeMailPicker(){
+  pendingMail = null;
+  mailPicker.classList.add("hidden");
+}
+function openViaGmail(){
+  if(!pendingMail) return;
+  openGmailCompose(pendingMail.to, pendingMail.subject, pendingMail.body);
+  const cb = pendingMail.afterOpen;
+  closeMailPicker();
+  if(typeof cb === "function") cb();
+}
+function openViaApple(){
+  if(!pendingMail) return;
+  openAppleMail(pendingMail.to, pendingMail.subject, pendingMail.body);
+  const cb = pendingMail.afterOpen;
+  closeMailPicker();
+  if(typeof cb === "function") cb();
+}
+pickGmail.addEventListener("click", openViaGmail);
+pickApple.addEventListener("click", openViaApple);
+pickCancel.addEventListener("click", closeMailPicker);
+mailPicker.addEventListener("click", (e)=>{ if(e.target === mailPicker) closeMailPicker(); });
+
+/* =========================================================
+   COMPLETED (after customer mail)
+   ========================================================= */
+async function setCompleted(rowId, val){
+  if(!isMasterLogin()) return { ok:false, error:"Not master" };
+
+  const completedValue = val ? "TRUE" : "FALSE";
+  const url = `${API_BASE}?action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&Completed=${encodeURIComponent(completedValue)}`;
+
+  try{
+    const data = await jsonp(url);
+    if(data && data.ok) return { ok:true };
+    return { ok:false, error: (data && data.error) ? String(data.error) : "Unknown" };
+  }catch(_){
+    return { ok:false, error:"Could not reach server" };
+  }
+}
+
+/* =========================================================
+   TEMPLATE HELPERS
+   ========================================================= */
 function flagForLang(lang){
   const l = String(lang||"").toLowerCase();
   if(l==="en") return "🇬🇧";
@@ -411,8 +713,16 @@ function flagForLang(lang){
   if(l==="fr") return "🇫🇷";
   return "🏳️";
 }
+function findTemplate(list, lang, label){
+  return list.find(t =>
+    String(t.language||"").toLowerCase() === String(lang||"").toLowerCase() &&
+    String(t.label||"").trim() === String(label||"").trim()
+  ) || null;
+}
 
-/* API load templates */
+/* =========================================================
+   LOAD ALL TEMPLATES (master-only)
+   ========================================================= */
 async function loadAllTemplates_(){
   if(!isMasterLogin()) return;
 
@@ -430,7 +740,9 @@ async function loadAllTemplates_(){
   renderIndepList_();
 }
 
-/* render independent templates list under flags */
+/* =========================================================
+   RENDER INDEPENDENT LIST (under customer flags)
+   ========================================================= */
 function renderIndepList_(){
   const wrap = $("indepList");
   const msg = $("indepMsg");
@@ -451,7 +763,6 @@ function renderIndepList_(){
     return;
   }
 
-  // show ALL independent templates (any language), sorted by label then language
   const list = indepTemplates.slice().sort((x,y)=>{
     const a = String(x.label||"").localeCompare(String(y.label||""));
     if(a!==0) return a;
@@ -494,7 +805,9 @@ function renderIndepList_(){
   });
 }
 
-/* upsert/delete independent template */
+/* =========================================================
+   INDEPENDENT UPSERT / DELETE
+   ========================================================= */
 async function indepSave_(){
   const lang = ($("indepLang").value||"en").toLowerCase();
   const label = ($("indepLabel").value||"").trim();
@@ -502,7 +815,7 @@ async function indepSave_(){
   const body = ($("indepBody").value||"").trim();
   const msg = $("indepSaveMsg");
 
-  if(!label){ msg.innerHTML = `<span style="color:var(--warn)">Label is required.</span>`; return; }
+  if(!label){ msg.innerHTML = `<span style="color:var(--warn)">Template name is required.</span>`; return; }
   if(!subject && !body){ msg.innerHTML = `<span style="color:var(--warn)">Add subject and/or body.</span>`; return; }
 
   const existing = indepTemplates.find(t => String(t.label||"")===label && String(t.language||"").toLowerCase()===lang);
@@ -527,7 +840,7 @@ async function indepDelete_(){
   const lang = ($("indepLang").value||"en").toLowerCase();
   const label = ($("indepLabel").value||"").trim();
   const msg = $("indepSaveMsg");
-  if(!label){ msg.innerHTML = `<span style="color:var(--warn)">Enter label to delete.</span>`; return; }
+  if(!label){ msg.innerHTML = `<span style="color:var(--warn)">Enter template name to delete.</span>`; return; }
 
   const existing = indepTemplates.find(t => String(t.label||"")===label && String(t.language||"").toLowerCase()===lang);
   if(!existing){ msg.innerHTML = `<span style="color:var(--warn)">Not found for this language.</span>`; return; }
@@ -543,11 +856,9 @@ async function indepDelete_(){
   await loadAllTemplates_();
 }
 
-/* customer edit load/save (tab Customer, label DEFAULT) */
-function findTemplate(list, lang, label){
-  return list.find(t => String(t.language||"").toLowerCase()===String(lang||"").toLowerCase()
-    && String(t.label||"").trim()===String(label||"").trim()) || null;
-}
+/* =========================================================
+   CUSTOMER EDIT (DEFAULT)
+   ========================================================= */
 async function custLoad_(){
   const lang = ($("custLang").value||"en").toLowerCase();
   const t = findTemplate(customerTemplates, lang, DEFAULT_LABEL);
@@ -560,6 +871,7 @@ async function custSave_(){
   const subject = ($("custSubject").value||"").trim();
   const body = ($("custBody").value||"").trim();
   const msg = $("custMsg");
+
   if(!subject && !body){ msg.innerHTML = `<span style="color:var(--warn)">Add subject and/or body.</span>`; return; }
 
   const existing = findTemplate(customerTemplates, lang, DEFAULT_LABEL);
@@ -581,7 +893,9 @@ async function custSave_(){
   await loadAllTemplates_();
 }
 
-/* supplier edit load/save (tab Supplier, label DEFAULT) */
+/* =========================================================
+   SUPPLIER EDIT (DEFAULT)
+   ========================================================= */
 async function supLoad_(){
   const lang = ($("supLang").value||"en").toLowerCase();
   const t = findTemplate(supplierTemplates, lang, DEFAULT_LABEL);
@@ -594,6 +908,7 @@ async function supSave_(){
   const subject = ($("supSubject").value||"").trim();
   const body = ($("supBody").value||"").trim();
   const msg = $("supMsg");
+
   if(!subject && !body){ msg.innerHTML = `<span style="color:var(--warn)">Add subject and/or body.</span>`; return; }
 
   const existing = findTemplate(supplierTemplates, lang, DEFAULT_LABEL);
@@ -615,98 +930,230 @@ async function supSave_(){
   await loadAllTemplates_();
 }
 
-/* mail customer using Customer tab DEFAULT */
+/* =========================================================
+   MAIL CUSTOMER (uses Customer DEFAULT + saves Completed after opening)
+   ========================================================= */
 async function mailCustomer(lang){
   if(!isMasterLogin() || !selected) return;
+
   const to = getAny(selected, ["Mail Customer","MailCustomer"]);
-  if(!to){ $("mailMsg").innerHTML = `<span style="color:var(--warn)">No customer email found.</span>`; return; }
+  if(!to){
+    $("mailMsg").innerHTML = `<span style="color:var(--warn)">No customer email found.</span>`;
+    return;
+  }
 
   const t = findTemplate(customerTemplates, lang, DEFAULT_LABEL) || { subject:"", body:"" };
-  openMailPicker({ to, subject: applyTokens(t.subject||""), body: applyTokens(t.body||"") });
-}
 
-/* toggles */
-function setupToggle(toggleId, bodyId, plusId){
-  const t = $(toggleId), b = $(bodyId), p = $(plusId);
-  t.addEventListener("click", ()=>{
-    const isHidden = b.classList.toggle("hidden");
-    p.textContent = isHidden ? "+" : "–";
+  openMailPicker({
+    to,
+    subject: applyTokens(t.subject||""),
+    body: applyTokens(t.body||""),
+    afterOpen: async () => {
+      $("mailMsg").textContent = "Mail opened. Saving Completed…";
+      const res = await setCompleted(selected.rowId, true);
+
+      if(!res.ok){
+        $("mailMsg").innerHTML =
+          `<span style="color:var(--warn)">Mail opened ✓ (could not save Completed: ${escapeHTML(res.error || "Unknown")})</span>`;
+        return;
+      }
+
+      $("mailMsg").innerHTML = `<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>`;
+      await loadOrders();
+      renderIndepList_();
+    }
   });
 }
 
 /* =========================================================
-   Orders + login (minimal version; keep yours if preferred)
+   SUPPLIER MAIL BUTTONS (EN/NL) in table (master-only)
    ========================================================= */
-async function doLogin(){
-  const key = ($("keyInput").value||"").trim();
-  if(!key){ $("loginMsg").innerHTML = `<span style="color:var(--warn)">Please enter key.</span>`; return; }
+function supplierMailTemplate(lang, supplierName, customerName, orderId){
+  if(lang === "nl"){
+    return {
+      subject: `Tracking nodig – Order ${orderId || ""}`.trim(),
+      body:
+`Hi ${supplierName || "daar"},
 
-  $("loginBtn").disabled = true;
-  $("loginMsg").textContent = "Checking…";
-  try{
-    const data = await jsonp(`${API_BASE}?action=auth&supplierKey=${encodeURIComponent(key)}`);
-    if(!data || !data.ok || !data.supplier){
-      $("loginMsg").innerHTML = `<span style="color:var(--bad)">Invalid key.</span>`;
-      return;
-    }
-    supplierKey = key;
-    supplier = String(data.supplier).trim();
+Kun je de verzendgegevens aanleveren voor onderstaande order?
 
-    sessionStorage.setItem("supplier_key", supplierKey);
-    sessionStorage.setItem("supplier_name", supplier);
+Customer: ${customerName || "-"}
+Order ID: ${orderId || "-"}
 
-    $("loginView").classList.add("hidden");
-    $("portalView").classList.remove("hidden");
+Graag terugkoppelen met:
+- Carrier
+- Tracking number
+- Tracking link
 
-    if(isMasterLogin()) await loadAllTemplates_();
-    await loadOrders_();
-  }catch(_){
-    $("loginMsg").innerHTML = `<span style="color:var(--bad)">Could not reach server.</span>`;
-  }finally{
-    $("loginBtn").disabled = false;
+Dank!`
+    };
   }
+  return {
+    subject: `Tracking needed – Order ${orderId || ""}`.trim(),
+    body:
+`Hi ${supplierName || "there"},
+
+Could you please provide the shipment details for the order below?
+
+Customer: ${customerName || "-"}
+Order ID: ${orderId || "-"}
+
+Please reply with:
+- Carrier
+- Tracking number
+- Tracking link
+
+Thank you!`
+  };
 }
 
-async function loadOrders_(){
+function mailSupplierRow(rowId, lang){
+  if(!isMasterLogin()) return;
+
+  const row = orders.find(x => Number(x.rowId) === Number(rowId));
+  if(!row){
+    $("msg").innerHTML = "<span style='color:var(--warn)'>Row not found.</span>";
+    return;
+  }
+
+  const to = getAny(row, ["Mail Supplier","MailSupplier"]);
+  const supplierName = getAny(row, ["Supplier"]);
+  const customerName = getAny(row, ["Customer"]);
+  const orderId = getAny(row, ["Order ID","OrderID"]);
+
+  if(!to){
+    $("msg").innerHTML = "<span style='color:var(--warn)'>No supplier email found.</span>";
+    return;
+  }
+
+  const tpl = supplierMailTemplate(lang, supplierName, customerName, orderId);
+  openMailPicker({ to, subject: tpl.subject, body: tpl.body });
+}
+
+/* =========================================================
+   ORDERS (load + render)
+   ========================================================= */
+async function loadOrders(){
   selected = null;
   $("form").classList.add("hidden");
   $("noSelection").classList.remove("hidden");
-  $("tbody").innerHTML = `<tr><td colspan="3" class="muted">Loading…</td></tr>`;
+
+  $("customerLabel").textContent = "—";
+  $("supplierLine").classList.add("hidden");
+  $("orderLine").classList.add("hidden");
+  setStatus("No selection", false);
+
+  $("msg").textContent = "";
+  $("mailMsg").textContent = "";
+  $("indepMsg").textContent = "";
+  $("indepList").textContent = "Loading…";
+
+  $("tbody").innerHTML = "<tr><td colspan='3' class='muted'>Loading…</td></tr>";
 
   const url = isMasterLogin()
     ? `${API_BASE}?action=orders&supplier=ALL&supplierKey=${encodeURIComponent(supplierKey)}`
     : `${API_BASE}?action=orders&supplier=${encodeURIComponent(supplier)}`;
 
   const data = await jsonp(url);
+
   if(!data || !data.ok){
-    $("tbody").innerHTML = `<tr><td colspan="3" class="muted">${escapeHTML((data&&data.error)||"Error")}</td></tr>`;
+    const err = escapeHTML((data && data.error) || "Error");
+    $("tbody").innerHTML = `<tr><td colspan="3" class="muted">${err}</td></tr>`;
     return;
   }
-  orders = (data.orders||[]).slice();
-  orders.sort((a,b)=>Number(b.rowId||0)-Number(a.rowId||0));
-  renderOrders_();
+
+  orders = (data.orders || []).slice();
+  orders.sort((a,b)=> Number(b.rowId||0) - Number(a.rowId||0));
+  renderOrders();
 }
 
-function trackingComplete(o){
-  return !!(getAny(o,["Carrier"]) && getAny(o,["Trackingnumber","Tracking Number"]) && getAny(o,["Trackinglink","Tracking Link"]));
+function renderOrders(){
+  const tb = $("tbody");
+  tb.innerHTML = "";
+
+  if(!orders.length){
+    tb.innerHTML = `<tr><td colspan="3" class="muted">No orders found.</td></tr>`;
+    return;
+  }
+
+  for(const o of orders){
+    const ok = trackingComplete(o);
+    const sup = getAny(o,["Supplier"]);
+    const oid = getAny(o,["Order ID","OrderID"]);
+
+    const supplierLineHtml = (isMasterLogin() && sup) ? `<div class="smallLine">${escapeHTML(sup)}</div>` : "";
+    const orderLineHtml = (oid) ? `<div class="smallLine">Order ID: ${escapeHTML(oid)}</div>` : "";
+
+    const mailSupplierBtns = isMasterLogin()
+      ? `
+        <button class="btn" data-mailsupplier-en="${escapeHTML(o.rowId)}"><span class="flag">🇬🇧</span> EN</button>
+        <button class="btn" data-mailsupplier-nl="${escapeHTML(o.rowId)}"><span class="flag">🇳🇱</span> NL</button>
+      `
+      : "";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <div class="customerOneLine" title="${escapeHTML(getAny(o,["Customer"]))}">
+          ${escapeHTML(getAny(o,["Customer"]))}
+        </div>
+        ${supplierLineHtml}
+        ${orderLineHtml}
+      </td>
+      <td class="statusCell">
+        <div class="statusWrap">
+          <span class="status ${ok ? "ready":"missing"}">
+            <span class="dot"></span>${ok ? "Complete" : "Missing tracking"}
+          </span>
+        </div>
+      </td>
+      <td>
+        <div class="actionsCell">
+          <button class="btn" data-open="${escapeHTML(o.rowId)}">Open</button>
+          ${mailSupplierBtns}
+        </div>
+      </td>
+    `;
+    tb.appendChild(tr);
+  }
+
+  tb.querySelectorAll("button[data-open]").forEach(btn=>{
+    btn.addEventListener("click", ()=> openRow(Number(btn.dataset.open)));
+  });
+
+  if(isMasterLogin()){
+    tb.querySelectorAll("button[data-mailsupplier-en]").forEach(btn=>{
+      btn.addEventListener("click", ()=> mailSupplierRow(Number(btn.dataset.mailsupplierEn), "en"));
+    });
+    tb.querySelectorAll("button[data-mailsupplier-nl]").forEach(btn=>{
+      btn.addEventListener("click", ()=> mailSupplierRow(Number(btn.dataset.mailsupplierNl), "nl"));
+    });
+  }
 }
-function setStatus(text, ok){
-  $("statusBadge").classList.remove("ready","missing");
-  $("statusBadge").classList.add(ok ? "ready" : "missing");
-  $("statusText").textContent = text;
-}
-function openRow_(rowId){
-  selected = orders.find(x=>Number(x.rowId)===Number(rowId));
+
+function openRow(rowId){
+  selected = orders.find(x => Number(x.rowId) === rowId);
   if(!selected) return;
 
-  $("customerLabel").textContent = getAny(selected,["Customer"]) || "—";
-  const oid = getAny(selected,["Order ID","OrderID"]);
-  if(oid){ $("orderLine").textContent = "Order ID: " + oid; $("orderLine").classList.remove("hidden"); }
-  else $("orderLine").classList.add("hidden");
-
+  const c = getAny(selected,["Customer"]) || "—";
   const sup = getAny(selected,["Supplier"]);
-  if(isMasterLogin() && sup){ $("supplierLine").textContent = sup; $("supplierLine").classList.remove("hidden"); }
-  else $("supplierLine").classList.add("hidden");
+  const oid = getAny(selected,["Order ID","OrderID"]);
+
+  $("customerLabel").textContent = c;
+
+  if(isMasterLogin() && sup){
+    $("supplierLine").textContent = sup;
+    $("supplierLine").classList.remove("hidden");
+  } else {
+    $("supplierLine").classList.add("hidden");
+  }
+
+  if(oid){
+    $("orderLine").textContent = "Order ID: " + oid;
+    $("orderLine").classList.remove("hidden");
+  } else {
+    $("orderLine").classList.add("hidden");
+  }
 
   $("carrier").value = getAny(selected,["Carrier"]) || "";
   $("trackingNumber").value = getAny(selected,["Trackingnumber","Tracking Number"]) || "";
@@ -715,46 +1162,21 @@ function openRow_(rowId){
   $("noSelection").classList.add("hidden");
   $("form").classList.remove("hidden");
 
-  setStatus(trackingComplete(selected) ? "Complete" : "Missing tracking", trackingComplete(selected));
-  $("mailCustomerWrap").classList.toggle("hidden", !isMasterLogin());
+  const ok = trackingComplete(selected);
+  setStatus(ok ? "Complete" : "Missing tracking", ok);
 
+  $("mailCustomerWrap").classList.toggle("hidden", !isMasterLogin());
+  $("mailMsg").textContent = "";
+  $("msg").textContent = "";
+
+  updateTokenPreview_();
   renderIndepList_();
 }
 
-function renderOrders_(){
-  const tb = $("tbody");
-  tb.innerHTML = "";
-  if(!orders.length){
-    tb.innerHTML = `<tr><td colspan="3" class="muted">No orders.</td></tr>`;
-    return;
-  }
-  for(const o of orders){
-    const ok = trackingComplete(o);
-    const oid = getAny(o,["Order ID","OrderID"]);
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>
-        <div class="customerOneLine">${escapeHTML(getAny(o,["Customer"]))}</div>
-        ${oid ? `<div class="smallLine">Order ID: ${escapeHTML(oid)}</div>` : ""}
-      </td>
-      <td>
-        <span class="status ${ok?"ready":"missing"}"><span class="dot"></span>${ok?"Complete":"Missing tracking"}</span>
-      </td>
-      <td>
-        <div class="actionsCell">
-          <button class="btn" type="button" data-open="${escapeHTML(o.rowId)}">Open</button>
-        </div>
-      </td>
-    `;
-    tb.appendChild(tr);
-  }
-  tb.querySelectorAll("button[data-open]").forEach(btn=>{
-    btn.addEventListener("click", ()=>openRow_(btn.dataset.open));
-  });
-}
-
-/* save tracking */
-async function save_(){
+/* =========================================================
+   SAVE TRACKING
+   ========================================================= */
+async function save(){
   if(!selected) return;
 
   const Carrier = $("carrier").value.trim();
@@ -762,7 +1184,7 @@ async function save_(){
   const Trackinglink = $("trackingLink").value.trim();
 
   if(!Carrier || !Trackingnumber || !Trackinglink){
-    $("msg").innerHTML = `<span style="color:var(--warn)">Please fill in all fields.</span>`;
+    $("msg").innerHTML = "<span style='color:var(--warn)'>Please fill in all fields.</span>";
     return;
   }
 
@@ -780,46 +1202,102 @@ async function save_(){
       `&Trackinglink=${encodeURIComponent(Trackinglink)}`;
 
     const data = await jsonp(url);
+
     if(data && data.ok){
-      $("msg").innerHTML = `<span style="color:var(--ok)">Saved ✓</span>`;
-      await loadOrders_();
+      $("msg").innerHTML = "<span style='color:var(--ok)'>Saved ✓</span>";
+      await loadOrders();
     } else {
-      $("msg").innerHTML = `<span style="color:var(--bad)">Save failed.</span>`;
+      $("msg").innerHTML = "<span style='color:var(--bad)'>Save failed.</span>";
     }
   }catch(_){
-    $("msg").innerHTML = `<span style="color:var(--bad)">Could not reach server.</span>`;
+    $("msg").innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
   }finally{
     $("saveBtn").disabled = false;
   }
 }
 
-/* logout */
-function logout_(){
-  supplier=""; supplierKey=""; orders=[]; selected=null;
-  indepTemplates=[]; customerTemplates=[]; supplierTemplates=[];
-  sessionStorage.removeItem("supplier_key");
-  sessionStorage.removeItem("supplier_name");
-  $("portalView").classList.add("hidden");
-  $("loginView").classList.remove("hidden");
+/* =========================================================
+   LOGIN
+   ========================================================= */
+async function doLogin(withKey){
+  const key = (withKey ?? $("keyInput").value).trim();
+  if(!key){
+    $("loginMsg").innerHTML = "<span style='color:var(--warn)'>Please enter key.</span>";
+    return;
+  }
+
+  $("loginBtn").disabled = true;
+  $("loginMsg").textContent = "Checking…";
+
+  try{
+    const data = await jsonp(`${API_BASE}?action=auth&supplierKey=${encodeURIComponent(key)}`);
+    if(!data || !data.ok || !data.supplier){
+      $("loginMsg").innerHTML = "<span style='color:var(--bad)'>Invalid key.</span>";
+      return;
+    }
+
+    supplierKey = key;
+    supplier = String(data.supplier).trim();
+
+    sessionStorage.setItem("supplier_key", supplierKey);
+    sessionStorage.setItem("supplier_name", supplier);
+
+    showPortal();
+
+    if(isMasterLogin()) await loadAllTemplates_();
+    await loadOrders();
+  }catch(_){
+    $("loginMsg").innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
+  }finally{
+    $("loginBtn").disabled = false;
+  }
 }
 
-/* wire */
-$("loginBtn").addEventListener("click", doLogin);
+function logout(){
+  supplier = "";
+  supplierKey = "";
+  orders = [];
+  selected = null;
+
+  indepTemplates = [];
+  customerTemplates = [];
+  supplierTemplates = [];
+
+  sessionStorage.removeItem("supplier_key");
+  sessionStorage.removeItem("supplier_name");
+  showLogin();
+}
+
+/* =========================================================
+   TOGGLES
+   ========================================================= */
+function setupToggle(toggleId, bodyId, plusId){
+  const t = $(toggleId), b = $(bodyId), p = $(plusId);
+  t.addEventListener("click", ()=>{
+    const isHidden = b.classList.toggle("hidden");
+    p.textContent = isHidden ? "+" : "–";
+  });
+}
+
+/* =========================================================
+   INIT + EVENTS
+   ========================================================= */
+$("loginBtn").addEventListener("click", ()=> doLogin());
 $("clearBtn").addEventListener("click", ()=>{ $("keyInput").value=""; $("loginMsg").textContent=""; $("keyInput").focus(); });
 $("keyInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") doLogin(); });
 
 $("reloadBtn").addEventListener("click", async ()=>{
   if(isMasterLogin()) await loadAllTemplates_();
-  await loadOrders_();
+  await loadOrders();
   renderIndepList_();
 });
-$("logoutBtn").addEventListener("click", logout_);
-$("saveBtn").addEventListener("click", save_);
+$("logoutBtn").addEventListener("click", logout);
+$("saveBtn").addEventListener("click", save);
 
-$("mc_en").addEventListener("click", ()=>mailCustomer("en"));
-$("mc_nl").addEventListener("click", ()=>mailCustomer("nl"));
-$("mc_de").addEventListener("click", ()=>mailCustomer("de"));
-$("mc_fr").addEventListener("click", ()=>mailCustomer("fr"));
+$("mc_en").addEventListener("click", ()=> mailCustomer("en"));
+$("mc_nl").addEventListener("click", ()=> mailCustomer("nl"));
+$("mc_de").addEventListener("click", ()=> mailCustomer("de"));
+$("mc_fr").addEventListener("click", ()=> mailCustomer("fr"));
 
 setupToggle("indepAddToggle","indepAddBody","indepAddPlus");
 setupToggle("custEditToggle","custEditBody","custEditPlus");
@@ -834,18 +1312,27 @@ $("custSave").addEventListener("click", custSave_);
 $("supLoad").addEventListener("click", supLoad_);
 $("supSave").addEventListener("click", supSave_);
 
+/* bind token insertion + live updates */
+bindFocusTracking_();
+bindTokenButtons_();
+bindTrackingLiveTokenUpdates_();
+updateTokenPreview_();
+
 /* init session */
 (function init(){
   const k = sessionStorage.getItem("supplier_key") || "";
   const s = sessionStorage.getItem("supplier_name") || "";
   if(k && s){
-    supplierKey = k; supplier = s;
-    $("loginView").classList.add("hidden");
-    $("portalView").classList.remove("hidden");
+    supplierKey = k;
+    supplier = s;
+    showPortal();
     (async ()=>{
       if(isMasterLogin()) await loadAllTemplates_();
-      await loadOrders_();
+      await loadOrders();
+      updateTokenPreview_();
     })();
+  } else {
+    showLogin();
   }
 })();
 </script>
