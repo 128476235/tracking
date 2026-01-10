@@ -33,6 +33,21 @@
     }
     select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:none}
 
+    /* ✅ kill yellow autofill (Chrome/Safari) */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    textarea:-webkit-autofill,
+    textarea:-webkit-autofill:hover,
+    textarea:-webkit-autofill:focus,
+    select:-webkit-autofill,
+    select:-webkit-autofill:hover,
+    select:-webkit-autofill:focus{
+      -webkit-text-fill-color: var(--text) !important;
+      box-shadow: 0 0 0 1000px #fff inset !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
     .btn{
       border:1px solid var(--border);background:#fff;color:var(--text);
       padding:10px 12px;border-radius:12px;cursor:pointer;white-space:nowrap;
@@ -123,6 +138,7 @@
     .overlay{position:fixed;inset:0;background:rgba(15,23,42,.35);display:grid;place-items:center;padding:18px;z-index:9999}
 
     .tokenRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
     .savedTemplateRow{
       display:flex;justify-content:space-between;align-items:center;gap:10px;
       padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;
@@ -130,6 +146,9 @@
     .savedLeft{min-width:0;display:flex;gap:10px;align-items:center}
     .tplName{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .tplMeta{color:var(--muted);font-size:12px;white-space:nowrap}
+
+    /* ✅ more spacing between mail templates */
+    #indepTemplatesList{display:flex;flex-direction:column;gap:10px}
   </style>
 </head>
 <body>
@@ -242,8 +261,8 @@
 
             <div class="divider"></div>
 
-            <!-- ✅ General templates (saved) -->
-            <div class="sectionTitle" style="margin-bottom:8px">Mail templates</div>
+            <!-- General templates -->
+            <div class="sectionTitle" style="margin-bottom:10px">Mail templates</div>
             <div id="indepTemplatesList">
               <div class="muted" style="font-size:13px">No templates.</div>
             </div>
@@ -251,7 +270,7 @@
 
             <div class="divider"></div>
 
-            <!-- ✅ Add template (collapsed) -->
+            <!-- Add template -->
             <div class="toggleRow" id="addIndepToggle">
               <div class="sectionTitle">Add template</div>
               <div class="plusSym" id="addIndepPlus">+</div>
@@ -269,7 +288,7 @@
                 </div>
                 <div>
                   <label style="margin-top:0">Template name</label>
-                  <input id="indepLabel" placeholder="e.g. Shipping update" />
+                  <input id="indepLabel" />
                 </div>
               </div>
 
@@ -299,7 +318,7 @@
 
             <div class="divider"></div>
 
-            <!-- ✅ Edit Mail customer (collapsed) -->
+            <!-- Edit Mail customer -->
             <div class="toggleRow" id="editCustomerToggle">
               <div class="sectionTitle">Edit Mail customer</div>
               <div class="plusSym" id="editCustomerPlus">+</div>
@@ -317,7 +336,7 @@
                 </div>
                 <div>
                   <label style="margin-top:0">Template name</label>
-                  <input id="editCustomerName" value="DEFAULT" />
+                  <input id="editCustomerName" />
                 </div>
               </div>
 
@@ -348,7 +367,7 @@
 
             <div class="divider"></div>
 
-            <!-- ✅ Edit Mail supplier (collapsed) -->
+            <!-- Edit Mail supplier -->
             <div class="toggleRow" id="editSupplierToggle">
               <div class="sectionTitle">Edit Mail supplier</div>
               <div class="plusSym" id="editSupplierPlus">+</div>
@@ -364,7 +383,7 @@
                 </div>
                 <div>
                   <label style="margin-top:0">Template name</label>
-                  <input id="editSupplierName" value="DEFAULT" />
+                  <input id="editSupplierName" />
                 </div>
               </div>
 
@@ -395,7 +414,7 @@
 
             <div class="divider"></div>
 
-            <!-- ✅ Mail log (collapsed) -->
+            <!-- Mail log -->
             <div class="toggleRow" id="mailLogToggle">
               <div class="sectionTitle">Mail log</div>
               <div class="plusSym" id="mailLogPlus">+</div>
@@ -503,7 +522,7 @@
 
 <script>
 /** ✅ Put your /exec URL here */
-const API_BASE = "https://script.google.com/macros/s/AKfycbwGl45ux88ipi89FwZEN5b5__od-PjyXGy9nW3Kp_WCX6TaGRRye5mU4NytLF12DIvrDg/exec";
+const API_BASE = "PASTE_YOUR_SCRIPT_EXEC_URL_HERE";
 const MASTER_SUPPLIER_NAME = "ALL";
 const $ = (id)=>document.getElementById(id);
 
@@ -556,9 +575,9 @@ let suppliersList = [];
 let suppliersMailMap = {};
 let suppliersKeyMap = {};
 
-let indepTemplates = [];    // Mail templates (general)
-let customerTemplates = []; // Customer sheet
-let supplierTemplates = []; // Supplier sheet
+let indepTemplates = [];
+let customerTemplates = [];
+let supplierTemplates = [];
 
 let lastFocusedField = null;
 
@@ -695,7 +714,7 @@ $("pickApple").addEventListener("click", ()=>{
 $("pickCancel").addEventListener("click", closeMailPicker);
 $("mailPicker").addEventListener("click", (e)=>{ if(e.target === $("mailPicker")) closeMailPicker(); });
 
-/* API helpers */
+/* API helper */
 async function api_(qs){
   return await jsonp(`${API_BASE}${API_BASE.includes("?") ? "&" : "?"}${qs}`);
 }
@@ -792,14 +811,14 @@ function renderIndepTemplates_(){
 
 function fillCustomerEditorFromLang_(lang){
   const t = findTpl_(customerTemplates, lang);
-  $("editCustomerName").value = "DEFAULT";
+  $("editCustomerName").value = t ? (t.label || "DEFAULT") : "DEFAULT";
   $("editCustomerSubject").value = t ? (t.subject||"") : "";
   $("editCustomerBodyText").value = t ? (t.body||"") : "";
   $("editCustomerMsg").textContent = "";
 }
 function fillSupplierEditorFromLang_(lang){
   const t = findTpl_(supplierTemplates, lang);
-  $("editSupplierName").value = "DEFAULT";
+  $("editSupplierName").value = t ? (t.label || "DEFAULT") : "DEFAULT";
   $("editSupplierSubject").value = t ? (t.subject||"") : "";
   $("editSupplierBodyText").value = t ? (t.body||"") : "";
   $("editSupplierMsg").textContent = "";
@@ -842,7 +861,7 @@ async function saveIndepTemplate_(){
 
 async function saveCustomerTemplate_(){
   const lang = ($("editCustomerLang").value||"en").toLowerCase();
-  const name = "DEFAULT";
+  const name = ($("editCustomerName").value || "DEFAULT").trim();
   const subject = ($("editCustomerSubject").value||"").trim();
   const body = ($("editCustomerBodyText").value||"").trim();
   const msg = $("editCustomerMsg");
@@ -868,7 +887,7 @@ async function saveCustomerTemplate_(){
 
 async function saveSupplierTemplate_(){
   const lang = ($("editSupplierLang").value||"en").toLowerCase();
-  const name = "DEFAULT";
+  const name = ($("editSupplierName").value || "DEFAULT").trim();
   const subject = ($("editSupplierSubject").value||"").trim();
   const body = ($("editSupplierBodyText").value||"").trim();
   const msg = $("editSupplierMsg");
@@ -894,7 +913,6 @@ async function saveSupplierTemplate_(){
 
 /* mail logging */
 function getOrderForLog_(){
-  // prefer dropshipment in supplier view; in master, still log dropshipment (main id)
   const drop = getAny(selected, ["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]) || "";
   return drop || "";
 }
@@ -955,7 +973,7 @@ async function loadMailLog_(){
   $("mailLogList").appendChild(ul);
 }
 
-/* completed */
+/* completed endpoint */
 async function setCompleted(rowId, val){
   if(!isMasterLogin()) return { ok:false, error:"Not master" };
   const completedValue = val ? "TRUE" : "FALSE";
@@ -1191,7 +1209,6 @@ async function openRow(rowId){
   $("customerLabel").textContent = getAny(selected,["Customer"]) || "—";
   $("customerMailLine").textContent = getAny(selected,["Mail Customer","MailCustomer"]) || "";
 
-  // Master-only details
   $("supplierBlock").classList.toggle("hidden", !isMasterLogin());
   $("surfOrderBlock").classList.toggle("hidden", !isMasterLogin());
 
