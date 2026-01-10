@@ -202,6 +202,15 @@
     .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end}
 
     .completedTitle{font-weight:800;color:var(--text);font-size:13px}
+
+    /* small list card */
+    .miniCard{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px;
+      box-shadow:none;
+      background:#fff;
+    }
   </style>
 </head>
 <body>
@@ -303,11 +312,11 @@
             <button id="saveBtn" class="btn primary" type="button">Save</button>
           </div>
 
-          <!-- MAIL CUSTOMER (MASTER ONLY) -->
+          <!-- MASTER ONLY: Mail customer + templates -->
           <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
             <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
 
-            <!-- ✅ Existing fixed templates (still 4 buttons) -->
+            <!-- existing 4 quick mails (unchanged) -->
             <div class="row">
               <button class="btn" id="mc_en"><span class="flag">🇬🇧</span> EN</button>
               <button class="btn" id="mc_nl"><span class="flag">🇳🇱</span> NL</button>
@@ -315,45 +324,28 @@
               <button class="btn" id="mc_fr"><span class="flag">🇫🇷</span> FR</button>
             </div>
 
-            <!-- ✅ Edit the 4 "top templates" (master only) -->
             <div class="divider"></div>
-            <div class="sectionTitle" style="margin-bottom:8px">Edit top templates (EN/NL/DE/FR)</div>
 
-            <div class="row" style="align-items:flex-end">
-              <div style="min-width:160px;flex:0 0 auto">
-                <label style="margin-top:0">Language</label>
-                <select id="top_lang">
-                  <option value="en">EN</option>
-                  <option value="nl">NL</option>
-                  <option value="de">DE</option>
-                  <option value="fr">FR</option>
-                </select>
-              </div>
-              <div style="flex:1;min-width:240px">
-                <div class="searchHint" id="top_hint" style="margin-top:0"></div>
-              </div>
+            <!-- templates toggle (collapsed by default) -->
+            <div class="toggleRow" id="tmplToggle">
+              <div class="sectionTitle">Templates</div>
+              <div class="plus" id="tmplPlus">+</div>
             </div>
 
-            <label>Mail subject</label>
-            <input id="top_subject" placeholder="Subject…" />
+            <div id="tmplBodyWrap" class="newOrderBody hidden">
+              <div class="sectionTitle" style="margin-bottom:8px">Saved templates</div>
 
-            <label>Mail body</label>
-            <textarea id="top_body" rows="7" placeholder="Body…"></textarea>
+              <div class="miniCard" id="tmplList"></div>
+              <div class="searchHint" id="tmplListHint" style="margin-top:6px"></div>
 
-            <div class="row" style="margin-top:10px">
-              <button id="top_fill" class="btn" type="button">Fill from current order</button>
-              <button id="top_reset" class="btn" type="button">Reset this language</button>
-            </div>
+              <div class="divider"></div>
 
-            <!-- ✅ Extra templates (max 5 per language) -->
-            <div class="divider"></div>
-            <div id="extraTplWrap">
-              <div class="sectionTitle" style="margin-bottom:8px">Extra templates (saved)</div>
+              <div class="sectionTitle" style="margin-bottom:8px">Add / edit template</div>
 
               <div class="row" style="align-items:flex-end">
                 <div style="min-width:160px;flex:0 0 auto">
                   <label style="margin-top:0">Language</label>
-                  <select id="xt_lang">
+                  <select id="tmplLang2">
                     <option value="en">EN</option>
                     <option value="nl">NL</option>
                     <option value="de">DE</option>
@@ -361,26 +353,32 @@
                   </select>
                 </div>
 
-                <div style="min-width:260px;flex:1">
-                  <label style="margin-top:0">Template</label>
-                  <div class="row" style="gap:8px;flex-wrap:nowrap">
-                    <select id="xt_select" style="flex:1"></select>
-                    <button id="xt_add" class="btn" type="button" title="Add template">+</button>
-                    <button id="xt_del" class="btn" type="button" title="Delete template">🗑</button>
-                  </div>
-                  <div id="xt_hint" class="searchHint" style="margin-top:6px"></div>
+                <div style="flex:1;min-width:240px">
+                  <label style="margin-top:0">Select saved template (optional)</label>
+                  <select id="tmplSelect2"></select>
+                  <div class="searchHint" id="tmplHint2" style="margin-top:6px"></div>
+                </div>
+
+                <div style="flex:0 0 auto" class="row" style="flex-wrap:nowrap">
+                  <button id="tmplNew" class="btn" type="button" title="New template">+</button>
+                  <button id="tmplDelete" class="btn" type="button" title="Delete template">🗑</button>
                 </div>
               </div>
 
+              <label>Label</label>
+              <input id="tmplLabel2" placeholder="E.g. Delay message" />
+
               <label>Mail subject</label>
-              <input id="xt_subject" placeholder="Subject…" />
+              <input id="tmplSubject2" placeholder="Subject…" />
 
               <label>Mail body</label>
-              <textarea id="xt_body" rows="7" placeholder="Body…"></textarea>
+              <textarea id="tmplText2" rows="7" placeholder="Body…"></textarea>
 
               <div class="row" style="margin-top:10px">
-                <button id="xt_send" class="btn primary" type="button">Send this template</button>
+                <button id="tmplSave" class="btn primary" type="button">Save</button>
               </div>
+
+              <div class="hint" id="tmplMsg" style="margin-top:8px"></div>
             </div>
 
             <div class="hint" style="margin-top:8px" id="mailMsg"></div>
@@ -496,24 +494,27 @@ const mc_nl = $("mc_nl");
 const mc_de = $("mc_de");
 const mc_fr = $("mc_fr");
 
-/* top templates editor */
-const top_lang = $("top_lang");
-const top_subject = $("top_subject");
-const top_body = $("top_body");
-const top_fill = $("top_fill");
-const top_reset = $("top_reset");
-const top_hint = $("top_hint");
+/* templates UI (master only) */
+const tmplToggle = $("tmplToggle");
+const tmplPlus = $("tmplPlus");
+const tmplBodyWrap = $("tmplBodyWrap");
 
-/* extra templates */
-const extraTplWrap = $("extraTplWrap");
-const xt_lang = $("xt_lang");
-const xt_select = $("xt_select");
-const xt_add = $("xt_add");
-const xt_del = $("xt_del");
-const xt_hint = $("xt_hint");
-const xt_subject = $("xt_subject");
-const xt_body = $("xt_body");
-const xt_send = $("xt_send");
+const tmplList = $("tmplList");
+const tmplListHint = $("tmplListHint");
+
+const tmplLang2 = $("tmplLang2");
+const tmplSelect2 = $("tmplSelect2");
+const tmplHint2 = $("tmplHint2");
+
+const tmplNew = $("tmplNew");
+const tmplDelete = $("tmplDelete");
+
+const tmplLabel2 = $("tmplLabel2");
+const tmplSubject2 = $("tmplSubject2");
+const tmplText2 = $("tmplText2");
+
+const tmplSave = $("tmplSave");
+const tmplMsg = $("tmplMsg");
 
 /* completed */
 const completedWrap = $("completedWrap");
@@ -914,8 +915,10 @@ function openRow(rowId){
   mailMsg.textContent = "";
   msg.textContent = "";
 
-  // refresh “fill from order” preview fields
-  if(isMasterLogin()) topRender();
+  if(isMasterLogin()){
+    // keep templates collapsed; just refresh list data for selected order
+    renderTemplatesUI();
+  }
 }
 
 /* save */
@@ -963,7 +966,7 @@ async function save(){
   }
 }
 
-/* templates (supplier mail unchanged) */
+/* templates */
 function supplierMailTemplate(lang, supplierName, customerName, orderId){
   if(lang === "nl"){
     return {
@@ -1003,7 +1006,6 @@ Thank you!`
   };
 }
 
-/* ===== Original fixed customer generator (kept) ===== */
 function customerMailTemplate(lang){
   const c = getAny(selected,["Customer"]) || "there";
   const oid = getAny(selected,["Order ID","OrderID"]) || "-";
@@ -1076,219 +1078,268 @@ Kind regards`
 }
 
 /* =========================
-   Editable TOP templates (EN/NL/DE/FR)
-   - If user edited: use stored text
-   - Else: fallback to customerMailTemplate(lang)
+   Templates (localStorage for now)
+   - list view: label left, send right
+   - editor: save button only
+   - collapsed by default
    ========================= */
-const TOP_LANGS = ["en","nl","de","fr"];
-let topStore = null; // {en:{subject,body,edited}, ...}
+const TMPL_LANGS = ["en","nl","de","fr"];
+const TMPL_MAX = 5;
 
-function topStorageKey(){
-  return `topCustomerTemplates:v1:${normalizeKey(supplierKey || "public")}`;
+let tmplStore = null;  // { en:[{id,label,subject,body}], ... }
+let tmplEditingId = null;
+
+function tmplStorageKey(){
+  return `customerTemplatesShared:v1:${normalizeKey(supplierKey || "public")}`;
 }
-function topLoad(){
-  let parsed=null;
-  try{ parsed = JSON.parse(localStorage.getItem(topStorageKey()) || "null"); }catch(_){ parsed=null; }
-  const out = {};
-  for(const lang of TOP_LANGS){
-    const p = parsed && parsed[lang] ? parsed[lang] : null;
-    out[lang] = {
-      subject: String(p?.subject || ""),
-      body: String(p?.body || ""),
-      edited: Boolean(p?.edited || false)
-    };
+
+function storageLoad(){
+  try{
+    const raw = localStorage.getItem(tmplStorageKey());
+    const parsed = raw ? JSON.parse(raw) : null;
+    const out = {};
+    for(const lang of TMPL_LANGS){
+      const arr = (parsed && Array.isArray(parsed[lang])) ? parsed[lang] : [];
+      out[lang] = arr.slice(0, TMPL_MAX).map(t => ({
+        id: String(t?.id || crypto.randomUUID()),
+        label: String(t?.label || "Template"),
+        subject: String(t?.subject || ""),
+        body: String(t?.body || "")
+      }));
+    }
+    return out;
+  }catch(_){
+    const out = {};
+    for(const lang of TMPL_LANGS) out[lang] = [];
+    return out;
   }
-  return out;
-}
-function topSave(){
-  localStorage.setItem(topStorageKey(), JSON.stringify(topStore));
-}
-function topCurLang(){ return top_lang?.value || "en"; }
-
-function topRender(){
-  if(!isMasterLogin()) return;
-  if(!topStore) topStore = topLoad();
-
-  const lang = topCurLang();
-  const s = topStore[lang];
-
-  const usingEdited = s?.edited && (s.subject || s.body);
-  const generated = customerMailTemplate(lang);
-
-  top_subject.value = usingEdited ? s.subject : generated.subject;
-  top_body.value = usingEdited ? s.body : generated.body;
-
-  top_hint.textContent = usingEdited
-    ? "Using your edited version for the top button."
-    : "Not edited yet. The top button uses the default (auto-filled from order).";
 }
 
-function topUpdateEdited(){
-  const lang = topCurLang();
-  topStore[lang] = {
-    subject: top_subject.value || "",
-    body: top_body.value || "",
-    edited: true
-  };
-  topSave();
-  top_hint.textContent = "Saved ✓ (top button will use this text)";
+function storageSave(){
+  localStorage.setItem(tmplStorageKey(), JSON.stringify(tmplStore));
 }
 
-function topResetLang(){
-  const lang = topCurLang();
-  topStore[lang] = { subject:"", body:"", edited:false };
-  topSave();
-  topRender();
-  top_hint.textContent = "Reset ✓ (top button uses default again)";
+function curLang(){
+  return tmplLang2?.value || "en";
 }
 
-function topFillFromOrder(){
-  const lang = topCurLang();
-  const generated = customerMailTemplate(lang);
-  top_subject.value = generated.subject;
-  top_body.value = generated.body;
-  topUpdateEdited();
+function listFor(lang){
+  return tmplStore?.[lang] || [];
 }
 
-/* =========================
-   Extra saved templates (MASTER only)
-   ========================= */
-const XT_LANGS = ["en","nl","de","fr"];
-const XT_MAX = 5;
-
-let xt_store = null; // { en:[...], nl:[...], ... }
-let xt_selectedId = { en:null, nl:null, de:null, fr:null };
-
-function xtStorageKey(){
-  return `extraCustomerMailTemplates:v1:${normalizeKey(supplierKey || "public")}`;
+function findTemplate(lang, id){
+  return listFor(lang).find(t => t.id === id) || null;
 }
 
-function xtLoad(){
-  let parsed = null;
-  try{ parsed = JSON.parse(localStorage.getItem(xtStorageKey()) || "null"); }catch(_){ parsed = null; }
+function renderTemplateList(){
+  if(!tmplList) return;
 
-  const out = {};
-  for(const lang of XT_LANGS){
-    const arr = (parsed && Array.isArray(parsed[lang])) ? parsed[lang] : [];
-    out[lang] = arr.slice(0, XT_MAX).map(x => ({
-      id: String(x?.id || crypto.randomUUID()),
-      name: String(x?.name || "Template"),
-      subject: String(x?.subject || ""),
-      body: String(x?.body || "")
-    }));
-  }
-  return out;
-}
+  const lang = curLang();
+  const arr = listFor(lang);
 
-function xtSave(){
-  localStorage.setItem(xtStorageKey(), JSON.stringify(xt_store));
-}
+  tmplList.innerHTML = "";
 
-function xtList(lang){
-  return xt_store?.[lang] || [];
-}
-
-function xtCurLang(){
-  return xt_lang?.value || "en";
-}
-
-function xtFind(lang, id){
-  return xtList(lang).find(t => t.id === id) || null;
-}
-
-function xtRender(){
-  if(!isMasterLogin()){
-    if(extraTplWrap) extraTplWrap.classList.add("hidden");
+  if(arr.length === 0){
+    tmplList.innerHTML = `<div class="muted" style="font-size:13px;padding:6px">No saved templates yet.</div>`;
+    tmplListHint.textContent = `Max ${TMPL_MAX} per language.`;
     return;
   }
-  if(extraTplWrap) extraTplWrap.classList.remove("hidden");
 
-  const lang = xtCurLang();
-  const list = xtList(lang);
+  for(const t of arr){
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.justifyContent = "space-between";
+    row.style.alignItems = "center";
+    row.style.padding = "6px 4px";
+    row.style.gap = "10px";
 
-  xt_select.innerHTML = "";
-  if(list.length === 0){
-    const opt = document.createElement("option");
-    opt.value = "";
-    opt.textContent = "No saved templates";
-    xt_select.appendChild(opt);
-    xt_subject.value = "";
-    xt_body.value = "";
-    xt_del.disabled = true;
-    xt_send.disabled = true;
-  }else{
-    for(const t of list){
-      const opt = document.createElement("option");
-      opt.value = t.id;
-      opt.textContent = t.name || "(Template)";
-      xt_select.appendChild(opt);
-    }
-    let cur = xt_selectedId[lang];
-    if(!cur || !list.some(t => t.id === cur)) cur = list[0].id;
-    xt_selectedId[lang] = cur;
-    xt_select.value = cur;
+    const left = document.createElement("div");
+    left.style.flex = "1";
+    left.style.minWidth = "0";
+    left.innerHTML = `<div style="font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(t.label)}</div>`;
 
-    const t = xtFind(lang, cur);
-    xt_subject.value = t?.subject || "";
-    xt_body.value = t?.body || "";
+    const right = document.createElement("div");
+    right.style.flex = "0 0 auto";
+    right.className = "row";
+    right.style.gap = "8px";
+    right.style.flexWrap = "nowrap";
 
-    xt_del.disabled = false;
-    xt_send.disabled = false;
+    const editBtn = document.createElement("button");
+    editBtn.className = "btn";
+    editBtn.type = "button";
+    editBtn.textContent = "Edit";
+    editBtn.addEventListener("click", ()=>{
+      tmplEditingId = t.id;
+      tmplSelect2.value = t.id;
+      renderEditorFromSelection();
+      tmplMsg.innerHTML = "<span class='muted'>Loaded for editing.</span>";
+    });
+
+    const sendBtn = document.createElement("button");
+    sendBtn.className = "btn primary";
+    sendBtn.type = "button";
+    sendBtn.textContent = "Send";
+    sendBtn.addEventListener("click", ()=> sendTemplate(lang, t.id));
+
+    right.appendChild(editBtn);
+    right.appendChild(sendBtn);
+
+    row.appendChild(left);
+    row.appendChild(right);
+    tmplList.appendChild(row);
   }
 
-  const remaining = XT_MAX - list.length;
-  xt_hint.textContent = `Max ${XT_MAX} extra templates per language. Remaining: ${remaining}.`;
-  xt_add.disabled = list.length >= XT_MAX;
+  tmplListHint.textContent = `Max ${TMPL_MAX} per language.`;
 }
 
-function xtUpdateCurrent(patch){
-  const lang = xtCurLang();
-  const list = xtList(lang);
-  const id = xt_selectedId[lang];
-  const idx = list.findIndex(t => t.id === id);
+function renderEditorSelect(){
+  const lang = curLang();
+  const arr = listFor(lang);
+
+  tmplSelect2.innerHTML = "";
+
+  const opt0 = document.createElement("option");
+  opt0.value = "";
+  opt0.textContent = "— Select template —";
+  tmplSelect2.appendChild(opt0);
+
+  for(const t of arr){
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = t.label || "Template";
+    tmplSelect2.appendChild(opt);
+  }
+
+  if(tmplEditingId && arr.some(t => t.id === tmplEditingId)){
+    tmplSelect2.value = tmplEditingId;
+  }else{
+    tmplEditingId = null;
+    tmplSelect2.value = "";
+  }
+
+  const remaining = TMPL_MAX - arr.length;
+  tmplHint2.textContent = `Remaining: ${remaining} (max ${TMPL_MAX}).`;
+  tmplNew.disabled = arr.length >= TMPL_MAX;
+  tmplDelete.disabled = !tmplEditingId;
+}
+
+function renderEditorFromSelection(){
+  const lang = curLang();
+  const id = tmplSelect2.value || null;
+  tmplEditingId = id;
+
+  if(!id){
+    tmplLabel2.value = "";
+    tmplSubject2.value = "";
+    tmplText2.value = "";
+    tmplDelete.disabled = true;
+    return;
+  }
+
+  const t = findTemplate(lang, id);
+  tmplLabel2.value = t?.label || "";
+  tmplSubject2.value = t?.subject || "";
+  tmplText2.value = t?.body || "";
+  tmplDelete.disabled = false;
+}
+
+function renderTemplatesUI(){
+  if(!isMasterLogin()){
+    if(tmplToggle) tmplToggle.classList.add("hidden");
+    if(tmplBodyWrap) tmplBodyWrap.classList.add("hidden");
+    return;
+  }
+  if(tmplToggle) tmplToggle.classList.remove("hidden");
+
+  renderTemplateList();
+  renderEditorSelect();
+  renderEditorFromSelection();
+}
+
+function newTemplate(){
+  const lang = curLang();
+  const arr = listFor(lang);
+  if(arr.length >= TMPL_MAX) return;
+
+  tmplEditingId = null;
+  tmplSelect2.value = "";
+
+  tmplLabel2.value = `Template ${arr.length + 1}`;
+  tmplSubject2.value = "";
+  tmplText2.value = "";
+  tmplDelete.disabled = true;
+
+  tmplMsg.innerHTML = "<span class='muted'>New template (not saved yet).</span>";
+}
+
+function deleteTemplate(){
+  const lang = curLang();
+  const id = tmplEditingId;
+  if(!id) return;
+
+  const arr = listFor(lang);
+  const idx = arr.findIndex(t => t.id === id);
   if(idx < 0) return;
 
-  list[idx] = { ...list[idx], ...patch };
-  xt_store[lang] = list;
-  xtSave();
+  arr.splice(idx, 1);
+  tmplStore[lang] = arr;
+  storageSave();
+
+  tmplEditingId = null;
+  tmplSelect2.value = "";
+  tmplLabel2.value = "";
+  tmplSubject2.value = "";
+  tmplText2.value = "";
+
+  tmplMsg.innerHTML = "<span style='color:var(--ok)'>Deleted ✓</span>";
+  renderTemplatesUI();
 }
 
-function xtAdd(){
-  const lang = xtCurLang();
-  const list = xtList(lang);
-  if(list.length >= XT_MAX) return;
+function saveTemplate(){
+  const lang = curLang();
+  const label = (tmplLabel2.value || "").trim();
+  const subject = (tmplSubject2.value || "").trim();
+  const body = (tmplText2.value || "").trim();
 
-  const t = {
-    id: crypto.randomUUID(),
-    name: `Extra template ${list.length + 1}`,
-    subject: "",
-    body: ""
-  };
-  list.push(t);
-  xt_store[lang] = list;
-  xtSave();
+  if(!label){
+    tmplMsg.innerHTML = "<span style='color:var(--warn)'>Please enter a label.</span>";
+    return;
+  }
+  if(!subject && !body){
+    tmplMsg.innerHTML = "<span style='color:var(--warn)'>Please enter subject and/or body.</span>";
+    return;
+  }
 
-  xt_selectedId[lang] = t.id;
-  xtRender();
-  xt_subject.focus();
+  const arr = listFor(lang);
+
+  // update existing
+  if(tmplEditingId && arr.some(t => t.id === tmplEditingId)){
+    const idx = arr.findIndex(t => t.id === tmplEditingId);
+    arr[idx] = { ...arr[idx], label, subject, body };
+    tmplStore[lang] = arr;
+    storageSave();
+    tmplMsg.innerHTML = "<span style='color:var(--ok)'>Saved ✓</span>";
+    renderTemplatesUI();
+    return;
+  }
+
+  // create new
+  if(arr.length >= TMPL_MAX){
+    tmplMsg.innerHTML = `<span style='color:var(--warn)'>Max ${TMPL_MAX} templates reached.</span>`;
+    return;
+  }
+
+  const id = crypto.randomUUID();
+  arr.push({ id, label, subject, body });
+  tmplStore[lang] = arr;
+  storageSave();
+
+  tmplEditingId = id;
+  tmplMsg.innerHTML = "<span style='color:var(--ok)'>Saved ✓</span>";
+  renderTemplatesUI();
 }
 
-function xtDel(){
-  const lang = xtCurLang();
-  const list = xtList(lang);
-  const id = xt_selectedId[lang];
-  const idx = list.findIndex(t => t.id === id);
-  if(idx < 0) return;
-
-  list.splice(idx, 1);
-  xt_store[lang] = list;
-  xtSave();
-
-  xt_selectedId[lang] = list[0]?.id || null;
-  xtRender();
-}
-
-async function xtSend(){
+async function sendTemplate(lang, id){
   if(!isMasterLogin() || !selected) return;
 
   const to = getAny(selected, ["Mail Customer","MailCustomer"]);
@@ -1297,11 +1348,9 @@ async function xtSend(){
     return;
   }
 
-  const lang = xtCurLang();
-  const id = xt_selectedId[lang];
-  const t = xtFind(lang, id);
+  const t = findTemplate(lang, id);
   if(!t){
-    mailMsg.innerHTML = "<span style='color:var(--warn)'>No template selected.</span>";
+    mailMsg.innerHTML = "<span style='color:var(--warn)'>Template not found.</span>";
     return;
   }
 
@@ -1349,7 +1398,7 @@ function mailSupplierRow(rowId, lang){
   openMailPicker({ to, subject: tpl.subject, body: tpl.body });
 }
 
-/* mail customer (TOP buttons) */
+/* mail customer (existing quick buttons unchanged) */
 async function mailCustomer(lang){
   if(!isMasterLogin() || !selected) return;
 
@@ -1359,19 +1408,12 @@ async function mailCustomer(lang){
     return;
   }
 
-  // ✅ use edited top template if present, otherwise fallback
-  if(!topStore) topStore = topLoad();
-  const s = topStore[lang];
-  const useEdited = s?.edited && (s.subject || s.body);
-
-  const tpl = useEdited
-    ? { subject: s.subject, body: s.body }
-    : customerMailTemplate(lang);
+  const tpl = customerMailTemplate(lang);
 
   openMailPicker({
     to,
-    subject: tpl.subject || "",
-    body: tpl.body || "",
+    subject: tpl.subject,
+    body: tpl.body,
     afterOpen: async () => {
       mailMsg.textContent = "Mail opened. Saving Completed…";
       const res = await setCompleted(selected.rowId, true);
@@ -1440,17 +1482,15 @@ async function bootstrapAfterLogin_(){
   if(isMasterLogin()) await loadSuppliers_();
   await loadOrders();
 
-  // init template UI for master
+  // init templates (master only)
   if(isMasterLogin()){
-    topStore = topLoad();
-    top_lang.value = "en";
-    topRender();
+    tmplStore = storageLoad();
+    if(tmplLang2) tmplLang2.value = "en";
+    renderTemplatesUI();
 
-    xt_store = xtLoad();
-    xt_lang.value = "en";
-    xtRender();
-  } else {
-    if(extraTplWrap) extraTplWrap.classList.add("hidden");
+    // keep collapsed by default
+    if(tmplBodyWrap) tmplBodyWrap.classList.add("hidden");
+    if(tmplPlus) tmplPlus.textContent = "+";
   }
 }
 
@@ -1500,24 +1540,34 @@ newOrderToggle.addEventListener("click", ()=>{
 });
 createBtn.addEventListener("click", createOrder);
 
-/* top templates editor events */
-top_lang.addEventListener("change", topRender);
-top_subject.addEventListener("input", topUpdateEdited);
-top_body.addEventListener("input", topUpdateEdited);
-top_fill.addEventListener("click", topFillFromOrder);
-top_reset.addEventListener("click", topResetLang);
+// Templates toggle (collapsed by default)
+if(tmplToggle){
+  tmplToggle.addEventListener("click", ()=>{
+    if(!isMasterLogin()) return;
+    const isHidden = tmplBodyWrap.classList.toggle("hidden");
+    tmplPlus.textContent = isHidden ? "+" : "–";
+    tmplMsg.textContent = "";
+    if(!isHidden) renderTemplatesUI();
+  });
+}
 
-/* extra templates events */
-xt_lang.addEventListener("change", xtRender);
-xt_select.addEventListener("change", ()=>{
-  xt_selectedId[xtCurLang()] = xt_select.value || null;
-  xtRender();
-});
-xt_add.addEventListener("click", xtAdd);
-xt_del.addEventListener("click", xtDel);
-xt_subject.addEventListener("input", ()=> xtUpdateCurrent({ subject: xt_subject.value }));
-xt_body.addEventListener("input", ()=> xtUpdateCurrent({ body: xt_body.value }));
-xt_send.addEventListener("click", xtSend);
+if(tmplLang2){
+  tmplLang2.addEventListener("change", ()=>{
+    tmplEditingId = null;
+    tmplMsg.textContent = "";
+    renderTemplatesUI();
+  });
+}
+if(tmplSelect2){
+  tmplSelect2.addEventListener("change", ()=>{
+    tmplMsg.textContent = "";
+    renderEditorFromSelection();
+    renderEditorSelect();
+  });
+}
+if(tmplNew) tmplNew.addEventListener("click", newTemplate);
+if(tmplDelete) tmplDelete.addEventListener("click", deleteTemplate);
+if(tmplSave) tmplSave.addEventListener("click", saveTemplate);
 </script>
 </body>
 </html>
