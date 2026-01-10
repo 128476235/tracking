@@ -12,7 +12,6 @@
       --muted:#64748b;
       --border:#e2e8f0;
 
-      /* primary */
       --primary:#2563eb;
       --primary2:#1d4ed8;
 
@@ -200,7 +199,6 @@
     .searchHint{color:#94a3b8;font-size:12px;margin-top:4px}
 
     .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end}
-
     .completedTitle{font-weight:800;color:var(--text);font-size:13px}
 
     .miniCard{
@@ -209,6 +207,33 @@
       padding:10px;
       box-shadow:none;
       background:#fff;
+    }
+
+    .listRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:8px 6px;
+      border-top:1px solid var(--border);
+    }
+    .listRow:first-child{border-top:none}
+    .listLabel{
+      flex:1;
+      min-width:0;
+      font-weight:650;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .btns{display:flex;gap:8px;flex-wrap:nowrap}
+
+    .pill{
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:11px;color:var(--muted);
+      border:1px solid var(--border);
+      padding:6px 10px;border-radius:999px;background:#fff;
+      white-space:nowrap;
     }
   </style>
 </head>
@@ -311,40 +336,33 @@
             <button id="saveBtn" class="btn primary" type="button">Save</button>
           </div>
 
-          <!-- MASTER ONLY: Mail customer + templates -->
+          <!-- MASTER ONLY -->
           <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
             <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
 
-            <!-- existing 4 quick mails (unchanged) -->
+            <!-- quick buttons -->
             <div class="row">
               <button class="btn" id="mc_en"><span class="flag">🇬🇧</span> EN</button>
               <button class="btn" id="mc_nl"><span class="flag">🇳🇱</span> NL</button>
               <button class="btn" id="mc_de"><span class="flag">🇩🇪</span> DE</button>
               <button class="btn" id="mc_fr"><span class="flag">🇫🇷</span> FR</button>
+              <span class="pill" id="tokenPill">Tokens: {{Customer}} {{OrderID}} {{Carrier}} {{Trackingnumber}} {{Trackinglink}}</span>
             </div>
 
             <div class="divider"></div>
 
-            <!-- templates toggle (collapsed by default) -->
+            <!-- Templates toggle (collapsed by default) -->
             <div class="toggleRow" id="tmplToggle">
               <div class="sectionTitle">Templates</div>
               <div class="plus" id="tmplPlus">+</div>
             </div>
 
             <div id="tmplBodyWrap" class="newOrderBody hidden">
-              <div class="sectionTitle" style="margin-bottom:8px">Saved templates</div>
-
-              <div class="miniCard" id="tmplList"></div>
-              <div class="searchHint" id="tmplListHint" style="margin-top:6px"></div>
-
-              <div class="divider"></div>
-
-              <div class="sectionTitle" style="margin-bottom:8px">Add / edit template</div>
-
-              <div class="row" style="align-items:flex-end">
-                <div style="min-width:160px;flex:0 0 auto">
+              <!-- Always visible list (once expanded) -->
+              <div style="display:grid; grid-template-columns:160px 1fr auto; gap:10px; align-items:end;">
+                <div>
                   <label style="margin-top:0">Language</label>
-                  <select id="tmplLang2">
+                  <select id="tmplLang">
                     <option value="en">EN</option>
                     <option value="nl">NL</option>
                     <option value="de">DE</option>
@@ -352,32 +370,111 @@
                   </select>
                 </div>
 
-                <div style="flex:1;min-width:240px">
-                  <label style="margin-top:0">Select saved template (optional)</label>
-                  <select id="tmplSelect2"></select>
-                  <div class="searchHint" id="tmplHint2" style="margin-top:6px"></div>
+                <div>
+                  <label style="margin-top:0">Saved templates</label>
+                  <div class="searchHint" id="tmplListHint" style="margin-top:6px"></div>
                 </div>
 
-                <div style="flex:0 0 auto" class="row" style="flex-wrap:nowrap">
-                  <button id="tmplNew" class="btn" type="button" title="New template">+</button>
-                  <button id="tmplDelete" class="btn" type="button" title="Delete template">🗑</button>
+                <div class="btns" style="justify-content:flex-end">
+                  <button id="tmplNew" class="btn" type="button" title="New template">+ New</button>
                 </div>
               </div>
 
-              <label>Label</label>
-              <input id="tmplLabel2" placeholder="E.g. Delay message" />
+              <div class="miniCard" id="tmplList" style="margin-top:10px"></div>
 
-              <label>Mail subject</label>
-              <input id="tmplSubject2" placeholder="Subject…" />
+              <div class="divider"></div>
 
-              <label>Mail body</label>
-              <textarea id="tmplText2" rows="7" placeholder="Body…"></textarea>
+              <!-- Editor: context-based, hidden until New/Edit -->
+              <div id="tmplEditorWrap" class="hidden">
+                <div class="row" style="justify-content:space-between; align-items:flex-end; gap:10px; margin-top:2px">
+                  <div>
+                    <div class="sectionTitle" id="tmplEditorTitle">Edit template</div>
+                    <div class="searchHint" id="tmplEditorHint"></div>
+                  </div>
+                  <div class="btns">
+                    <button id="tmplCancel" class="btn" type="button">Close</button>
+                    <button id="tmplDelete" class="btn" type="button" title="Delete template">🗑</button>
+                    <button id="tmplSave" class="btn primary" type="button">Save</button>
+                  </div>
+                </div>
 
-              <div class="row" style="margin-top:10px">
-                <button id="tmplSave" class="btn primary" type="button">Save</button>
+                <label>Label</label>
+                <input id="tmplLabel" placeholder="E.g. Delay message" />
+
+                <label>Mail subject</label>
+                <input id="tmplSubject" placeholder="Subject…" />
+
+                <label>Mail body</label>
+                <textarea id="tmplBody" rows="7" placeholder="Body…"></textarea>
+
+                <div class="row" style="margin-top:10px; gap:8px">
+                  <div class="sectionTitle" style="margin-right:6px">Insert fields</div>
+                  <button class="btn" type="button" id="tokCustomer">{{Customer}}</button>
+                  <button class="btn" type="button" id="tokOrderID">{{OrderID}}</button>
+                  <button class="btn" type="button" id="tokCarrier">{{Carrier}}</button>
+                  <button class="btn" type="button" id="tokTrackingnumber">{{Trackingnumber}}</button>
+                  <button class="btn" type="button" id="tokTrackinglink">{{Trackinglink}}</button>
+                </div>
+
+                <div class="hint" id="tmplMsg" style="margin-top:8px"></div>
               </div>
 
-              <div class="hint" id="tmplMsg" style="margin-top:8px"></div>
+              <div class="hint" style="margin-top:8px">
+                Tip: Use tokens like <b>{{OrderID}}</b> in subject/body. They’ll be replaced when sending.
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Supplier mail edit (collapsed by default) -->
+            <div id="supplierEditWrap" class="hidden" style="margin-top:0">
+              <div class="toggleRow" id="supToggle">
+                <div class="sectionTitle">Supplier mail (edit)</div>
+                <div class="plus" id="supPlus">+</div>
+              </div>
+
+              <div id="supBodyWrap" class="newOrderBody hidden">
+                <div style="display:grid; grid-template-columns:160px 1fr auto; gap:10px; align-items:end;">
+                  <div>
+                    <label style="margin-top:0">Language</label>
+                    <select id="supLang">
+                      <option value="en">EN</option>
+                      <option value="nl">NL</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style="margin-top:0">Supplier mail draft</label>
+                    <div class="searchHint" id="supHint" style="margin-top:6px"></div>
+                  </div>
+
+                  <div class="btns" style="justify-content:flex-end">
+                    <button id="supLoadDefault" class="btn" type="button">Load default</button>
+                    <button id="supUseThisMail" class="btn primary" type="button">Use for this mail</button>
+                  </div>
+                </div>
+
+                <label>Mail subject</label>
+                <input id="supSubject" placeholder="Subject…" />
+
+                <label>Mail body</label>
+                <textarea id="supBody" rows="7" placeholder="Body…"></textarea>
+
+                <div class="row" style="margin-top:10px; gap:8px">
+                  <div class="sectionTitle" style="margin-right:6px">Insert fields</div>
+                  <button class="btn" type="button" id="supTokCustomer">{{Customer}}</button>
+                  <button class="btn" type="button" id="supTokOrderID">{{OrderID}}</button>
+                  <button class="btn" type="button" id="supTokCarrier">{{Carrier}}</button>
+                  <button class="btn" type="button" id="supTokTrackingnumber">{{Trackingnumber}}</button>
+                  <button class="btn" type="button" id="supTokTrackinglink">{{Trackinglink}}</button>
+                </div>
+
+                <div class="hint" id="supMsg" style="margin-top:8px"></div>
+
+                <div class="hint" style="margin-top:8px">
+                  Note: This edits the draft only (no saving yet). Later you can store these in Sheets.
+                </div>
+              </div>
             </div>
 
             <div class="hint" style="margin-top:8px" id="mailMsg"></div>
@@ -435,29 +532,30 @@
   </div>
 </section>
 
-<!-- ✅ Mail picker modal -->
+<!-- Mail picker modal -->
 <div id="mailPicker" class="hidden" style="
   position:fixed;inset:0;background:rgba(15,23,42,.35);
   display:grid;place-items:center;padding:18px;z-index:9999">
   <div class="card" style="max-width:420px;width:100%">
     <div style="font-weight:700;font-size:14px">Choose mail app</div>
-
     <div class="row" style="margin-top:12px; justify-content:center">
       <button id="pickGmail" class="btn" type="button">Gmail</button>
       <button id="pickApple" class="btn" type="button">Apple Mail</button>
       <button id="pickCancel" class="btn primary" type="button">Cancel</button>
     </div>
-
     <div class="hint" id="pickHint"></div>
   </div>
 </div>
 
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbx7qHo1iEopZaHm2fXWJx4sgZQA8rfZqxlf_VDMY9Fs5XnR8TnoqUcGXrBwr7qI9eVT5w/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbwaya1-6P3EkiEuOP02THoCVI10vGyVYU9_pOcNaKqx7j0tfjaZUhamLSJ41R5Jw_qcHg/exec";
 const MASTER_SUPPLIER_NAME = "ALL";
+const TMPL_MAX = 5;
+const LANGS = ["en","nl","de","fr"];
 
 const $ = (id) => document.getElementById(id);
 
+/* elements */
 const loginView = $("loginView");
 const portalView = $("portalView");
 const keyInput = $("keyInput");
@@ -493,27 +591,52 @@ const mc_nl = $("mc_nl");
 const mc_de = $("mc_de");
 const mc_fr = $("mc_fr");
 
-/* templates UI (master only) */
+/* templates */
 const tmplToggle = $("tmplToggle");
 const tmplPlus = $("tmplPlus");
 const tmplBodyWrap = $("tmplBodyWrap");
 
+const tmplLang = $("tmplLang");
 const tmplList = $("tmplList");
 const tmplListHint = $("tmplListHint");
-
-const tmplLang2 = $("tmplLang2");
-const tmplSelect2 = $("tmplSelect2");
-const tmplHint2 = $("tmplHint2");
-
 const tmplNew = $("tmplNew");
+
+const tmplEditorWrap = $("tmplEditorWrap");
+const tmplEditorTitle = $("tmplEditorTitle");
+const tmplEditorHint = $("tmplEditorHint");
+const tmplCancel = $("tmplCancel");
 const tmplDelete = $("tmplDelete");
-
-const tmplLabel2 = $("tmplLabel2");
-const tmplSubject2 = $("tmplSubject2");
-const tmplText2 = $("tmplText2");
-
 const tmplSave = $("tmplSave");
+const tmplLabel = $("tmplLabel");
+const tmplSubject = $("tmplSubject");
+const tmplBody = $("tmplBody");
 const tmplMsg = $("tmplMsg");
+
+/* tokens buttons */
+const tokCustomer = $("tokCustomer");
+const tokOrderID = $("tokOrderID");
+const tokCarrier = $("tokCarrier");
+const tokTrackingnumber = $("tokTrackingnumber");
+const tokTrackinglink = $("tokTrackinglink");
+
+/* supplier edit */
+const supplierEditWrap = $("supplierEditWrap");
+const supToggle = $("supToggle");
+const supPlus = $("supPlus");
+const supBodyWrap = $("supBodyWrap");
+const supLang = $("supLang");
+const supLoadDefault = $("supLoadDefault");
+const supUseThisMail = $("supUseThisMail");
+const supHint = $("supHint");
+const supSubject = $("supSubject");
+const supBody = $("supBody");
+const supMsg = $("supMsg");
+
+const supTokCustomer = $("supTokCustomer");
+const supTokOrderID = $("supTokOrderID");
+const supTokCarrier = $("supTokCarrier");
+const supTokTrackingnumber = $("supTokTrackingnumber");
+const supTokTrackinglink = $("supTokTrackinglink");
 
 /* completed */
 const completedWrap = $("completedWrap");
@@ -545,9 +668,11 @@ let supplierKey = "";
 let orders = [];
 let selected = null;
 let suppliersList = [];
-
-/* mail picker state */
 let pendingMail = null;
+
+/* templates state (from sheet via Apps Script) */
+let tmplStore = { en:[], nl:[], de:[], fr:[] };
+let tmplEditingId = null; // current editing template id
 
 /* utils */
 function escapeHTML(s){
@@ -657,6 +782,41 @@ pickGmail.addEventListener("click", openViaGmail);
 pickApple.addEventListener("click", openViaApple);
 pickCancel.addEventListener("click", closeMailPicker);
 mailPicker.addEventListener("click", (e)=>{ if(e.target === mailPicker) closeMailPicker(); });
+
+/* tokens */
+function insertAtCursor(el, text){
+  if(!el) return;
+  const start = (el.selectionStart ?? el.value.length);
+  const end = (el.selectionEnd ?? el.value.length);
+  const before = el.value.slice(0, start);
+  const after = el.value.slice(end);
+  el.value = before + text + after;
+  const pos = start + text.length;
+  el.focus();
+  el.setSelectionRange(pos, pos);
+}
+function tokenMapFromSelected(){
+  const customer = getAny(selected, ["Customer"]) || "";
+  const orderId = getAny(selected, ["Order ID","OrderID"]) || "";
+  const Carrier = carrier.value.trim() || getAny(selected, ["Carrier"]) || "";
+  const Trackingnumber = trackingNumber.value.trim() || getAny(selected, ["Trackingnumber","Tracking Number"]) || "";
+  const Trackinglink = trackingLink.value.trim() || getAny(selected, ["Trackinglink","Tracking Link"]) || "";
+
+  return {
+    "{{Customer}}": customer,
+    "{{OrderID}}": orderId,
+    "{{Carrier}}": Carrier,
+    "{{Trackingnumber}}": Trackingnumber,
+    "{{Trackinglink}}": Trackinglink
+  };
+}
+function applyTokens(text, map){
+  let out = String(text || "");
+  for(const k of Object.keys(map)){
+    out = out.split(k).join(String(map[k] || ""));
+  }
+  return out;
+}
 
 /* Completed endpoint */
 async function setCompleted(rowId, val){
@@ -911,15 +1071,24 @@ function openRow(rowId){
   setStatus(ok ? "Complete" : "Missing tracking", ok);
 
   mailCustomerWrap.classList.toggle("hidden", !isMasterLogin());
+  supplierEditWrap.classList.toggle("hidden", !isMasterLogin());
+
   mailMsg.textContent = "";
   msg.textContent = "";
 
+  // keep both editors collapsed (user can expand)
   if(isMasterLogin()){
-    renderTemplatesUI();
+    // templates editor closes when changing order (clean)
+    closeTemplateEditor_();
+
+    // supplier panel stays collapsed
+    supBodyWrap.classList.add("hidden");
+    supPlus.textContent = "+";
+    supMsg.textContent = "";
   }
 }
 
-/* save */
+/* save tracking */
 async function save(){
   if(!selected) return;
 
@@ -964,7 +1133,7 @@ async function save(){
   }
 }
 
-/* templates */
+/* ---------- built-in templates (unchanged content, now token-capable too) ---------- */
 function supplierMailTemplate(lang, supplierName, customerName, orderId){
   if(lang === "nl"){
     return {
@@ -1075,29 +1244,71 @@ Kind regards`
   };
 }
 
-/* =========================
-   Templates (SERVER via Apps Script)
-   Actions used:
-   - mailTemplates
-   - upsertMailTemplate
-   - deleteMailTemplate
-   ========================= */
-const TMPL_LANGS = ["en","nl","de","fr"];
-const TMPL_MAX = 5;
+/* mail supplier quick from table */
+function mailSupplierRow(rowId, lang){
+  if(!isMasterLogin()) return;
 
-let tmplStore = { en:[], nl:[], de:[], fr:[] };
-let tmplEditingId = null;
+  const row = orders.find(x => Number(x.rowId) === rowId);
+  if(!row){
+    msg.innerHTML = "<span style='color:var(--warn)'>Row not found.</span>";
+    return;
+  }
 
-function curLang(){
-  return tmplLang2?.value || "en";
-}
-function listFor(lang){
-  return (tmplStore && tmplStore[lang]) ? tmplStore[lang] : [];
-}
-function findTemplate(lang, id){
-  return listFor(lang).find(t => t.id === id) || null;
+  const to = getAny(row, ["Mail Supplier","MailSupplier"]);
+  const supplierName = getAny(row, ["Supplier"]);
+  const customerName = getAny(row, ["Customer"]);
+  const orderId = getAny(row, ["Order ID","OrderID"]);
+
+  if(!to){
+    msg.innerHTML = "<span style='color:var(--warn)'>No supplier email found.</span>";
+    return;
+  }
+
+  const tpl = supplierMailTemplate(lang, supplierName, customerName, orderId);
+
+  // token apply (works even if you add {{...}} later)
+  const map = tokenMapFromSelected();
+  openMailPicker({
+    to,
+    subject: applyTokens(tpl.subject, map),
+    body: applyTokens(tpl.body, map)
+  });
 }
 
+/* mail customer quick buttons (token apply enabled) */
+async function mailCustomer(lang){
+  if(!isMasterLogin() || !selected) return;
+
+  const to = getAny(selected, ["Mail Customer","MailCustomer"]);
+  if(!to){
+    mailMsg.innerHTML = "<span style='color:var(--warn)'>No customer email found.</span>";
+    return;
+  }
+
+  const tpl = customerMailTemplate(lang);
+  const map = tokenMapFromSelected();
+
+  openMailPicker({
+    to,
+    subject: applyTokens(tpl.subject, map),
+    body: applyTokens(tpl.body, map),
+    afterOpen: async () => {
+      mailMsg.textContent = "Mail opened. Saving Completed…";
+      const res = await setCompleted(selected.rowId, true);
+
+      if(!res.ok){
+        mailMsg.innerHTML =
+          `<span style="color:var(--warn)">Mail opened ✓ (could not save Completed: ${escapeHTML(res.error || "Unknown")})</span>`;
+        return;
+      }
+
+      mailMsg.innerHTML = `<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>`;
+      await loadOrders();
+    }
+  });
+}
+
+/* ---------- templates: load/save/delete via Apps Script ---------- */
 async function storageLoad(){
   const out = { en:[], nl:[], de:[], fr:[] };
   if(!isMasterLogin()) return out;
@@ -1119,195 +1330,135 @@ async function storageLoad(){
         body: String(t.body || "")
       });
     }
+
+    for(const l of LANGS){
+      out[l].sort((a,b)=> String(a.label).localeCompare(String(b.label)));
+    }
+
     return out;
   }catch(_){
     return out;
   }
 }
 
-function renderTemplateList(){
-  if(!tmplList) return;
+function listForLang_(lang){
+  const l = String(lang || "en").toLowerCase();
+  return tmplStore[l] || [];
+}
+function findTemplate_(lang, id){
+  return listForLang_(lang).find(t => t.id === id) || null;
+}
 
-  const lang = curLang();
-  const arr = listFor(lang);
+function renderTemplates_(){
+  if(!isMasterLogin()) return;
+
+  const lang = (tmplLang.value || "en").toLowerCase();
+  const arr = listForLang_(lang);
+  const remaining = TMPL_MAX - arr.length;
+
+  tmplListHint.textContent = `Max ${TMPL_MAX} per language. Remaining: ${Math.max(0, remaining)}.`;
 
   tmplList.innerHTML = "";
-
-  if(arr.length === 0){
+  if(!arr.length){
     tmplList.innerHTML = `<div class="muted" style="font-size:13px;padding:6px">No saved templates yet.</div>`;
-    tmplListHint.textContent = `Max ${TMPL_MAX} per language.`;
     return;
   }
 
   for(const t of arr){
     const row = document.createElement("div");
-    row.className = "row";
-    row.style.justifyContent = "space-between";
-    row.style.alignItems = "center";
-    row.style.padding = "6px 4px";
-    row.style.gap = "10px";
+    row.className = "listRow";
 
     const left = document.createElement("div");
-    left.style.flex = "1";
-    left.style.minWidth = "0";
-    left.innerHTML = `<div style="font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(t.label)}</div>`;
+    left.className = "listLabel";
+    left.title = t.label || "";
+    left.textContent = t.label || "Template";
 
     const right = document.createElement("div");
-    right.style.flex = "0 0 auto";
-    right.className = "row";
-    right.style.gap = "8px";
-    right.style.flexWrap = "nowrap";
+    right.className = "btns";
 
     const editBtn = document.createElement("button");
     editBtn.className = "btn";
     editBtn.type = "button";
     editBtn.textContent = "Edit";
     editBtn.addEventListener("click", ()=>{
-      tmplEditingId = t.id;
-      tmplSelect2.value = t.id;
-      renderEditorFromSelection();
-      tmplMsg.innerHTML = "<span class='muted'>Loaded for editing.</span>";
+      openTemplateEditor_({ mode:"edit", id: t.id });
     });
 
     const sendBtn = document.createElement("button");
     sendBtn.className = "btn primary";
     sendBtn.type = "button";
     sendBtn.textContent = "Send";
-    sendBtn.addEventListener("click", ()=> sendTemplate(lang, t.id));
+    sendBtn.disabled = !selected;
+    sendBtn.title = selected ? "" : "Open an order first";
+    sendBtn.addEventListener("click", ()=> sendTemplate_(lang, t.id));
 
     right.appendChild(editBtn);
     right.appendChild(sendBtn);
 
     row.appendChild(left);
     row.appendChild(right);
+
     tmplList.appendChild(row);
   }
-
-  tmplListHint.textContent = `Max ${TMPL_MAX} per language.`;
 }
 
-function renderEditorSelect(){
-  const lang = curLang();
-  const arr = listFor(lang);
+function openTemplateEditor_({mode, id}){
+  const lang = (tmplLang.value || "en").toLowerCase();
+  const arr = listForLang_(lang);
 
-  tmplSelect2.innerHTML = "";
-
-  const opt0 = document.createElement("option");
-  opt0.value = "";
-  opt0.textContent = "— Select template —";
-  tmplSelect2.appendChild(opt0);
-
-  for(const t of arr){
-    const opt = document.createElement("option");
-    opt.value = t.id;
-    opt.textContent = t.label || "Template";
-    tmplSelect2.appendChild(opt);
-  }
-
-  if(tmplEditingId && arr.some(t => t.id === tmplEditingId)){
-    tmplSelect2.value = tmplEditingId;
-  }else{
-    tmplEditingId = null;
-    tmplSelect2.value = "";
-  }
-
-  const remaining = TMPL_MAX - arr.length;
-  tmplHint2.textContent = `Remaining: ${remaining} (max ${TMPL_MAX}).`;
-  tmplNew.disabled = arr.length >= TMPL_MAX;
-  tmplDelete.disabled = !tmplEditingId;
-}
-
-function renderEditorFromSelection(){
-  const lang = curLang();
-  const id = tmplSelect2.value || null;
-  tmplEditingId = id;
-
-  if(!id){
-    tmplLabel2.value = "";
-    tmplSubject2.value = "";
-    tmplText2.value = "";
-    tmplDelete.disabled = true;
-    return;
-  }
-
-  const t = findTemplate(lang, id);
-  tmplLabel2.value = t?.label || "";
-  tmplSubject2.value = t?.subject || "";
-  tmplText2.value = t?.body || "";
-  tmplDelete.disabled = false;
-}
-
-function renderTemplatesUI(){
-  if(!isMasterLogin()){
-    if(tmplToggle) tmplToggle.classList.add("hidden");
-    if(tmplBodyWrap) tmplBodyWrap.classList.add("hidden");
-    return;
-  }
-  if(tmplToggle) tmplToggle.classList.remove("hidden");
-
-  renderTemplateList();
-  renderEditorSelect();
-  renderEditorFromSelection();
-}
-
-function newTemplate(){
-  const lang = curLang();
-  const arr = listFor(lang);
-  if(arr.length >= TMPL_MAX) return;
-
+  tmplMsg.textContent = "";
   tmplEditingId = null;
-  tmplSelect2.value = "";
 
-  tmplLabel2.value = `Template ${arr.length + 1}`;
-  tmplSubject2.value = "";
-  tmplText2.value = "";
-  tmplDelete.disabled = true;
+  tmplEditorWrap.classList.remove("hidden");
 
-  tmplMsg.innerHTML = "<span class='muted'>New template (not saved yet).</span>";
-}
-
-async function deleteTemplate(){
-  const id = tmplEditingId;
-  if(!id) return;
-
-  tmplDelete.disabled = true;
-  tmplMsg.textContent = "Deleting…";
-
-  try{
-    const url =
-      `${API_BASE}?action=deleteMailTemplate` +
-      `&supplierKey=${encodeURIComponent(supplierKey)}` +
-      `&id=${encodeURIComponent(id)}`;
-
-    const data = await jsonp(url);
-
-    if(!data || !data.ok || !data.deleted){
-      tmplMsg.innerHTML = "<span style='color:var(--bad)'>Delete failed.</span>";
+  if(mode === "new"){
+    if(arr.length >= TMPL_MAX){
+      tmplMsg.innerHTML = `<span style="color:var(--warn)">Max ${TMPL_MAX} templates reached for ${lang.toUpperCase()}.</span>`;
       return;
     }
+    tmplEditorTitle.textContent = `New template (${lang.toUpperCase()})`;
+    tmplEditorHint.textContent = "Not saved yet.";
+    tmplDelete.disabled = true;
 
-    tmplEditingId = null;
-    tmplSelect2.value = "";
-    tmplLabel2.value = "";
-    tmplSubject2.value = "";
-    tmplText2.value = "";
-
-    tmplStore = await storageLoad();
-
-    tmplMsg.innerHTML = "<span style='color:var(--ok)'>Deleted ✓</span>";
-    renderTemplatesUI();
-  }catch(_){
-    tmplMsg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
-  }finally{
-    tmplDelete.disabled = false;
+    tmplLabel.value = "";
+    tmplSubject.value = "";
+    tmplBody.value = "";
+    return;
   }
+
+  // edit mode
+  const t = findTemplate_(lang, id);
+  if(!t){
+    tmplMsg.innerHTML = `<span style="color:var(--warn)">Template not found.</span>`;
+    return;
+  }
+
+  tmplEditingId = t.id;
+  tmplEditorTitle.textContent = `Edit template (${lang.toUpperCase()})`;
+  tmplEditorHint.textContent = `ID: ${t.id}`;
+  tmplDelete.disabled = false;
+
+  tmplLabel.value = t.label || "";
+  tmplSubject.value = t.subject || "";
+  tmplBody.value = t.body || "";
 }
 
-async function saveTemplate(){
-  const lang = curLang();
-  const label = (tmplLabel2.value || "").trim();
-  const subject = (tmplSubject2.value || "").trim();
-  const body = (tmplText2.value || "").trim();
+function closeTemplateEditor_(){
+  tmplEditorWrap.classList.add("hidden");
+  tmplEditingId = null;
+  tmplMsg.textContent = "";
+  tmplLabel.value = "";
+  tmplSubject.value = "";
+  tmplBody.value = "";
+  tmplDelete.disabled = true;
+}
+
+async function saveTemplate_(){
+  if(!isMasterLogin()) return;
+  const lang = (tmplLang.value || "en").toLowerCase();
+  const label = (tmplLabel.value || "").trim();
+  const subject = (tmplSubject.value || "").trim();
+  const body = (tmplBody.value || "").trim();
 
   if(!label){
     tmplMsg.innerHTML = "<span style='color:var(--warn)'>Please enter a label.</span>";
@@ -1318,8 +1469,7 @@ async function saveTemplate(){
     return;
   }
 
-  // soft max guard (server doesn't enforce it)
-  const arr = listFor(lang);
+  const arr = listForLang_(lang);
   const isNew = !tmplEditingId;
   if(isNew && arr.length >= TMPL_MAX){
     tmplMsg.innerHTML = `<span style='color:var(--warn)'>Max ${TMPL_MAX} templates reached.</span>`;
@@ -1350,9 +1500,11 @@ async function saveTemplate(){
     tmplEditingId = String(saved.id || tmplEditingId || "");
 
     tmplStore = await storageLoad();
+    renderTemplates_();
 
     tmplMsg.innerHTML = "<span style='color:var(--ok)'>Saved ✓</span>";
-    renderTemplatesUI();
+    // keep editor open in edit mode
+    openTemplateEditor_({ mode:"edit", id: tmplEditingId });
   }catch(_){
     tmplMsg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
   }finally{
@@ -1360,7 +1512,39 @@ async function saveTemplate(){
   }
 }
 
-async function sendTemplate(lang, id){
+async function deleteTemplate_(){
+  const id = tmplEditingId;
+  if(!id) return;
+
+  tmplDelete.disabled = true;
+  tmplMsg.textContent = "Deleting…";
+
+  try{
+    const url =
+      `${API_BASE}?action=deleteMailTemplate` +
+      `&supplierKey=${encodeURIComponent(supplierKey)}` +
+      `&id=${encodeURIComponent(id)}`;
+
+    const data = await jsonp(url);
+
+    if(!data || !data.ok || !data.deleted){
+      tmplMsg.innerHTML = "<span style='color:var(--bad)'>Delete failed.</span>";
+      return;
+    }
+
+    tmplStore = await storageLoad();
+    renderTemplates_();
+
+    tmplMsg.innerHTML = "<span style='color:var(--ok)'>Deleted ✓</span>";
+    closeTemplateEditor_();
+  }catch(_){
+    tmplMsg.innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
+  }finally{
+    tmplDelete.disabled = false;
+  }
+}
+
+async function sendTemplate_(lang, id){
   if(!isMasterLogin() || !selected) return;
 
   const to = getAny(selected, ["Mail Customer","MailCustomer"]);
@@ -1369,16 +1553,20 @@ async function sendTemplate(lang, id){
     return;
   }
 
-  const t = findTemplate(lang, id);
+  const t = findTemplate_(lang, id);
   if(!t){
     mailMsg.innerHTML = "<span style='color:var(--warn)'>Template not found.</span>";
     return;
   }
 
+  const map = tokenMapFromSelected();
+  const subject = applyTokens(t.subject || "", map);
+  const body = applyTokens(t.body || "", map);
+
   openMailPicker({
     to,
-    subject: t.subject || "",
-    body: t.body || "",
+    subject,
+    body,
     afterOpen: async () => {
       mailMsg.textContent = "Mail opened. Saving Completed…";
       const res = await setCompleted(selected.rowId, true);
@@ -1395,60 +1583,36 @@ async function sendTemplate(lang, id){
   });
 }
 
-/* mail supplier */
-function mailSupplierRow(rowId, lang){
-  if(!isMasterLogin()) return;
+/* ---------- supplier mail editor (draft only) ---------- */
+function loadSupplierDefault_(){
+  if(!selected) return;
+  const supplierName = getAny(selected, ["Supplier"]) || "";
+  const customerName = getAny(selected, ["Customer"]) || "";
+  const orderId = getAny(selected, ["Order ID","OrderID"]) || "";
 
-  const row = orders.find(x => Number(x.rowId) === rowId);
-  if(!row){
-    msg.innerHTML = "<span style='color:var(--warn)'>Row not found.</span>";
-    return;
-  }
+  const lang = (supLang.value || "en").toLowerCase();
+  const tpl = supplierMailTemplate(lang, supplierName, customerName, orderId);
 
-  const to = getAny(row, ["Mail Supplier","MailSupplier"]);
-  const supplierName = getAny(row, ["Supplier"]);
-  const customerName = getAny(row, ["Customer"]);
-  const orderId = getAny(row, ["Order ID","OrderID"]);
+  supSubject.value = tpl.subject || "";
+  supBody.value = tpl.body || "";
+  supHint.textContent = `Loaded default (${lang.toUpperCase()}).`;
+  supMsg.innerHTML = "<span class='muted'>Edit text, then click “Use for this mail”.</span>";
+}
+function useSupplierDraftForThisMail_(){
+  if(!isMasterLogin() || !selected) return;
 
+  const to = getAny(selected, ["Mail Supplier","MailSupplier"]);
   if(!to){
     msg.innerHTML = "<span style='color:var(--warn)'>No supplier email found.</span>";
     return;
   }
 
-  const tpl = supplierMailTemplate(lang, supplierName, customerName, orderId);
-  openMailPicker({ to, subject: tpl.subject, body: tpl.body });
-}
+  const map = tokenMapFromSelected();
+  const subject = applyTokens(supSubject.value || "", map);
+  const body = applyTokens(supBody.value || "", map);
 
-/* mail customer (existing quick buttons unchanged) */
-async function mailCustomer(lang){
-  if(!isMasterLogin() || !selected) return;
-
-  const to = getAny(selected, ["Mail Customer","MailCustomer"]);
-  if(!to){
-    mailMsg.innerHTML = "<span style='color:var(--warn)'>No customer email found.</span>";
-    return;
-  }
-
-  const tpl = customerMailTemplate(lang);
-
-  openMailPicker({
-    to,
-    subject: tpl.subject,
-    body: tpl.body,
-    afterOpen: async () => {
-      mailMsg.textContent = "Mail opened. Saving Completed…";
-      const res = await setCompleted(selected.rowId, true);
-
-      if(!res.ok){
-        mailMsg.innerHTML =
-          `<span style="color:var(--warn)">Mail opened ✓ (could not save Completed: ${escapeHTML(res.error || "Unknown")})</span>`;
-        return;
-      }
-
-      mailMsg.innerHTML = `<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>`;
-      await loadOrders();
-    }
-  });
+  openMailPicker({ to, subject, body });
+  supMsg.innerHTML = "<span style='color:var(--ok)'>Mail draft opened ✓</span>";
 }
 
 /* create order */
@@ -1498,6 +1662,7 @@ async function createOrder(){
 async function bootstrapAfterLogin_(){
   newOrderWrap.classList.toggle("hidden", !isMasterLogin());
   mailCustomerWrap.classList.toggle("hidden", !isMasterLogin());
+  supplierEditWrap.classList.toggle("hidden", !isMasterLogin());
   completedWrap.classList.toggle("hidden", !isMasterLogin());
 
   if(isMasterLogin()) await loadSuppliers_();
@@ -1505,12 +1670,15 @@ async function bootstrapAfterLogin_(){
 
   if(isMasterLogin()){
     tmplStore = await storageLoad();
-    if(tmplLang2) tmplLang2.value = "en";
-    renderTemplatesUI();
 
-    // keep templates collapsed by default
-    if(tmplBodyWrap) tmplBodyWrap.classList.add("hidden");
-    if(tmplPlus) tmplPlus.textContent = "+";
+    // default collapsed
+    tmplBodyWrap.classList.add("hidden");
+    tmplPlus.textContent = "+";
+    closeTemplateEditor_();
+
+    supBodyWrap.classList.add("hidden");
+    supPlus.textContent = "+";
+    supHint.textContent = "";
   }
 }
 
@@ -1560,34 +1728,59 @@ newOrderToggle.addEventListener("click", ()=>{
 });
 createBtn.addEventListener("click", createOrder);
 
-// Templates toggle (collapsed by default)
-if(tmplToggle){
-  tmplToggle.addEventListener("click", ()=>{
-    if(!isMasterLogin()) return;
-    const isHidden = tmplBodyWrap.classList.toggle("hidden");
-    tmplPlus.textContent = isHidden ? "+" : "–";
-    tmplMsg.textContent = "";
-    if(!isHidden) renderTemplatesUI();
-  });
-}
+/* templates toggle */
+tmplToggle.addEventListener("click", ()=>{
+  if(!isMasterLogin()) return;
+  const isHidden = tmplBodyWrap.classList.toggle("hidden");
+  tmplPlus.textContent = isHidden ? "+" : "–";
+  mailMsg.textContent = "";
+  if(!isHidden){
+    renderTemplates_();
+  }else{
+    closeTemplateEditor_();
+  }
+});
+tmplLang.addEventListener("change", ()=>{
+  closeTemplateEditor_();
+  renderTemplates_();
+});
+tmplNew.addEventListener("click", ()=>{
+  openTemplateEditor_({ mode:"new" });
+});
+tmplCancel.addEventListener("click", closeTemplateEditor_);
+tmplSave.addEventListener("click", saveTemplate_);
+tmplDelete.addEventListener("click", deleteTemplate_);
 
-if(tmplLang2){
-  tmplLang2.addEventListener("change", ()=>{
-    tmplEditingId = null;
-    tmplMsg.textContent = "";
-    renderTemplatesUI();
-  });
-}
-if(tmplSelect2){
-  tmplSelect2.addEventListener("change", ()=>{
-    tmplMsg.textContent = "";
-    renderEditorFromSelection();
-    renderEditorSelect();
-  });
-}
-if(tmplNew) tmplNew.addEventListener("click", newTemplate);
-if(tmplDelete) tmplDelete.addEventListener("click", deleteTemplate);
-if(tmplSave) tmplSave.addEventListener("click", saveTemplate);
+/* token insert buttons (template editor) */
+if(tokCustomer) tokCustomer.addEventListener("click", ()=> insertAtCursor(tmplBody, "{{Customer}}"));
+if(tokOrderID) tokOrderID.addEventListener("click", ()=> insertAtCursor(tmplBody, "{{OrderID}}"));
+if(tokCarrier) tokCarrier.addEventListener("click", ()=> insertAtCursor(tmplBody, "{{Carrier}}"));
+if(tokTrackingnumber) tokTrackingnumber.addEventListener("click", ()=> insertAtCursor(tmplBody, "{{Trackingnumber}}"));
+if(tokTrackinglink) tokTrackinglink.addEventListener("click", ()=> insertAtCursor(tmplBody, "{{Trackinglink}}"));
+
+/* supplier edit toggle */
+supToggle.addEventListener("click", ()=>{
+  if(!isMasterLogin()) return;
+  const isHidden = supBodyWrap.classList.toggle("hidden");
+  supPlus.textContent = isHidden ? "+" : "–";
+  supMsg.textContent = "";
+  if(!isHidden && selected){
+    loadSupplierDefault_();
+  }
+});
+supLang.addEventListener("change", ()=>{
+  if(supBodyWrap.classList.contains("hidden")) return;
+  loadSupplierDefault_();
+});
+supLoadDefault.addEventListener("click", loadSupplierDefault_);
+supUseThisMail.addEventListener("click", useSupplierDraftForThisMail_);
+
+/* token insert buttons (supplier draft) */
+if(supTokCustomer) supTokCustomer.addEventListener("click", ()=> insertAtCursor(supBody, "{{Customer}}"));
+if(supTokOrderID) supTokOrderID.addEventListener("click", ()=> insertAtCursor(supBody, "{{OrderID}}"));
+if(supTokCarrier) supTokCarrier.addEventListener("click", ()=> insertAtCursor(supBody, "{{Carrier}}"));
+if(supTokTrackingnumber) supTokTrackingnumber.addEventListener("click", ()=> insertAtCursor(supBody, "{{Trackingnumber}}"));
+if(supTokTrackinglink) supTokTrackinglink.addEventListener("click", ()=> insertAtCursor(supBody, "{{Trackinglink}}"));
 </script>
 </body>
 </html>
