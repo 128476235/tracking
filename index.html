@@ -1,12 +1,13 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Delivery Overview</title>
+  <title>Tracking Portal</title>
   <style>
     :root{
       --bg:#ffffff; --card:#ffffff; --text:#0f172a; --muted:#64748b; --border:#e2e8f0;
@@ -16,9 +17,11 @@
     }
     *{box-sizing:border-box}
     body{
-      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-      background:linear-gradient(180deg,#ffffff 0%, #f6f7fb 100%);
-      color:var(--text);min-height:100vh;
+      margin:0;
+      font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:#f3f4f6;
+      color:var(--text);
+      min-height:100vh;
     }
     .wrap{max-width:1120px;margin:0 auto;padding:26px 16px}
     header{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
@@ -56,8 +59,8 @@
     }
     .btn:active{transform:translateY(1px)}
     .btn.primary{
-      background:linear-gradient(180deg,var(--primary),var(--primary2));
-      border-color:transparent;color:#fff;box-shadow:0 8px 16px rgba(15,23,42,.18);
+      background:linear-gradient(180deg,#111827,#000000);
+      border-color:transparent;color:#fff;box-shadow:0 10px 22px rgba(15,23,42,.18);
     }
     .btn:disabled{opacity:.55;cursor:not-allowed}
     .btn.icon{width:44px;padding:10px 0}
@@ -67,7 +70,7 @@
       border:none;
       color:#fff;
       border-radius:999px;
-      background:linear-gradient(180deg,#2b2d33 0%, #121317 100%);
+      background:linear-gradient(180deg,#111827 0%, #000000 100%);
       box-shadow:0 12px 24px rgba(15,23,42,.16);
       min-height:46px;
       padding:0 18px;
@@ -75,15 +78,15 @@
     }
     .btn.toolbarBtn:hover{box-shadow:0 14px 28px rgba(15,23,42,.22)}
     .btn.toolbarIcon{
-      width:46px;
       min-width:46px;
       height:46px;
-      padding:0;
+      padding:0 16px;
       border-radius:999px;
       border:none;
-      background:linear-gradient(180deg,#ffffff 0%, #eef2f7 100%);
+      background:#fff;
       box-shadow:0 10px 22px rgba(15,23,42,.12);
-      font-size:18px;
+      font-size:14px;
+      font-weight:700;
     }
 
     .modeWrap{display:flex;justify-content:flex-start;margin-bottom:14px}
@@ -117,7 +120,7 @@
     @media (max-width:980px){.two{grid-template-columns:1fr}}
 
     .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.5}
-    .center{min-height:100vh;display:grid;place-items:center;padding:18px}
+    .center{min-height:100vh;display:grid;place-items:center;padding:18px;background:#f3f4f6}
     .hidden{display:none !important}
 
     .kvRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin:10px 0 6px}
@@ -126,10 +129,10 @@
     .kvValue{font-size:16px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .smallLine{margin-top:3px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-    .loginCard{max-width:520px;width:100%;padding:18px}
-    .loginHeader{text-align:center;margin-bottom:14px}
-    .loginLogo{height:64px;max-width:260px;object-fit:contain;display:block;margin:0 auto 8px}
-    .loginForm{max-width:380px;margin:0 auto}
+    .loginCard{max-width:560px;width:100%;padding:28px;border-radius:22px;background:#fff;box-shadow:0 18px 40px rgba(15,23,42,.08)}
+    .loginHeader{text-align:center;margin-bottom:18px}
+    .loginLogo{height:78px;max-width:280px;object-fit:contain;display:block;margin:0 auto 10px}
+    .loginForm{max-width:420px;margin:0 auto}
     .loginActions{justify-content:center}
     .loginMsg{text-align:center;min-height:18px}
 
@@ -167,11 +170,13 @@
       <img src="logo.png" alt="Logo" class="loginLogo">
     </div>
     <div class="loginForm">
+      <div style="text-align:center;font-size:32px;font-weight:800;color:#111827;margin-bottom:6px">Tracking</div>
+      <div style="text-align:center;color:#6b7280;font-size:14px;margin-bottom:18px">Portal styled for your Magento page</div>
       <label for="keyInput">Login</label>
-      <input id="keyInput" type="password" autocomplete="current-password" placeholder="Enter…" />
-      <div class="row loginActions" style="margin-top:12px">
-        <button id="loginBtn" class="btn primary" type="button">Login</button>
-        <button id="clearBtn" class="btn" type="button">Clear</button>
+      <input id="keyInput" type="password" autocomplete="current-password" placeholder="Login" style="text-align:left;font-size:18px;padding:14px 16px;border:2px solid #9ca3af;background:#fff" />
+      <div class="row loginActions" style="margin-top:14px;gap:10px">
+        <button id="loginBtn" class="btn primary" type="button" style="min-width:120px;padding:14px 18px;border-radius:16px">Login</button>
+        <button id="clearBtn" class="btn" type="button" style="min-width:100px;padding:14px 18px;border-radius:16px;box-shadow:0 6px 16px rgba(15,23,42,.08)">Clear</button>
       </div>
       <div id="loginMsg" class="hint loginMsg"></div>
     </div>
@@ -185,14 +190,14 @@
         <div class="brand">
           <img src="logo.png" alt="Logo">
         </div>
-        <div class="sub hidden" id="portalSub"></div>
+        <div class="sub" id="portalSub">Home  ...  Tracking</div>
       </div>
       <div class="row topRightTools">
         <button id="newOrderBtn" class="btn toolbarBtn hidden" type="button" title="New order">
           <span style="font-weight:900;font-size:18px;line-height:1">+</span>
           <span id="newOrderBtnText">Add new order</span>
         </button>
-        <button id="logoutBtn" class="btn toolbarIcon" type="button" title="Logout">⏻</button>
+        <button id="logoutBtn" class="btn toolbarIcon" type="button" title="Logout">Logout</button>
       </div>
     </header>
 
@@ -263,10 +268,10 @@
               <div>
                 <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
                 <div class="flagRow" id="defaultCustomerFlags">
-                  <button class="btn icon" id="mc_en" title="EN"><span class="flag">🇬🇧</span></button>
-                  <button class="btn icon" id="mc_nl" title="NL"><span class="flag">🇳🇱</span></button>
-                  <button class="btn icon" id="mc_de" title="DE"><span class="flag">🇩🇪</span></button>
-                  <button class="btn icon" id="mc_fr" title="FR"><span class="flag">🇫🇷</span></button>
+                  <button class="btn icon" id="mc_en" title="EN"><span class="flag">EN</span></button>
+                  <button class="btn icon" id="mc_nl" title="NL"><span class="flag">NL</span></button>
+                  <button class="btn icon" id="mc_de" title="DE"><span class="flag">DE</span></button>
+                  <button class="btn icon" id="mc_fr" title="FR"><span class="flag">FR</span></button>
                 </div>
                 <div class="hint" id="mailMsg"></div>
               </div>
@@ -274,8 +279,8 @@
               <div class="rightBox" id="supplierMailBox">
                 <div class="sectionTitle" style="margin-bottom:8px">Mail supplier</div>
                 <div class="flagRow">
-                  <button class="btn icon" id="ms_en" title="EN"><span class="flag">🇬🇧</span></button>
-                  <button class="btn icon" id="ms_nl" title="NL"><span class="flag">🇳🇱</span></button>
+                  <button class="btn icon" id="ms_en" title="EN"><span class="flag">EN</span></button>
+                  <button class="btn icon" id="ms_nl" title="NL"><span class="flag">NL</span></button>
                 </div>
                 <div class="hint" id="mailSupplierMsg"></div>
               </div>
@@ -535,7 +540,7 @@
       </section>
 
       <section class="card colStretch">
-        <input id="historySearch" placeholder="Search…" style="width:100%;margin-bottom:12px" />
+        <input id="historySearch" placeholder="Search..." style="width:100%;margin-bottom:12px" />
 
         <table class="table">
           <thead>
@@ -547,7 +552,7 @@
             </tr>
           </thead>
           <tbody id="tbodyOpen">
-            <tr><td colspan="4" class="muted">Loading…</td></tr>
+            <tr><td colspan="4" class="muted">Loading...</td></tr>
           </tbody>
         </table>
 
@@ -692,7 +697,7 @@ function canUseInvoiceMode(){ return isMasterLogin() || isAccountmanagerLogin();
 function canCreateOrders(){ return isMasterLogin() || isAccountmanagerLogin(); }
 function isDropshipMode(){ return currentMode === ORDER_MODE_DROPSHIP; }
 function isInvoiceMode(){ return currentMode === ORDER_MODE_INVOICE; }
-function shouldSplitCompletedList(){ return isMasterLogin(); }
+function shouldSplitCompletedList(){ return isMasterLogin() || isSupplierLogin() || isAccountmanagerLogin(); }
 function shouldShowMailLog(){ return isMasterLogin() || isAccountmanagerLogin(); }
 function mapLoginKeyAlias(key){ return String(key || "").trim().toLowerCase() === MASTER_ALIAS.toLowerCase() ? MASTER_LOGIN_KEY : String(key || "").trim(); }
 function displayLoginAlias(key){ return String(key || "").trim().toLowerCase() === MASTER_LOGIN_KEY.toLowerCase() ? MASTER_ALIAS : String(key || "").trim(); }
@@ -790,7 +795,7 @@ function setupToggle(toggleId, bodyId, plusId, onOpen){
   if(!t || !b || !p) return;
   t.addEventListener("click", ()=>{
     const isHidden = b.classList.toggle("hidden");
-    p.textContent = isHidden ? "+" : "–";
+    p.textContent = isHidden ? "+" : "-";
     if(!isHidden && typeof onOpen === "function") onOpen();
   });
 }
@@ -884,10 +889,10 @@ function findTpl_(arr, lang){
 }
 function langFlag_(lang){
   const l = String(lang||"").toLowerCase();
-  if(l==="nl") return "🇳🇱";
-  if(l==="de") return "🇩🇪";
-  if(l==="fr") return "🇫🇷";
-  return "🇬🇧";
+  if(l==="nl") return "NL";
+  if(l==="de") return "DE";
+  if(l==="fr") return "FR";
+  return "EN";
 }
 
 async function loadAllTemplates_(){
@@ -950,7 +955,7 @@ function renderIndepTemplates_(){
   wrap.querySelectorAll("button[data-indep-edit]").forEach(btn=>btn.addEventListener("click", ()=>{
     const tpl = indepTemplates.find(x => String(x.id)===String(btn.getAttribute("data-indep-edit")));
     if(!tpl) return;
-    $("addIndepBody").classList.remove("hidden"); $("addIndepPlus").textContent = "–";
+    $("addIndepBody").classList.remove("hidden"); $("addIndepPlus").textContent = "-";
     $("indepLang").value = (tpl.language || "en").toLowerCase(); $("indepLabel").value = tpl.label || ""; $("indepSubject").value = tpl.subject || ""; $("indepBodyText").value = tpl.body || "";
     $("indepSave").dataset.editId = String(tpl.id || ""); $("indepSave").textContent = "Update"; $("indepSaveMsg").textContent = "";
   }));
@@ -987,7 +992,7 @@ function renderInvoiceTemplates_(){
   wrap.querySelectorAll("button[data-invoice-edit]").forEach(btn=>btn.addEventListener("click", ()=>{
     const tpl = invoiceTemplates.find(x => String(x.id)===String(btn.getAttribute("data-invoice-edit")));
     if(!tpl) return;
-    $("addInvoiceTemplateBody").classList.remove("hidden"); $("addInvoiceTemplatePlus").textContent = "–";
+    $("addInvoiceTemplateBody").classList.remove("hidden"); $("addInvoiceTemplatePlus").textContent = "-";
     $("invoiceTemplateLang").value = (tpl.language || "en").toLowerCase(); $("invoiceTemplateLabel").value = tpl.label || ""; $("invoiceTemplateSubject").value = tpl.subject || ""; $("invoiceTemplateBodyText").value = tpl.body || "";
     $("invoiceTemplateSave").dataset.editId = String(tpl.id || ""); $("invoiceTemplateSave").textContent = "Update"; $("invoiceTemplateSaveMsg").textContent = "";
   }));
@@ -1003,39 +1008,39 @@ function resetInvoiceTemplateEditor_(){ $("invoiceTemplateLang").value = "en"; $
 async function saveIndepTemplate_(){
   const lang = ($("indepLang").value||"en").toLowerCase(), label = ($("indepLabel").value||"").trim(), subject = ($("indepSubject").value||"").trim(), body = ($("indepBodyText").value||"").trim();
   const msg = $("indepSaveMsg"); if(!label){ msg.innerHTML = `<span style="color:var(--warn)">Template name required.</span>`; return; }
-  msg.textContent = "Saving…"; const editId = $("indepSave").dataset.editId || "";
+  msg.textContent = "Saving..."; const editId = $("indepSave").dataset.editId || "";
   const data = await api_(`action=indep_upsert&supplierKey=${encodeURIComponent(supplierKey)}` + (editId ? `&id=${encodeURIComponent(editId)}` : "") + `&language=${encodeURIComponent(lang)}&label=${encodeURIComponent(label)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`).catch(()=>null);
   if(!data || !data.ok){ msg.innerHTML = `<span style="color:var(--bad)">${escapeHTML((data && data.error) || "Save failed.")}</span>`; return; }
-  msg.innerHTML = `<span style="color:var(--ok)">Saved ✓</span>`; resetIndepEditor_(); await loadAllTemplates_();
+  msg.innerHTML = `<span style="color:var(--ok)">Saved OK</span>`; resetIndepEditor_(); await loadAllTemplates_();
 }
 async function saveCustomerTemplate_(){
   const lang = ($("editCustomerLang").value||"en").toLowerCase(), subject = ($("editCustomerSubject").value||"").trim(), body = ($("editCustomerBodyText").value||"").trim();
-  const msg = $("editCustomerMsg"); const existing = findTpl_(customerTemplates, lang); msg.textContent = "Saving…";
+  const msg = $("editCustomerMsg"); const existing = findTpl_(customerTemplates, lang); msg.textContent = "Saving...";
   const data = await api_(`action=customer_upsert&supplierKey=${encodeURIComponent(supplierKey)}` + (existing?.id ? `&id=${encodeURIComponent(existing.id)}` : "") + `&language=${encodeURIComponent(lang)}&label=${encodeURIComponent("DEFAULT")}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`).catch(()=>null);
   if(!data || !data.ok){ msg.innerHTML = `<span style="color:var(--bad)">Save failed.</span>`; return; }
-  msg.innerHTML = `<span style="color:var(--ok)">Saved ✓</span>`; await loadAllTemplates_();
+  msg.innerHTML = `<span style="color:var(--ok)">Saved OK</span>`; await loadAllTemplates_();
 }
 async function saveSupplierTemplate_(){
   const lang = ($("editSupplierLang").value||"en").toLowerCase(), subject = ($("editSupplierSubject").value||"").trim(), body = ($("editSupplierBodyText").value||"").trim();
-  const msg = $("editSupplierMsg"); const existing = findTpl_(supplierTemplates, lang); msg.textContent = "Saving…";
+  const msg = $("editSupplierMsg"); const existing = findTpl_(supplierTemplates, lang); msg.textContent = "Saving...";
   const data = await api_(`action=supplier_upsert&supplierKey=${encodeURIComponent(supplierKey)}` + (existing?.id ? `&id=${encodeURIComponent(existing.id)}` : "") + `&language=${encodeURIComponent(lang)}&label=${encodeURIComponent("DEFAULT")}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`).catch(()=>null);
   if(!data || !data.ok){ msg.innerHTML = `<span style="color:var(--bad)">Save failed.</span>`; return; }
-  msg.innerHTML = `<span style="color:var(--ok)">Saved ✓</span>`; await loadAllTemplates_();
+  msg.innerHTML = `<span style="color:var(--ok)">Saved OK</span>`; await loadAllTemplates_();
 }
 async function saveInvoiceTemplate_(){
   const lang = ($("invoiceTemplateLang").value||"en").toLowerCase(), label = ($("invoiceTemplateLabel").value||"").trim(), subject = ($("invoiceTemplateSubject").value||"").trim(), body = ($("invoiceTemplateBodyText").value||"").trim();
   const msg = $("invoiceTemplateSaveMsg"); if(!label){ msg.innerHTML = `<span style="color:var(--warn)">Template name required.</span>`; return; }
-  msg.textContent = "Saving…"; const editId = $("invoiceTemplateSave").dataset.editId || "";
+  msg.textContent = "Saving..."; const editId = $("invoiceTemplateSave").dataset.editId || "";
   const data = await api_(`action=invoice_template_upsert&supplierKey=${encodeURIComponent(supplierKey)}` + (editId ? `&id=${encodeURIComponent(editId)}` : "") + `&language=${encodeURIComponent(lang)}&label=${encodeURIComponent(label)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`).catch(()=>null);
   if(!data || !data.ok){ msg.innerHTML = `<span style="color:var(--bad)">${escapeHTML((data && data.error) || "Save failed.")}</span>`; return; }
-  msg.innerHTML = `<span style="color:var(--ok)">Saved ✓</span>`; resetInvoiceTemplateEditor_(); await loadInvoiceOnlyTemplates_();
+  msg.innerHTML = `<span style="color:var(--ok)">Saved OK</span>`; resetInvoiceTemplateEditor_(); await loadInvoiceOnlyTemplates_();
 }
 async function saveInvoiceCustomerTemplate_(){
   const lang = ($("editInvoiceCustomerLang").value||"en").toLowerCase(), subject = ($("editInvoiceCustomerSubject").value||"").trim(), body = ($("editInvoiceCustomerBodyText").value||"").trim();
-  const msg = $("editInvoiceCustomerMsg"); const existing = findTpl_(invoiceCustomerTemplates, lang); msg.textContent = "Saving…";
+  const msg = $("editInvoiceCustomerMsg"); const existing = findTpl_(invoiceCustomerTemplates, lang); msg.textContent = "Saving...";
   const data = await api_(`action=customer2_upsert&supplierKey=${encodeURIComponent(supplierKey)}` + (existing?.id ? `&id=${encodeURIComponent(existing.id)}` : "") + `&language=${encodeURIComponent(lang)}&label=${encodeURIComponent("DEFAULT")}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`).catch(()=>null);
   if(!data || !data.ok){ msg.innerHTML = `<span style="color:var(--bad)">Save failed.</span>`; return; }
-  msg.innerHTML = `<span style="color:var(--ok)">Saved ✓</span>`; await loadInvoiceOnlyTemplates_();
+  msg.innerHTML = `<span style="color:var(--ok)">Saved OK</span>`; await loadInvoiceOnlyTemplates_();
 }
 
 async function logMail_(payload){
@@ -1044,7 +1049,7 @@ async function logMail_(payload){
   await api_(`action=log_mail&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}&RowID=${encodeURIComponent(RowID)}&Customer=${encodeURIComponent(Customer)}&OrderID=${encodeURIComponent(OrderID)}&To=${encodeURIComponent(payload.to || "")}&CC=${encodeURIComponent(payload.cc || "")}&Kind=${encodeURIComponent(payload.kind || "")}&Language=${encodeURIComponent(payload.language || "")}&Template=${encodeURIComponent(payload.template || "")}&Subject=${encodeURIComponent(payload.subject || "")}`).catch(()=>null);
 }
 async function loadMailLog_(){
-  if(!selected) return; $("mailLogMsg").textContent = ""; $("mailLogList").textContent = "Loading…";
+  if(!selected) return; $("mailLogMsg").textContent = ""; $("mailLogList").textContent = "Loading...";
   const data = await api_(`action=mail_log&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}&RowID=${encodeURIComponent(String(selected.rowId))}`).catch(()=>null);
   if(!data || !data.ok){ $("mailLogList").textContent = "Mail log unavailable."; return; }
   const rows = Array.isArray(data.rows) ? data.rows : []; if(!rows.length){ $("mailLogList").textContent = "No log."; return; }
@@ -1070,10 +1075,10 @@ async function mailCustomer(lang, clickedBtn){
   const logTitle = `Mail customer ${String(lang||"").toUpperCase()}`;
   openMailPicker({ to, cc, subject: tpl.subject, body: tpl.body, afterOpen: async () => {
     await logMail_({ to, cc, kind:"customer", language:lang, template:logTitle, subject:tpl.subject });
-    $("mailMsg").textContent = "Mail opened. Saving Completed…";
+    $("mailMsg").textContent = "Mail opened. Saving Completed...";
     const res = await setCompleted(selected.rowId, true);
-    if(!res.ok) $("mailMsg").innerHTML = `<span style="color:var(--warn)">Mail opened ✓ (could not save Completed)</span>`;
-    else $("mailMsg").innerHTML = `<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>`;
+    if(!res.ok) $("mailMsg").innerHTML = `<span style="color:var(--warn)">Mail opened OK (could not save Completed)</span>`;
+    else $("mailMsg").innerHTML = `<span style="color:var(--ok)">Mail opened OK Completed saved OK</span>`;
     await loadOrders();
     if(selected && shouldShowMailLog()) await loadMailLog_();
   }});
@@ -1083,35 +1088,50 @@ async function mailSupplier(lang, clickedBtn){
   const supName = getAny(selected,["Supplier"]) || "", to = suppliersMailMap[String(supName).toLowerCase()] || getAny(selected,["Mail Supplier","MailSupplier"]) || "";
   if(!to){ $("mailSupplierMsg").innerHTML = "<span style='color:var(--warn)'>No supplier email found.</span>"; return; }
   const tpl = supplierDraftFromLang_(lang), logTitle = `Mail supplier ${String(lang||"").toUpperCase()}`;
-  openMailPicker({ to, cc:"", subject:tpl.subject, body:tpl.body, afterOpen: async ()=>{ await logMail_({ to, kind:"supplier", language:lang, template:logTitle, subject:tpl.subject }); $("mailSupplierMsg").innerHTML = `<span style="color:var(--ok)">Mail opened ✓</span>`; if(shouldShowMailLog()) await loadMailLog_(); }});
+  openMailPicker({ to, cc:"", subject:tpl.subject, body:tpl.body, afterOpen: async ()=>{ await logMail_({ to, kind:"supplier", language:lang, template:logTitle, subject:tpl.subject }); $("mailSupplierMsg").innerHTML = `<span style="color:var(--ok)">Mail opened OK</span>`; if(shouldShowMailLog()) await loadMailLog_(); }});
 }
 async function sendIndependentTemplate_(tpl){
   if(!selected) return; const to = selectedCustomerMail_(), cc = selectedAccountmanagerCC_(); if(!to){ $("indepSendMsg").innerHTML = "<span style='color:var(--warn)'>No customer email found.</span>"; return; }
   const subject = applyTokens(tpl.subject||""), body = applyTokens(tpl.body||""), lang = String(tpl.language||"").toLowerCase(), logTitle = `Template ${tpl.label || ""}`.trim();
-  openMailPicker({ to, cc, subject, body, afterOpen: async ()=>{ await logMail_({ to, cc, kind:"independent", language:lang, template:logTitle, subject }); $("indepSendMsg").innerHTML = `<span style="color:var(--ok)">Mail opened ✓</span>`; if(shouldShowMailLog()) await loadMailLog_(); }});
+  openMailPicker({ to, cc, subject, body, afterOpen: async ()=>{ await logMail_({ to, cc, kind:"independent", language:lang, template:logTitle, subject }); $("indepSendMsg").innerHTML = `<span style="color:var(--ok)">Mail opened OK</span>`; if(shouldShowMailLog()) await loadMailLog_(); }});
 }
 async function sendInvoiceTemplate_(tpl){
   if(!selected) return; const to = selectedCustomerMail_(), cc = selectedAccountmanagerCC_(); if(!to){ $("invoiceSendMsg").innerHTML = "<span style='color:var(--warn)'>No customer email found.</span>"; return; }
   const subject = applyTokens(tpl.subject||""), body = applyTokens(tpl.body||""), lang = String(tpl.language||"").toLowerCase(), logTitle = `Template ${tpl.label || ""}`.trim();
-  openMailPicker({ to, cc, subject, body, afterOpen: async ()=>{ await logMail_({ to, cc, kind:"independent", language:lang, template:logTitle, subject }); $("invoiceSendMsg").innerHTML = `<span style="color:var(--ok)">Mail opened ✓</span>`; if(shouldShowMailLog()) await loadMailLog_(); }});
+  openMailPicker({ to, cc, subject, body, afterOpen: async ()=>{ await logMail_({ to, cc, kind:"independent", language:lang, template:logTitle, subject }); $("invoiceSendMsg").innerHTML = `<span style="color:var(--ok)">Mail opened OK</span>`; if(shouldShowMailLog()) await loadMailLog_(); }});
 }
 
 function applyModeUI_(){
-  $("modeWrap").classList.toggle("hidden", !canUseInvoiceMode());
+  const isSpecialLogin = (accountmanagerName || "").toLowerCase().includes("jelle") && (accountmanagerName || "").toLowerCase().includes("reinder");
+
+  $("modeWrap").classList.toggle("hidden", !canUseInvoiceMode() || isSpecialLogin);
   $("modeDropshipBtn").classList.toggle("active", isDropshipMode());
   $("modeInvoiceBtn").classList.toggle("active", isInvoiceMode());
+
   $("supplierBlock").classList.toggle("hidden", !isDropshipMode());
   $("supplierMailBox").classList.toggle("hidden", !isDropshipMode());
-  $("dropshipTemplatesSection").classList.toggle("hidden", !(isDropshipMode() && isMasterLogin()));
-  $("invoiceTemplatesSection").classList.toggle("hidden", !isInvoiceMode());
+
+  // templates visibility
+  const showDropshipTemplates = isDropshipMode() && (isMasterLogin() || isAccountmanagerLogin()) && !isSpecialLogin;
+  const showInvoiceTemplates = isInvoiceMode() && (isMasterLogin() || isAccountmanagerLogin()) && !isSpecialLogin;
+  $("dropshipTemplatesSection").classList.toggle("hidden", !showDropshipTemplates);
+  $("invoiceTemplatesSection").classList.toggle("hidden", !showInvoiceTemplates);
+
   $("trackingFieldsWrap").classList.toggle("hidden", isInvoiceMode());
   $("accountmanagerBlock").classList.toggle("hidden", !isInvoiceMode());
   $("completedWrap").classList.toggle("hidden", !shouldSplitCompletedList());
   $("mailLogSection").classList.toggle("hidden", !shouldShowMailLog());
-  $("defaultCustomerFlags").classList.toggle("hidden", false);
+
+  // dropshipment order visibility
+  $("primaryOrderCaption").classList.toggle("hidden", !isDropshipMode());
+  $("primaryOrderLabel").classList.toggle("hidden", !isDropshipMode());
+
   if(isInvoiceMode()){
     $("newOrderBtnText").textContent = "Add invoice order";
   } else {
+    $("newOrderBtnText").textContent = "Add new order";
+  }
+} else {
     $("newOrderBtnText").textContent = "Add new order";
   }
 }
@@ -1121,7 +1141,7 @@ async function loadOrders(){
   selected = null; $("form").classList.add("hidden"); $("noSelection").classList.remove("hidden");
   $("customerLabel").textContent = "—"; $("customerMailLine").textContent = ""; $("supplierLabel").textContent = "—"; $("supplierKeyLine").textContent = ""; $("accountmanagerLabel").textContent = "—"; $("accountmanagerMailLine").textContent = ""; $("primaryOrderLabel").textContent = "—"; $("surfOrderLabel").textContent = "—";
   setStatus("No selection", false); $("msg").textContent = ""; $("mailMsg").textContent = ""; $("mailSupplierMsg").textContent = ""; $("indepSendMsg").textContent = ""; $("invoiceSendMsg").textContent = "";
-  $("tbodyOpen").innerHTML = "<tr><td colspan='4' class='muted'>Loading…</td></tr>"; $("tbodyCompleted").innerHTML = "<tr><td colspan='4' class='muted'>Loading…</td></tr>";
+  $("tbodyOpen").innerHTML = "<tr><td colspan='4' class='muted'>Loading...</td></tr>"; $("tbodyCompleted").innerHTML = "<tr><td colspan='4' class='muted'>Loading...</td></tr>";
   let url = `${API_BASE}?action=orders&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}`;
   if(isMasterLogin()) url += `&supplier=ALL`;
   if(isSupplierLogin()) url += `&supplier=${encodeURIComponent(supplier)}`;
@@ -1142,15 +1162,17 @@ function renderOrders(){
   const doneList = shouldSplitCompletedList() ? filtered.filter(o => Boolean(o.Completed)) : [];
   const renderRow = (o, targetTB)=>{
     const ok = trackingComplete(o), mailC = getAny(o,["Mail Customer","MailCustomer"]), surf = getAny(o,["Surfcenter order","SurfcenterOrder"]), completed = Boolean(o.Completed);
+    const drop = getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]);
+    const dropLineHtml = isDropshipMode() && drop ? `<div class="smallLine">${escapeHTML(drop)}</div>` : "";
     const surfLineHtml = surf ? `<div class="smallLine">${escapeHTML(surf)}</div>` : "";
-    const completedHtml = completed ? `<span class="checkPill yes">✓</span>` : `<span class="checkPill">—</span>`;
+    const completedHtml = completed ? `<span class="checkPill yes">OK</span>` : `<span class="checkPill">—</span>`;
     const statusText = isInvoiceMode() ? (completed ? "Completed" : "Pending") : (ok ? "Complete" : "Missing tracking");
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>
         <div style="font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escapeHTML(getAny(o,["Customer"]))}">${escapeHTML(getAny(o,["Customer"]))}</div>
         ${mailC ? `<div class="smallLine">${escapeHTML(mailC)}</div>` : ""}
-        ${surfLineHtml}
+        ${dropLineHtml}${surfLineHtml}
       </td>
       <td class="statusCell"><div class="statusWrap"><span class="status ${ok ? "ready":"missing"}"><span class="dot"></span>${statusText}</span></div></td>
       <td><div class="actionsCell"><button class="btn" data-open="${escapeHTML(o.rowId)}">Open</button></div></td>
@@ -1180,18 +1202,18 @@ async function save(){
   if(!selected || isInvoiceMode()) return;
   const Carrier = $("carrier").value.trim(), Trackingnumber = $("trackingNumber").value.trim(), Trackinglink = $("trackingLink").value.trim();
   if(!Carrier || !Trackingnumber || !Trackinglink){ $("msg").innerHTML = "<span style='color:var(--warn)'>Please fill in all fields.</span>"; return; }
-  $("saveBtn").disabled = true; $("msg").textContent = "Saving…";
+  $("saveBtn").disabled = true; $("msg").textContent = "Saving...";
   try{
     const url = `${API_BASE}?action=update&rowId=${encodeURIComponent(selected.rowId)}&supplier=${encodeURIComponent(supplier)}&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}&Carrier=${encodeURIComponent(Carrier)}&Trackingnumber=${encodeURIComponent(Trackingnumber)}&Trackinglink=${encodeURIComponent(Trackinglink)}`;
     const data = await jsonp(url);
-    if(data && data.ok){ selected.Carrier = Carrier; selected.Trackingnumber = Trackingnumber; selected.Trackinglink = Trackinglink; renderOrders(); setStatus("Complete", true); $("msg").innerHTML = "<span style='color:var(--ok)'>Saved ✓</span>"; }
+    if(data && data.ok){ selected.Carrier = Carrier; selected.Trackingnumber = Trackingnumber; selected.Trackinglink = Trackinglink; renderOrders(); setStatus("Complete", true); $("msg").innerHTML = "<span style='color:var(--ok)'>Saved OK</span>"; }
     else $("msg").innerHTML = "<span style='color:var(--bad)'>Save failed.</span>";
   }catch(_){ $("msg").innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>"; }
   finally{ $("saveBtn").disabled = false; }
 }
 
 async function createOrder(){
-  if(!canCreateOrders()) return; $("createBtn").disabled = true; $("createMsg").textContent = "Adding…";
+  if(!canCreateOrders()) return; $("createBtn").disabled = true; $("createMsg").textContent = "Adding...";
   try{
     let url = `${API_BASE}?action=create&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}`;
     if(isDropshipMode()){
@@ -1204,7 +1226,7 @@ async function createOrder(){
       url += `&Customer=${encodeURIComponent(Customer)}&MailCustomer=${encodeURIComponent(MailCustomer)}&Accountmanager=${encodeURIComponent(Accountmanager)}&SurfcenterOrder=${encodeURIComponent(SurfcenterOrder)}`;
     }
     const data = await jsonp(url);
-    if(data && data.ok){ $("createMsg").innerHTML = "<span style='color:var(--ok)'>Added ✓</span>"; $("newCustomer").value = ""; $("newMailCustomer").value = ""; $("newDropOrder").value = ""; $("newSurfOrder").value = ""; $("newInvoiceCustomer").value = ""; $("newInvoiceMailCustomer").value = ""; $("newInvoiceSurfOrder").value = ""; $("newOrderModal").classList.add("hidden"); await loadOrders(); }
+    if(data && data.ok){ $("createMsg").innerHTML = "<span style='color:var(--ok)'>Added OK</span>"; $("newCustomer").value = ""; $("newMailCustomer").value = ""; $("newDropOrder").value = ""; $("newSurfOrder").value = ""; $("newInvoiceCustomer").value = ""; $("newInvoiceMailCustomer").value = ""; $("newInvoiceSurfOrder").value = ""; $("newOrderModal").classList.add("hidden"); await loadOrders(); }
     else $("createMsg").innerHTML = `<span style='color:var(--bad)'>Failed: ${escapeHTML((data && data.error) || "Unknown")}</span>`;
   }catch(_){ $("createMsg").innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>"; }
   finally{ $("createBtn").disabled = false; }
@@ -1223,12 +1245,12 @@ function prepareCreateModal_(){
 }
 
 function showLogin(){ $("portalView").classList.add("hidden"); $("loginView").classList.remove("hidden"); $("loginMsg").textContent = ""; $("keyInput").value = ""; setTimeout(()=> $("keyInput").focus(), 50); }
-function showPortal(){ $("loginView").classList.add("hidden"); $("portalView").classList.remove("hidden"); }
+function showPortal(){ $("loginView").classList.add("hidden"); $("portalView").classList.remove("hidden"); $("portalSub").textContent = "Home  ...  Tracking"; }
 async function doLogin(withKey){
   const rawKey = (withKey ?? $("keyInput").value).trim();
   const key = mapLoginKeyAlias(rawKey);
   if(!key){ $("loginMsg").innerHTML = "<span style='color:var(--warn)'>Please enter login.</span>"; return; }
-  $("loginBtn").disabled = true; $("loginMsg").textContent = "Checking…";
+  $("loginBtn").disabled = true; $("loginMsg").textContent = "Checking...";
   try{
     const data = await jsonp(`${API_BASE}?action=auth&supplierKey=${encodeURIComponent(key)}`);
     if(!data || !data.ok){ $("loginMsg").innerHTML = "<span style='color:var(--bad)'>Invalid login.</span>"; return; }
