@@ -645,7 +645,7 @@
   </div>
 </div>
 
-<script
+<script>
 const API_BASE = "https://script.google.com/macros/s/AKfycbyJU3X0vZY6uRTvSY_Ee_D8qriU-Bimw9xApBe4jV7jznOsrI9Mqyalf7hyn59jeRayWA/exec";
 const MASTER_NAME = "ALL";
 const MASTER_ALIAS = "Jasper";
@@ -1105,7 +1105,7 @@ function applyModeUI_(){
   $("dropshipTemplatesSection").classList.toggle("hidden", !(isDropshipMode() && isMasterLogin()));
   $("invoiceTemplatesSection").classList.toggle("hidden", !isInvoiceMode());
   $("trackingFieldsWrap").classList.toggle("hidden", isInvoiceMode());
-  $("accountmanagerBlock").classList.toggle("hidden", true);
+  $("accountmanagerBlock").classList.toggle("hidden", !isInvoiceMode());
   $("completedWrap").classList.toggle("hidden", !shouldSplitCompletedList());
   $("mailLogSection").classList.toggle("hidden", !shouldShowMailLog());
   $("defaultCustomerFlags").classList.toggle("hidden", false);
