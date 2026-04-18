@@ -200,13 +200,8 @@
 
               <div id="accountmanagerBlock" class="hidden" style="margin-top:10px">
                 <div class="kvLabel">Accountmanager</div>
-                <div id="accountmanagerValueWrap">
-                  <div class="kvValue" id="accountmanagerLabel">—</div>
-                  <div class="smallLine" id="accountmanagerMailLine"></div>
-                </div>
-                <div id="accountmanagerSelectWrap" class="hidden" style="margin-top:8px">
-                  <select id="accountmanagerSelect"></select>
-                </div>
+                <div class="kvValue" id="accountmanagerLabel">—</div>
+                <div class="smallLine" id="accountmanagerMailLine"></div>
               </div>
 
               <div style="height:10px"></div>
@@ -306,46 +301,6 @@
             </div>
 
             <div id="invoiceTemplatesSection" class="hidden">
-              <div class="divider"></div>
-              <div class="toggleRow" id="editInvoiceCustomerToggle">
-                <div class="sectionTitle">Edit Mail customer</div>
-                <div class="plusSym" id="editInvoiceCustomerPlus">+</div>
-              </div>
-              <div id="editInvoiceCustomerBody" class="hidden" style="margin-top:10px">
-                <div class="grid2">
-                  <div>
-                    <label style="margin-top:0">Language</label>
-                    <select id="editInvoiceCustomerLang">
-                      <option value="en">EN</option>
-                      <option value="nl">NL</option>
-                      <option value="de">DE</option>
-                      <option value="fr">FR</option>
-                    </select>
-                  </div>
-                  <div></div>
-                </div>
-
-                <label>Subject</label>
-                <input id="editInvoiceCustomerSubject" />
-
-                <label>Body</label>
-                <textarea id="editInvoiceCustomerBodyText" rows="7"></textarea>
-
-                <div class="tokenRow">
-                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
-                  <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
-                </div>
-
-                <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px">
-                  <button id="editInvoiceCustomerSave" class="btn primary" type="button">Save</button>
-                </div>
-                <div class="hint" id="editInvoiceCustomerMsg"></div>
-              </div>
-
-              <div class="divider"></div>
               <div class="divider"></div>
               <div class="sectionTitle" style="margin-bottom:10px">Mail Templates</div>
               <div id="invoiceTemplatesList">
@@ -637,7 +592,6 @@
 
       <label>Accountmanager</label>
       <input id="newInvoiceAccountmanager" readonly />
-      <select id="newInvoiceAccountmanagerSelect" class="hidden"></select>
 
       <label>Surfcenter order</label>
       <input id="newInvoiceSurfOrder" />
@@ -664,9 +618,8 @@
 </div>
 
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbwGl45ux88ipi89FwZEN5b5__od-PjyXGy9nW3Kp_WCX6TaGRRye5mU4NytLF12DIvrDg/exec";
-const MASTER_LOGIN_NAME = "Jasper";
-const MASTER_NAME = "Jasper";
+const API_BASE = "https://script.google.com/macros/s/AKfycbyJU3X0vZY6uRTvSY_Ee_D8qriU-Bimw9xApBe4jV7jznOsrI9Mqyalf7hyn59jeRayWA/exec";
+const MASTER_NAME = "ALL";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
 const LOGIN_TYPE_SUPPLIER = "supplier";
@@ -730,8 +683,6 @@ let selected = null;
 let suppliersList = [];
 let suppliersMailMap = {};
 let suppliersKeyMap = {};
-let accountmanagersList = [];
-let accountmanagerMailMap = {};
 let indepTemplates = [];
 let customerTemplates = [];
 let supplierTemplates = [];
@@ -1262,4 +1213,3 @@ setupToggle("editInvoiceCustomerToggle","editInvoiceCustomerBody","editInvoiceCu
 </script>
 </body>
 </html>
-
