@@ -1,18 +1,18 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Favicon -->
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Delivery Overview </title>
+  <title>Delivery Overview</title>
   <style>
     :root{
       --bg:#ffffff; --card:#ffffff; --text:#0f172a; --muted:#64748b; --border:#e2e8f0;
       --primary:#2563eb; --primary2:#1d4ed8;
       --ok:#16a34a; --warn:#d97706; --bad:#dc2626; --soft:#f8fafc;
+      --pill:#ededee; --pillText:#36383d; --pillActive:#1f2024;
     }
     *{box-sizing:border-box}
     body{
@@ -22,7 +22,8 @@
     }
     .wrap{max-width:1120px;margin:0 auto;padding:26px 16px}
     header{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
-    h1{font-size:18px;margin:0}
+    .brand{display:flex;align-items:center;gap:12px;min-height:42px}
+    .brand img{height:42px;max-width:220px;object-fit:contain;display:block}
     .sub{color:var(--muted);font-size:13px;line-height:1.4}
     .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:0 10px 22px rgba(2,6,23,.06)}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -32,12 +33,8 @@
       padding:10px 12px;border-radius:12px;outline:none;
     }
     textarea{resize:vertical}
-    input:focus, select:focus, textarea:focus{
-      border-color:rgba(37,99,235,.55);box-shadow:0 0 0 4px rgba(37,99,235,.12)
-    }
+    input:focus, select:focus, textarea:focus{border-color:rgba(37,99,235,.55);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
     select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:none}
-
-    /* kill yellow autofill (Chrome/Safari) */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus,
@@ -51,7 +48,6 @@
       box-shadow: 0 0 0 1000px #fff inset !important;
       transition: background-color 5000s ease-in-out 0s;
     }
-
     .btn{
       border:1px solid var(--border);background:#fff;color:var(--text);
       padding:10px 12px;border-radius:12px;cursor:pointer;white-space:nowrap;
@@ -66,10 +62,18 @@
     .btn:disabled{opacity:.55;cursor:not-allowed}
     .btn.icon{width:44px;padding:10px 0}
     .btn.small{padding:8px 10px;border-radius:10px;font-size:12px}
-    .btn.active{
-      border-color:rgba(37,99,235,.55);
-      box-shadow:0 0 0 4px rgba(37,99,235,.12);
+    .btn.active{border-color:rgba(37,99,235,.55);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+
+    .modeWrap{display:flex;justify-content:flex-start;margin-bottom:14px}
+    .modeSwitch{
+      display:inline-flex;align-items:center;gap:6px;padding:6px;background:var(--pill);
+      border-radius:999px;
     }
+    .modeBtn{
+      border:none;background:transparent;color:var(--pillText);padding:10px 18px;border-radius:999px;
+      font-size:14px;cursor:pointer;min-width:120px;
+    }
+    .modeBtn.active{background:var(--pillActive);color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(15,23,42,.14)}
 
     .table{
       width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;
@@ -78,7 +82,6 @@
     .table th,.table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;text-align:left}
     .table th{color:var(--muted);font-weight:600;background:var(--soft)}
     .table tr:last-child td{border-bottom:none}
-
     .muted{color:var(--muted)}
     .status{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--muted);white-space:nowrap;background:#fff}
     .dot{width:8px;height:8px;border-radius:999px;background:var(--warn)}
@@ -89,7 +92,7 @@
 
     .two{display:grid;grid-template-columns:440px 1fr;gap:14px;align-items:stretch}
     .colStretch{height:100%;display:flex;flex-direction:column}
-    @media (max-width: 980px){.two{grid-template-columns:1fr}}
+    @media (max-width:980px){.two{grid-template-columns:1fr}}
 
     .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.5}
     .center{min-height:100vh;display:grid;place-items:center;padding:18px}
@@ -102,7 +105,8 @@
     .smallLine{margin-top:3px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
     .loginCard{max-width:520px;width:100%;padding:18px}
-    .loginHeader{text-align:center;margin-bottom:10px}
+    .loginHeader{text-align:center;margin-bottom:14px}
+    .loginLogo{height:64px;max-width:260px;object-fit:contain;display:block;margin:0 auto 8px}
     .loginForm{max-width:380px;margin:0 auto}
     .loginActions{justify-content:center}
     .loginMsg{text-align:center;min-height:18px}
@@ -110,63 +114,27 @@
     .actionsCell{white-space:nowrap;display:flex;gap:8px;justify-content:flex-start;align-items:center;flex-wrap:nowrap}
     .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.2px}
     .divider{height:1px;background:var(--border);margin:12px 0}
-
-    .toggleRow{
-      display:flex;justify-content:space-between;align-items:center;gap:10px;
-      padding:10px 12px;border:1px dashed var(--border);background:var(--soft);
-      border-radius:12px;cursor:pointer;user-select:none;
-    }
+    .toggleRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px dashed var(--border);background:var(--soft);border-radius:12px;cursor:pointer;user-select:none}
     .plusSym{font-weight:800;font-size:18px;line-height:1;color:var(--muted)}
     .flag{font-size:16px;line-height:1}
-
     .mailGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;margin-top:10px}
     @media (max-width:520px){.mailGrid{grid-template-columns:1fr}}
-
     .flagRow{display:flex;gap:8px;flex-wrap:nowrap}
     .rightBox{display:flex;flex-direction:column;align-items:flex-end}
     .rightBox .row{justify-content:flex-end}
-
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     @media (max-width:520px){.grid2{grid-template-columns:1fr}}
-
     .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end}
-
     .completedCell{text-align:center;width:110px}
-    .checkPill{
-      display:inline-flex;align-items:center;justify-content:center;
-      min-width:34px;height:26px;border-radius:999px;border:1px solid var(--border);
-      background:#fff;color:var(--muted);font-size:14px;font-weight:900;
-    }
+    .checkPill{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted);font-size:14px;font-weight:900}
     .checkPill.yes{border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.08);color:var(--ok)}
-
     .overlay{position:fixed;inset:0;background:rgba(15,23,42,.35);display:grid;place-items:center;padding:18px;z-index:9999}
-
     .tokenRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-
-    .savedTemplateRow{
-      display:flex;justify-content:space-between;align-items:center;gap:10px;
-      padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;
-    }
+    .savedTemplateRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff}
     .savedLeft{min-width:0;display:flex;gap:10px;align-items:flex-start}
-    .tplName{
-      font-weight:700;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width:520px;
-    }
-    /* mail log text wrap inside card */
-    .tplMeta{
-      color:var(--muted);
-      font-size:12px;
-      white-space:normal;
-      overflow-wrap:anywhere;
-      word-break:break-word;
-      max-width:520px;
-    }
-
-    /* more spacing between saved templates */
-    #indepTemplatesList{display:flex;flex-direction:column;gap:10px}
+    .tplName{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
+    .tplMeta{color:var(--muted);font-size:12px;white-space:normal;overflow-wrap:anywhere;word-break:break-word;max-width:520px}
+    #indepTemplatesList,#invoiceTemplatesList{display:flex;flex-direction:column;gap:10px}
   </style>
 </head>
 <body>
@@ -174,7 +142,8 @@
 <section id="loginView" class="center">
   <div class="card loginCard">
     <div class="loginHeader">
-      <h1>Delivery Overview 📦</h1>
+      <img src="logo.png" alt="Logo" class="loginLogo">
+      <div class="sub">Login with supplier key, accountmanager key or master key</div>
     </div>
     <div class="loginForm">
       <label for="keyInput">Login</label>
@@ -192,20 +161,28 @@
   <div class="wrap">
     <header>
       <div>
-        <h1 id="headerTitle">Delivery Overview 📦</h1>
-        <div class="sub">Open an order to enter / check shipment details</div>
+        <div class="brand">
+          <img src="logo.png" alt="Logo">
+        </div>
+        <div class="sub" id="portalSub">Open an order to enter / check shipment details</div>
       </div>
       <div class="row topRightTools">
         <button id="newOrderBtn" class="btn hidden" type="button" title="New order">
           <span style="font-weight:900;font-size:18px;line-height:1">+</span>
-          <span>Add new order</span>
+          <span id="newOrderBtnText">Add new order</span>
         </button>
         <button id="logoutBtn" class="btn icon" type="button" title="Logout">⏻</button>
       </div>
     </header>
 
+    <div id="modeWrap" class="modeWrap hidden">
+      <div class="modeSwitch" role="tablist" aria-label="Portal mode">
+        <button id="modeDropshipBtn" class="modeBtn active" type="button">Dropshipment</button>
+        <button id="modeInvoiceBtn" class="modeBtn" type="button">Invoice</button>
+      </div>
+    </div>
+
     <div class="two">
-      <!-- LEFT -->
       <section class="card colStretch">
         <div id="noSelection" class="hint">Open an order from the table.</div>
 
@@ -216,18 +193,23 @@
               <div class="kvValue" id="customerLabel">—</div>
               <div class="smallLine" id="customerMailLine"></div>
 
-              <!-- Master only -->
               <div id="supplierBlock" class="hidden" style="margin-top:10px">
                 <div class="kvLabel">Supplier</div>
                 <div class="kvValue" id="supplierLabel">—</div>
                 <div class="smallLine" id="supplierKeyLine"></div>
               </div>
 
-              <div style="height:10px"></div>
-              <div class="kvLabel">Dropshipment order</div>
-              <div class="kvValue" id="dropOrderLabel">—</div>
+              <div id="accountmanagerBlock" class="hidden" style="margin-top:10px">
+                <div class="kvLabel">Accountmanager</div>
+                <div class="kvValue" id="accountmanagerLabel">—</div>
+                <div class="smallLine" id="accountmanagerMailLine"></div>
+              </div>
 
-              <div id="surfOrderBlock" class="hidden" style="margin-top:10px">
+              <div style="height:10px"></div>
+              <div class="kvLabel" id="primaryOrderCaption">Dropshipment order</div>
+              <div class="kvValue" id="primaryOrderLabel">—</div>
+
+              <div id="surfOrderBlock" style="margin-top:10px">
                 <div class="kvLabel">Surfcenter order</div>
                 <div class="kvValue" id="surfOrderLabel">—</div>
               </div>
@@ -240,25 +222,26 @@
             </div>
           </div>
 
-          <label>Carrier</label>
-          <input id="carrier" />
+          <div id="trackingFieldsWrap">
+            <label>Carrier</label>
+            <input id="carrier" />
 
-          <label>Tracking number</label>
-          <input id="trackingNumber" />
+            <label>Tracking number</label>
+            <input id="trackingNumber" />
 
-          <label>Tracking link</label>
-          <input id="trackingLink" />
+            <label>Tracking link</label>
+            <input id="trackingLink" />
 
-          <div class="row" style="margin-top:12px">
-            <button id="saveBtn" class="btn primary" type="button">Save</button>
+            <div class="row" style="margin-top:12px">
+              <button id="saveBtn" class="btn primary" type="button">Save</button>
+            </div>
           </div>
 
-          <!-- MASTER ONLY -->
           <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
-            <div class="mailGrid">
+            <div class="mailGrid" id="dropshipMailGrid">
               <div>
                 <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
-                <div class="flagRow">
+                <div class="flagRow" id="defaultCustomerFlags">
                   <button class="btn icon" id="mc_en" title="EN"><span class="flag">🇬🇧</span></button>
                   <button class="btn icon" id="mc_nl" title="NL"><span class="flag">🇳🇱</span></button>
                   <button class="btn icon" id="mc_de" title="DE"><span class="flag">🇩🇪</span></button>
@@ -267,7 +250,7 @@
                 <div class="hint" id="mailMsg"></div>
               </div>
 
-              <div class="rightBox">
+              <div class="rightBox" id="supplierMailBox">
                 <div class="sectionTitle" style="margin-bottom:8px">Mail supplier</div>
                 <div class="flagRow">
                   <button class="btn icon" id="ms_en" title="EN"><span class="flag">🇬🇧</span></button>
@@ -277,146 +260,188 @@
               </div>
             </div>
 
-            <div class="divider"></div>
+            <div id="invoiceMailTemplatesSection" class="hidden">
+              <div class="divider"></div>
+              <div class="sectionTitle" style="margin-bottom:10px">Mail Templates 2</div>
+              <div id="invoiceTemplatesList">
+                <div class="muted" style="font-size:13px">No invoice templates.</div>
+              </div>
+              <div class="hint" id="invoiceSendMsg"></div>
 
-            <div class="sectionTitle" style="margin-bottom:10px">Mail templates</div>
-            <div id="indepTemplatesList">
-              <div class="muted" style="font-size:13px">No templates.</div>
-            </div>
-            <div class="hint" id="indepSendMsg"></div>
+              <div class="divider"></div>
 
-            <div class="divider"></div>
+              <div class="toggleRow" id="addInvoiceTemplateToggle">
+                <div class="sectionTitle">Add template</div>
+                <div class="plusSym" id="addInvoiceTemplatePlus">+</div>
+              </div>
+              <div id="addInvoiceTemplateBody" class="hidden" style="margin-top:10px">
+                <label style="margin-top:0">Template name</label>
+                <input id="invoiceTemplateLabel" />
 
-            <div class="toggleRow" id="addIndepToggle">
-              <div class="sectionTitle">Add template</div>
-              <div class="plusSym" id="addIndepPlus">+</div>
-            </div>
-            <div id="addIndepBody" class="hidden" style="margin-top:10px">
-              <div class="grid2">
-                <div>
-                  <label style="margin-top:0">Language</label>
-                  <select id="indepLang">
-                    <option value="en">EN</option>
-                    <option value="nl">NL</option>
-                    <option value="de">DE</option>
-                    <option value="fr">FR</option>
-                  </select>
+                <label>Subject</label>
+                <input id="invoiceTemplateSubject" />
+
+                <label>Body</label>
+                <textarea id="invoiceTemplateBodyText" rows="7"></textarea>
+
+                <div class="tokenRow">
+                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                  <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
+                  <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
                 </div>
-                <div>
-                  <label style="margin-top:0">Template name</label>
-                  <input id="indepLabel" />
+
+                <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px">
+                  <button id="invoiceTemplateCancel" class="btn" type="button">Cancel edit</button>
+                  <button id="invoiceTemplateSave" class="btn primary" type="button">Save</button>
                 </div>
+                <div class="hint" id="invoiceTemplateSaveMsg"></div>
               </div>
-
-              <label>Subject</label>
-              <input id="indepSubject" />
-
-              <label>Body</label>
-              <textarea id="indepBodyText" rows="7"></textarea>
-
-              <div class="tokenRow">
-                <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
-                <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
-                <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
-                <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
-                <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
-                <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
-              </div>
-
-              <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px">
-                <button id="indepCancel" class="btn" type="button">Cancel edit</button>
-                <button id="indepSave" class="btn primary" type="button">Save</button>
-              </div>
-              <div class="hint" id="indepSaveMsg"></div>
             </div>
 
-            <div class="divider"></div>
+            <div id="dropshipTemplatesSection">
+              <div class="divider"></div>
 
-            <div class="toggleRow" id="editCustomerToggle">
-              <div class="sectionTitle">Edit Mail customer</div>
-              <div class="plusSym" id="editCustomerPlus">+</div>
-            </div>
-            <div id="editCustomerBody" class="hidden" style="margin-top:10px">
-              <div class="grid2">
-                <div>
-                  <label style="margin-top:0">Language</label>
-                  <select id="editCustomerLang">
-                    <option value="en">EN</option>
-                    <option value="nl">NL</option>
-                    <option value="de">DE</option>
-                    <option value="fr">FR</option>
-                  </select>
+              <div class="sectionTitle" style="margin-bottom:10px">Mail templates</div>
+              <div id="indepTemplatesList">
+                <div class="muted" style="font-size:13px">No templates.</div>
+              </div>
+              <div class="hint" id="indepSendMsg"></div>
+
+              <div class="divider"></div>
+
+              <div class="toggleRow" id="addIndepToggle">
+                <div class="sectionTitle">Add template</div>
+                <div class="plusSym" id="addIndepPlus">+</div>
+              </div>
+              <div id="addIndepBody" class="hidden" style="margin-top:10px">
+                <div class="grid2">
+                  <div>
+                    <label style="margin-top:0">Language</label>
+                    <select id="indepLang">
+                      <option value="en">EN</option>
+                      <option value="nl">NL</option>
+                      <option value="de">DE</option>
+                      <option value="fr">FR</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="margin-top:0">Template name</label>
+                    <input id="indepLabel" />
+                  </div>
                 </div>
-                <div></div>
-              </div>
 
-              <label>Subject</label>
-              <input id="editCustomerSubject" />
+                <label>Subject</label>
+                <input id="indepSubject" />
 
-              <label>Body</label>
-              <textarea id="editCustomerBodyText" rows="7"></textarea>
+                <label>Body</label>
+                <textarea id="indepBodyText" rows="7"></textarea>
 
-              <div class="tokenRow">
-                <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
-                <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
-                <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
-                <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
-                <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
-                <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
-              </div>
-
-              <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px">
-                <button id="editCustomerSave" class="btn primary" type="button">Save</button>
-              </div>
-              <div class="hint" id="editCustomerMsg"></div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="toggleRow" id="editSupplierToggle">
-              <div class="sectionTitle">Edit Mail supplier</div>
-              <div class="plusSym" id="editSupplierPlus">+</div>
-            </div>
-            <div id="editSupplierBody" class="hidden" style="margin-top:10px">
-              <div class="grid2">
-                <div>
-                  <label style="margin-top:0">Language</label>
-                  <select id="editSupplierLang">
-                    <option value="en">EN</option>
-                    <option value="nl">NL</option>
-                  </select>
+                <div class="tokenRow">
+                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                  <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
+                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                  <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                  <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                  <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                  <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                  <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
                 </div>
-                <div></div>
+
+                <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px">
+                  <button id="indepCancel" class="btn" type="button">Cancel edit</button>
+                  <button id="indepSave" class="btn primary" type="button">Save</button>
+                </div>
+                <div class="hint" id="indepSaveMsg"></div>
               </div>
 
-              <label>Subject</label>
-              <input id="editSupplierSubject" />
+              <div class="divider"></div>
 
-              <label>Body</label>
-              <textarea id="editSupplierBodyText" rows="7"></textarea>
+              <div class="toggleRow" id="editCustomerToggle">
+                <div class="sectionTitle">Edit Mail customer</div>
+                <div class="plusSym" id="editCustomerPlus">+</div>
+              </div>
+              <div id="editCustomerBody" class="hidden" style="margin-top:10px">
+                <div class="grid2">
+                  <div>
+                    <label style="margin-top:0">Language</label>
+                    <select id="editCustomerLang">
+                      <option value="en">EN</option>
+                      <option value="nl">NL</option>
+                      <option value="de">DE</option>
+                      <option value="fr">FR</option>
+                    </select>
+                  </div>
+                  <div></div>
+                </div>
 
-              <div class="tokenRow">
-                <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
-                <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
-                <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
-                <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
-                <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
-                <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
+                <label>Subject</label>
+                <input id="editCustomerSubject" />
+
+                <label>Body</label>
+                <textarea id="editCustomerBodyText" rows="7"></textarea>
+
+                <div class="tokenRow">
+                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                  <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
+                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                  <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                  <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                  <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                  <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                  <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
+                </div>
+
+                <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px">
+                  <button id="editCustomerSave" class="btn primary" type="button">Save</button>
+                </div>
+                <div class="hint" id="editCustomerMsg"></div>
               </div>
 
-              <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px">
-                <button id="editSupplierSave" class="btn primary" type="button">Save</button>
+              <div class="divider"></div>
+
+              <div class="toggleRow" id="editSupplierToggle">
+                <div class="sectionTitle">Edit Mail supplier</div>
+                <div class="plusSym" id="editSupplierPlus">+</div>
               </div>
-              <div class="hint" id="editSupplierMsg"></div>
+              <div id="editSupplierBody" class="hidden" style="margin-top:10px">
+                <div class="grid2">
+                  <div>
+                    <label style="margin-top:0">Language</label>
+                    <select id="editSupplierLang">
+                      <option value="en">EN</option>
+                      <option value="nl">NL</option>
+                    </select>
+                  </div>
+                  <div></div>
+                </div>
+
+                <label>Subject</label>
+                <input id="editSupplierSubject" />
+
+                <label>Body</label>
+                <textarea id="editSupplierBodyText" rows="7"></textarea>
+
+                <div class="tokenRow">
+                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                  <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
+                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                  <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                  <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                  <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                  <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                  <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
+                </div>
+
+                <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px">
+                  <button id="editSupplierSave" class="btn primary" type="button">Save</button>
+                </div>
+                <div class="hint" id="editSupplierMsg"></div>
+              </div>
             </div>
 
             <div class="divider"></div>
@@ -435,7 +460,6 @@
         </div>
       </section>
 
-      <!-- RIGHT -->
       <section class="card colStretch">
         <input id="historySearch" placeholder="Search…" style="width:100%;margin-bottom:12px" />
 
@@ -482,28 +506,43 @@
   </div>
 </section>
 
-<!-- New order modal -->
 <div id="newOrderModal" class="overlay hidden">
   <div class="card" style="max-width:520px;width:100%">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-      <div style="font-weight:800">New order</div>
+      <div style="font-weight:800" id="newOrderModalTitle">New order</div>
       <button id="newOrderClose" class="btn" type="button">Close</button>
     </div>
 
-    <label>Customer</label>
-    <input id="newCustomer" />
+    <div id="dropshipCreateFields">
+      <label>Customer</label>
+      <input id="newCustomer" />
 
-    <label>Mail Customer</label>
-    <input id="newMailCustomer" type="email" />
+      <label>Mail Customer</label>
+      <input id="newMailCustomer" type="email" />
 
-    <label>Supplier</label>
-    <select id="newSupplier"></select>
+      <label>Supplier</label>
+      <select id="newSupplier"></select>
 
-    <label>Dropshipment order</label>
-    <input id="newDropOrder" />
+      <label>Dropshipment order</label>
+      <input id="newDropOrder" />
 
-    <label>Surfcenter order</label>
-    <input id="newSurfOrder" />
+      <label>Surfcenter order</label>
+      <input id="newSurfOrder" />
+    </div>
+
+    <div id="invoiceCreateFields" class="hidden">
+      <label>Customer</label>
+      <input id="newInvoiceCustomer" />
+
+      <label>Mail Customer</label>
+      <input id="newInvoiceMailCustomer" type="email" />
+
+      <label>Accountmanager</label>
+      <input id="newInvoiceAccountmanager" readonly />
+
+      <label>Surfcenter order</label>
+      <input id="newInvoiceSurfOrder" />
+    </div>
 
     <div class="row" style="margin-top:12px;justify-content:flex-end">
       <button id="createBtn" class="btn primary" type="button">Add order</button>
@@ -513,7 +552,6 @@
   </div>
 </div>
 
-<!-- Mail picker -->
 <div id="mailPicker" class="hidden" style="position:fixed;inset:0;background:rgba(15,23,42,.35);display:grid;place-items:center;padding:18px;z-index:9999">
   <div class="card" style="max-width:420px;width:100%">
     <div style="font-weight:700;font-size:14px">Choose mail app</div>
@@ -527,14 +565,17 @@
 </div>
 
 <script>
-/** Put your /exec URL here */
 const API_BASE = "https://script.google.com/macros/s/AKfycbwGl45ux88ipi89FwZEN5b5__od-PjyXGy9nW3Kp_WCX6TaGRRye5mU4NytLF12DIvrDg/exec";
-const MASTER_SUPPLIER_NAME = "ALL";
+const MASTER_NAME = "ALL";
+const ORDER_MODE_DROPSHIP = "dropshipment";
+const ORDER_MODE_INVOICE = "invoice";
+const LOGIN_TYPE_SUPPLIER = "supplier";
+const LOGIN_TYPE_MASTER = "master";
+const LOGIN_TYPE_ACCOUNTMANAGER = "accountmanager";
 const $ = (id)=>document.getElementById(id);
 
-/* utils */
 function escapeHTML(s){
-  return String(s || "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+  return String(s || "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 }
 function normalizeKey(k){ return String(k || "").trim().toLowerCase().replace(/\s+/g," "); }
 function getAny(obj, wantedKeys){
@@ -550,9 +591,6 @@ function getAny(obj, wantedKeys){
   }
   return "";
 }
-function isMasterLogin(){
-  return String(supplier || "").trim().toLowerCase() === String(MASTER_SUPPLIER_NAME).toLowerCase();
-}
 function jsonp(url){
   return new Promise((resolve, reject) => {
     const cb = "cb_" + Math.random().toString(36).slice(2);
@@ -563,7 +601,17 @@ function jsonp(url){
     document.head.appendChild(script);
   });
 }
+function api_(qs){ return jsonp(`${API_BASE}${API_BASE.includes("?") ? "&" : "?"}${qs}`); }
+function isMasterLogin(){ return loginType === LOGIN_TYPE_MASTER; }
+function isSupplierLogin(){ return loginType === LOGIN_TYPE_SUPPLIER; }
+function isAccountmanagerLogin(){ return loginType === LOGIN_TYPE_ACCOUNTMANAGER; }
+function canUseInvoiceMode(){ return isMasterLogin() || isAccountmanagerLogin(); }
+function canCreateOrders(){ return isMasterLogin() || isAccountmanagerLogin(); }
+function isDropshipMode(){ return currentMode === ORDER_MODE_DROPSHIP; }
+function isInvoiceMode(){ return currentMode === ORDER_MODE_INVOICE; }
+
 function trackingComplete(o){
+  if(isInvoiceMode()) return true;
   return !!(getAny(o,["Carrier"]) && getAny(o,["Trackingnumber","Tracking Number"]) && getAny(o,["Trackinglink","Tracking Link"]));
 }
 function setStatus(text, ok){
@@ -572,9 +620,14 @@ function setStatus(text, ok){
   $("statusText").textContent = text;
 }
 
-/* state */
 let supplier = "";
 let supplierKey = "";
+let loginType = "";
+let accountmanagerName = "";
+let accountmanagerMail = "";
+let accountmanagerKey = "";
+let currentMode = ORDER_MODE_DROPSHIP;
+
 let orders = [];
 let selected = null;
 let suppliersList = [];
@@ -584,35 +637,37 @@ let suppliersKeyMap = {};
 let indepTemplates = [];
 let customerTemplates = [];
 let supplierTemplates = [];
+let invoiceTemplates = [];
 
 let lastFocusedField = null;
+let pendingMail = null;
 
-/* tokens */
 function firstNameFromCustomer_(full){
   const s = String(full||"").trim();
   if(!s) return "";
   return s.split(/\s+/)[0] || s;
 }
 function tokenMap(){
-  const fullCustomer = getAny(selected, ["Customer"]) || "";
-  const sup = getAny(selected, ["Supplier"]) || "";
-
-  const rowSupKey = getAny(selected, ["Supplier KEY","SupplierKey","Supplier KEY "]) || "";
-  const supKey = isMasterLogin() ? rowSupKey : supplierKey;
-
-  const drop = getAny(selected, ["Dropshipment order","Dropshipment Order","DropshipmentOrder","Order ID","OrderID"]) || "";
-  const surf = getAny(selected, ["Surfcenter order","Surfcenter Order","SurfcenterOrder"]) || "";
+  const fullCustomer = getAny(selected,["Customer"]) || "";
+  const sup = getAny(selected,["Supplier"]) || "";
+  const rowSupKey = getAny(selected,["Supplier KEY","SupplierKey","Supplier KEY "]) || "";
+  const drop = getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]) || "";
+  const surf = getAny(selected,["Surfcenter order","Surfcenter Order","SurfcenterOrder"]) || "";
+  const accName = getAny(selected,["Accountmanager"]) || accountmanagerName || "";
+  const accMail = getAny(selected,["Mail Accountmanager","MailAccountmanager"]) || accountmanagerMail || "";
 
   return {
     "{{Customer}}": firstNameFromCustomer_(fullCustomer),
     "{{CustomerFull}}": fullCustomer,
     "{{DropshipmentOrder}}": drop,
     "{{SurfcenterOrder}}": surf,
-    "{{Carrier}}": ($("carrier").value.trim() || getAny(selected, ["Carrier"]) || ""),
-    "{{Trackingnumber}}": ($("trackingNumber").value.trim() || getAny(selected, ["Trackingnumber","Tracking Number"]) || ""),
-    "{{Trackinglink}}": ($("trackingLink").value.trim() || getAny(selected, ["Trackinglink","Tracking Link"]) || ""),
+    "{{Carrier}}": ($("carrier").value.trim() || getAny(selected,["Carrier"]) || ""),
+    "{{Trackingnumber}}": ($("trackingNumber").value.trim() || getAny(selected,["Trackingnumber","Tracking Number"]) || ""),
+    "{{Trackinglink}}": ($("trackingLink").value.trim() || getAny(selected,["Trackinglink","Tracking Link"]) || ""),
     "{{Supplier}}": sup,
-    "{{SupplierKey}}": supKey,
+    "{{SupplierKey}}": rowSupKey || supplierKey,
+    "{{Accountmanager}}": accName,
+    "{{MailAccountmanager}}": accMail,
   };
 }
 function applyTokens(txt){
@@ -622,13 +677,6 @@ function applyTokens(txt){
   return out;
 }
 
-/* focus tracking for token insertion */
-document.addEventListener("focusin", (e)=>{
-  const el = e.target;
-  if(!el) return;
-  const tag = (el.tagName || "").toLowerCase();
-  if(tag === "input" || tag === "textarea") lastFocusedField = el;
-});
 function insertAtCursor_(el, text){
   if(!el) return;
   const start = (typeof el.selectionStart === "number") ? el.selectionStart : el.value.length;
@@ -642,14 +690,18 @@ function bindTokenButtons_(){
   document.querySelectorAll("button[data-token]").forEach(btn=>{
     btn.addEventListener("click", ()=>{
       const token = btn.getAttribute("data-token");
-      const fallback = $("indepBodyText") || $("editCustomerBodyText");
-      const target = lastFocusedField || fallback;
+      const target = lastFocusedField || $("invoiceTemplateBodyText") || $("indepBodyText");
       insertAtCursor_(target, token);
     });
   });
 }
+document.addEventListener("focusin", (e)=>{
+  const el = e.target;
+  if(!el) return;
+  const tag = (el.tagName || "").toLowerCase();
+  if(tag === "input" || tag === "textarea") lastFocusedField = el;
+});
 
-/* toggles */
 function setupToggle(toggleId, bodyId, plusId, onOpen){
   const t = $(toggleId), b = $(bodyId), p = $(plusId);
   if(!t || !b || !p) return;
@@ -659,13 +711,7 @@ function setupToggle(toggleId, bodyId, plusId, onOpen){
     if(!isHidden && typeof onOpen === "function") onOpen();
   });
 }
-setupToggle("addIndepToggle","addIndepBody","addIndepPlus", resetIndepEditor_);
-setupToggle("editCustomerToggle","editCustomerBody","editCustomerPlus");
-setupToggle("editSupplierToggle","editSupplierBody","editSupplierPlus");
-setupToggle("mailLogToggle","mailLogBody","mailLogPlus");
-setupToggle("completedToggle","completedBody","completedPlus");
 
-/* active button outline reset */
 function clearActiveMailButtons_(){
   document.querySelectorAll(".flagRow .btn.active").forEach(b=>b.classList.remove("active"));
 }
@@ -676,35 +722,34 @@ function setBtnActive_(btn){
   btn.classList.add("active");
 }
 
-/* mail picker */
-let pendingMail = null;
-function openGmailCompose(to, subject, body){
-  const gmailUrl =
-    "https://mail.google.com/mail/?view=cm&fs=1" +
+function openGmailCompose(to, cc, subject, body){
+  let gmailUrl = "https://mail.google.com/mail/?view=cm&fs=1" +
     `&to=${encodeURIComponent(to)}` +
     `&su=${encodeURIComponent(subject)}` +
     `&body=${encodeURIComponent(body)}`;
+  if(cc) gmailUrl += `&cc=${encodeURIComponent(cc)}`;
   window.open(gmailUrl, "_blank", "noopener,noreferrer");
 }
-function openAppleMail(to, subject, body){
-  const mailtoUrl =
-    "mailto:" + encodeURIComponent(to) +
+function openAppleMail(to, cc, subject, body){
+  let mailtoUrl = "mailto:" + encodeURIComponent(to) +
     `?subject=${encodeURIComponent(subject)}` +
     `&body=${encodeURIComponent(body)}`;
+  if(cc) mailtoUrl += `&cc=${encodeURIComponent(cc)}`;
   window.location.href = mailtoUrl;
 }
 function openMailPicker(payload){
   pendingMail = payload;
-  $("pickHint").textContent = "";
+  $("pickHint").textContent = payload.cc ? `CC: ${payload.cc}` : "";
   $("mailPicker").classList.remove("hidden");
 }
 function closeMailPicker(){
   pendingMail = null;
   $("mailPicker").classList.add("hidden");
 }
+
 $("pickGmail").addEventListener("click", ()=>{
   if(!pendingMail) return;
-  openGmailCompose(pendingMail.to, pendingMail.subject, pendingMail.body);
+  openGmailCompose(pendingMail.to, pendingMail.cc || "", pendingMail.subject, pendingMail.body);
   const cb = pendingMail.afterOpen;
   closeMailPicker();
   clearActiveMailButtons_();
@@ -712,7 +757,7 @@ $("pickGmail").addEventListener("click", ()=>{
 });
 $("pickApple").addEventListener("click", ()=>{
   if(!pendingMail) return;
-  openAppleMail(pendingMail.to, pendingMail.subject, pendingMail.body);
+  openAppleMail(pendingMail.to, pendingMail.cc || "", pendingMail.subject, pendingMail.body);
   const cb = pendingMail.afterOpen;
   closeMailPicker();
   clearActiveMailButtons_();
@@ -721,19 +766,12 @@ $("pickApple").addEventListener("click", ()=>{
 $("pickCancel").addEventListener("click", closeMailPicker);
 $("mailPicker").addEventListener("click", (e)=>{ if(e.target === $("mailPicker")) closeMailPicker(); });
 
-/* API helper */
-async function api_(qs){
-  return await jsonp(`${API_BASE}${API_BASE.includes("?") ? "&" : "?"}${qs}`);
-}
-
-/* suppliers */
 async function loadSuppliers_(){
   if(!isMasterLogin()) return;
   const data = await api_(`action=suppliers&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
   suppliersList = (data && data.ok && Array.isArray(data.suppliers)) ? data.suppliers : [];
   suppliersMailMap = (data && data.ok && data.mailMap && typeof data.mailMap === "object") ? data.mailMap : {};
   suppliersKeyMap = (data && data.ok && data.keyMap && typeof data.keyMap === "object") ? data.keyMap : {};
-
   $("newSupplier").innerHTML = "";
   for(const s of suppliersList){
     const opt = document.createElement("option");
@@ -743,13 +781,20 @@ async function loadSuppliers_(){
   }
 }
 
-/* templates */
 function findTpl_(arr, lang){
   const l = String(lang||"").toLowerCase();
   return arr.find(x => String(x.language||"").toLowerCase()===l && String(x.label||"").toUpperCase()==="DEFAULT")
       || arr.find(x => String(x.language||"").toLowerCase()===l)
       || null;
 }
+function langFlag_(lang){
+  const l = String(lang||"").toLowerCase();
+  if(l==="nl") return "🇳🇱";
+  if(l==="de") return "🇩🇪";
+  if(l==="fr") return "🇫🇷";
+  return "🇬🇧";
+}
+
 async function loadAllTemplates_(){
   if(!isMasterLogin()) return;
 
@@ -762,17 +807,15 @@ async function loadAllTemplates_(){
   const s = await api_(`action=supplier_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
   supplierTemplates = (s && s.ok && Array.isArray(s.templates)) ? s.templates : [];
 
+  const inv = await api_(`action=invoice_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
+  invoiceTemplates = (inv && inv.ok && Array.isArray(inv.templates)) ? inv.templates : [];
+
   renderIndepTemplates_();
+  renderInvoiceTemplates_();
   fillCustomerEditorFromLang_($("editCustomerLang").value);
   fillSupplierEditorFromLang_($("editSupplierLang").value);
 }
-function langFlag_(lang){
-  const l = String(lang||"").toLowerCase();
-  if(l==="nl") return "🇳🇱";
-  if(l==="de") return "🇩🇪";
-  if(l==="fr") return "🇫🇷";
-  return "🇬🇧";
-}
+
 function renderIndepTemplates_(){
   const wrap = $("indepTemplatesList");
   wrap.innerHTML = "";
@@ -782,12 +825,10 @@ function renderIndepTemplates_(){
     if(la!==lb) return la.localeCompare(lb);
     return String(a.label||"").localeCompare(String(b.label||""));
   });
-
   if(!list.length){
     wrap.innerHTML = `<div class="muted" style="font-size:13px">No templates.</div>`;
     return;
   }
-
   for(const t of list){
     const row = document.createElement("div");
     row.className = "savedTemplateRow";
@@ -806,34 +847,72 @@ function renderIndepTemplates_(){
     `;
     wrap.appendChild(row);
   }
-
   wrap.querySelectorAll("button[data-indep-send]").forEach(btn=>{
     btn.addEventListener("click", ()=>{
-      const id = btn.getAttribute("data-indep-send");
-      const tpl = indepTemplates.find(x => String(x.id)===String(id));
-      if(!tpl) return;
-      sendIndependentTemplate_(tpl);
+      const tpl = indepTemplates.find(x => String(x.id)===String(btn.getAttribute("data-indep-send")));
+      if(tpl) sendIndependentTemplate_(tpl);
     });
   });
-
   wrap.querySelectorAll("button[data-indep-edit]").forEach(btn=>{
     btn.addEventListener("click", ()=>{
-      const id = btn.getAttribute("data-indep-edit");
-      const tpl = indepTemplates.find(x => String(x.id)===String(id));
+      const tpl = indepTemplates.find(x => String(x.id)===String(btn.getAttribute("data-indep-edit")));
       if(!tpl) return;
-
       $("addIndepBody").classList.remove("hidden");
       $("addIndepPlus").textContent = "–";
-
       $("indepLang").value = (tpl.language || "en").toLowerCase();
       $("indepLabel").value = tpl.label || "";
       $("indepSubject").value = tpl.subject || "";
       $("indepBodyText").value = tpl.body || "";
-
       $("indepSave").dataset.editId = String(tpl.id || "");
       $("indepSave").textContent = "Update";
-
       $("indepSaveMsg").textContent = "";
+    });
+  });
+}
+
+function renderInvoiceTemplates_(){
+  const wrap = $("invoiceTemplatesList");
+  wrap.innerHTML = "";
+  const list = invoiceTemplates.slice().sort((a,b)=> String(a.label||"").localeCompare(String(b.label||"")));
+  if(!list.length){
+    wrap.innerHTML = `<div class="muted" style="font-size:13px">No invoice templates.</div>`;
+    return;
+  }
+  for(const t of list){
+    const row = document.createElement("div");
+    row.className = "savedTemplateRow";
+    row.innerHTML = `
+      <div class="savedLeft">
+        <div style="min-width:0">
+          <div class="tplName" title="${escapeHTML(t.label||"")}">${escapeHTML(t.label||"")}</div>
+          <div class="tplMeta">${escapeHTML(String(t.subject||"") || "")}</div>
+        </div>
+      </div>
+      <div class="row" style="flex-wrap:nowrap;gap:8px">
+        <button class="btn" type="button" data-invoice-edit="${escapeHTML(t.id)}">Edit</button>
+        <button class="btn" type="button" data-invoice-send="${escapeHTML(t.id)}">Send</button>
+      </div>
+    `;
+    wrap.appendChild(row);
+  }
+  wrap.querySelectorAll("button[data-invoice-send]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const tpl = invoiceTemplates.find(x => String(x.id)===String(btn.getAttribute("data-invoice-send")));
+      if(tpl) sendInvoiceTemplate_(tpl);
+    });
+  });
+  wrap.querySelectorAll("button[data-invoice-edit]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const tpl = invoiceTemplates.find(x => String(x.id)===String(btn.getAttribute("data-invoice-edit")));
+      if(!tpl) return;
+      $("addInvoiceTemplateBody").classList.remove("hidden");
+      $("addInvoiceTemplatePlus").textContent = "–";
+      $("invoiceTemplateLabel").value = tpl.label || "";
+      $("invoiceTemplateSubject").value = tpl.subject || "";
+      $("invoiceTemplateBodyText").value = tpl.body || "";
+      $("invoiceTemplateSave").dataset.editId = String(tpl.id || "");
+      $("invoiceTemplateSave").textContent = "Update";
+      $("invoiceTemplateSaveMsg").textContent = "";
     });
   });
 }
@@ -850,9 +929,6 @@ function fillSupplierEditorFromLang_(lang){
   $("editSupplierBodyText").value = t ? (t.body||"") : "";
   $("editSupplierMsg").textContent = "";
 }
-$("editCustomerLang").addEventListener("change", ()=> fillCustomerEditorFromLang_($("editCustomerLang").value));
-$("editSupplierLang").addEventListener("change", ()=> fillSupplierEditorFromLang_($("editSupplierLang").value));
-
 
 function resetIndepEditor_(){
   $("indepLang").value = "en";
@@ -863,6 +939,14 @@ function resetIndepEditor_(){
   $("indepSave").textContent = "Save";
   delete $("indepSave").dataset.editId;
 }
+function resetInvoiceTemplateEditor_(){
+  $("invoiceTemplateLabel").value = "";
+  $("invoiceTemplateSubject").value = "";
+  $("invoiceTemplateBodyText").value = "";
+  $("invoiceTemplateSaveMsg").textContent = "";
+  $("invoiceTemplateSave").textContent = "Save";
+  delete $("invoiceTemplateSave").dataset.editId;
+}
 
 async function saveIndepTemplate_(){
   const lang = ($("indepLang").value||"en").toLowerCase();
@@ -870,14 +954,8 @@ async function saveIndepTemplate_(){
   const subject = ($("indepSubject").value||"").trim();
   const body = ($("indepBodyText").value||"").trim();
   const msg = $("indepSaveMsg");
-
-  if(!label){
-    msg.innerHTML = `<span style="color:var(--warn)">Template name required.</span>`;
-    return;
-  }
-
+  if(!label){ msg.innerHTML = `<span style="color:var(--warn)">Template name required.</span>`; return; }
   msg.textContent = "Saving…";
-
   const editId = $("indepSave").dataset.editId || "";
   const data = await api_(
     `action=indep_upsert&supplierKey=${encodeURIComponent(supplierKey)}` +
@@ -887,16 +965,30 @@ async function saveIndepTemplate_(){
     `&subject=${encodeURIComponent(subject)}` +
     `&body=${encodeURIComponent(body)}`
   ).catch(()=>null);
-
-  if(!data || !data.ok){
-    msg.innerHTML = `<span style="color:var(--bad)">${escapeHTML((data && data.error) || "Save failed.")}</span>`;
-    return;
-  }
-
+  if(!data || !data.ok){ msg.innerHTML = `<span style="color:var(--bad)">${escapeHTML((data && data.error) || "Save failed.")}</span>`; return; }
   msg.innerHTML = `<span style="color:var(--ok)">Saved ✓</span>`;
-
   resetIndepEditor_();
+  await loadAllTemplates_();
+}
 
+async function saveInvoiceTemplate_(){
+  const label = ($("invoiceTemplateLabel").value||"").trim();
+  const subject = ($("invoiceTemplateSubject").value||"").trim();
+  const body = ($("invoiceTemplateBodyText").value||"").trim();
+  const msg = $("invoiceTemplateSaveMsg");
+  if(!label){ msg.innerHTML = `<span style="color:var(--warn)">Template name required.</span>`; return; }
+  msg.textContent = "Saving…";
+  const editId = $("invoiceTemplateSave").dataset.editId || "";
+  const data = await api_(
+    `action=invoice_template_upsert&supplierKey=${encodeURIComponent(supplierKey)}` +
+    (editId ? `&id=${encodeURIComponent(editId)}` : "") +
+    `&label=${encodeURIComponent(label)}` +
+    `&subject=${encodeURIComponent(subject)}` +
+    `&body=${encodeURIComponent(body)}`
+  ).catch(()=>null);
+  if(!data || !data.ok){ msg.innerHTML = `<span style="color:var(--bad)">${escapeHTML((data && data.error) || "Save failed.")}</span>`; return; }
+  msg.innerHTML = `<span style="color:var(--ok)">Saved ✓</span>`;
+  resetInvoiceTemplateEditor_();
   await loadAllTemplates_();
 }
 
@@ -905,7 +997,6 @@ async function saveCustomerTemplate_(){
   const subject = ($("editCustomerSubject").value||"").trim();
   const body = ($("editCustomerBodyText").value||"").trim();
   const msg = $("editCustomerMsg");
-
   const existing = findTpl_(customerTemplates, lang);
   msg.textContent = "Saving…";
   const data = await api_(
@@ -916,11 +1007,7 @@ async function saveCustomerTemplate_(){
     `&subject=${encodeURIComponent(subject)}` +
     `&body=${encodeURIComponent(body)}`
   ).catch(()=>null);
-
-  if(!data || !data.ok){
-    msg.innerHTML = `<span style="color:var(--bad)">Save failed.</span>`;
-    return;
-  }
+  if(!data || !data.ok){ msg.innerHTML = `<span style="color:var(--bad)">Save failed.</span>`; return; }
   msg.innerHTML = `<span style="color:var(--ok)">Saved ✓</span>`;
   await loadAllTemplates_();
 }
@@ -930,7 +1017,6 @@ async function saveSupplierTemplate_(){
   const subject = ($("editSupplierSubject").value||"").trim();
   const body = ($("editSupplierBodyText").value||"").trim();
   const msg = $("editSupplierMsg");
-
   const existing = findTpl_(supplierTemplates, lang);
   msg.textContent = "Saving…";
   const data = await api_(
@@ -941,59 +1027,42 @@ async function saveSupplierTemplate_(){
     `&subject=${encodeURIComponent(subject)}` +
     `&body=${encodeURIComponent(body)}`
   ).catch(()=>null);
-
-  if(!data || !data.ok){
-    msg.innerHTML = `<span style="color:var(--bad)">Save failed.</span>`;
-    return;
-  }
+  if(!data || !data.ok){ msg.innerHTML = `<span style="color:var(--bad)">Save failed.</span>`; return; }
   msg.innerHTML = `<span style="color:var(--ok)">Saved ✓</span>`;
   await loadAllTemplates_();
 }
 
-/* mail logging */
-function getOrderForLog_(){
-  const drop = getAny(selected, ["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]) || "";
-  return drop || "";
-}
 async function logMail_(payload){
-  if(!isMasterLogin() || !selected) return;
-  const RowID = String(selected.rowId);
-  const Customer = getAny(selected, ["Customer"]) || "";
-  const OrderID = getOrderForLog_();
+  if(!selected) return;
+  const RowID = String(selected.rowId || "");
+  const Customer = getAny(selected,["Customer"]) || "";
+  const OrderID = getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID","Surfcenter order","SurfcenterOrder"]) || "";
   await api_(
     `action=log_mail&supplierKey=${encodeURIComponent(supplierKey)}` +
     `&RowID=${encodeURIComponent(RowID)}` +
     `&Customer=${encodeURIComponent(Customer)}` +
     `&OrderID=${encodeURIComponent(OrderID)}` +
     `&To=${encodeURIComponent(payload.to || "")}` +
+    `&CC=${encodeURIComponent(payload.cc || "")}` +
     `&Kind=${encodeURIComponent(payload.kind || "")}` +
     `&Language=${encodeURIComponent(payload.language || "")}` +
     `&Template=${encodeURIComponent(payload.template || "")}` +
     `&Subject=${encodeURIComponent(payload.subject || "")}`
   ).catch(()=>null);
 }
+
 async function loadMailLog_(){
-  if(!isMasterLogin() || !selected) return;
+  if(!selected) return;
   $("mailLogMsg").textContent = "";
   $("mailLogList").textContent = "Loading…";
-
   const data = await api_(`action=mail_log&supplierKey=${encodeURIComponent(supplierKey)}&RowID=${encodeURIComponent(String(selected.rowId))}`).catch(()=>null);
-  if(!data || !data.ok){
-    $("mailLogList").textContent = "Mail log unavailable.";
-    return;
-  }
-
+  if(!data || !data.ok){ $("mailLogList").textContent = "Mail log unavailable."; return; }
   const rows = Array.isArray(data.rows) ? data.rows : [];
-  if(!rows.length){
-    $("mailLogList").textContent = "No log.";
-    return;
-  }
-
+  if(!rows.length){ $("mailLogList").textContent = "No log."; return; }
   const ul = document.createElement("div");
   ul.style.display = "flex";
   ul.style.flexDirection = "column";
   ul.style.gap = "8px";
-
   for(const r of rows){
     const line = document.createElement("div");
     line.className = "savedTemplateRow";
@@ -1007,25 +1076,23 @@ async function loadMailLog_(){
     `;
     ul.appendChild(line);
   }
-
   $("mailLogList").innerHTML = "";
   $("mailLogList").appendChild(ul);
 }
 
-/* completed endpoint */
 async function setCompleted(rowId, val){
-  if(!isMasterLogin()) return { ok:false, error:"Not master" };
+  if(!(isMasterLogin() || isSupplierLogin())) return { ok:false, error:"Not allowed" };
   const completedValue = val ? "TRUE" : "FALSE";
   const data = await api_(
     `action=complete&supplierKey=${encodeURIComponent(supplierKey)}` +
     `&rowId=${encodeURIComponent(rowId)}` +
-    `&Completed=${encodeURIComponent(completedValue)}`
+    `&Completed=${encodeURIComponent(completedValue)}` +
+    `&mode=${encodeURIComponent(currentMode)}`
   ).catch(()=>null);
   if(data && data.ok) return { ok:true };
   return { ok:false, error: (data && data.error) ? String(data.error) : "Unknown" };
 }
 
-/* draft builders */
 function customerDraftFromLang_(lang){
   const t = findTpl_(customerTemplates, lang) || { subject:"", body:"" };
   return { subject: applyTokens(t.subject||""), body: applyTokens(t.body||"") };
@@ -1035,56 +1102,52 @@ function supplierDraftFromLang_(lang){
   return { subject: applyTokens(t.subject||""), body: applyTokens(t.body||"") };
 }
 
-/* send mail */
+function selectedCustomerMail_(){
+  return getAny(selected,["Mail Customer","MailCustomer"]);
+}
+function selectedAccountmanagerCC_(){
+  return getAny(selected,["Mail Accountmanager","MailAccountmanager"]) || accountmanagerMail || "";
+}
+
 async function mailCustomer(lang, clickedBtn){
-  if(!isMasterLogin() || !selected) return;
+  if(!selected) return;
   if(clickedBtn) setBtnActive_(clickedBtn);
-
-  const to = getAny(selected, ["Mail Customer","MailCustomer"]);
-  if(!to){
-    $("mailMsg").innerHTML = "<span style='color:var(--warn)'>No customer email found.</span>";
-    return;
-  }
-
+  const to = selectedCustomerMail_();
+  const cc = selectedAccountmanagerCC_();
+  if(!to){ $("mailMsg").innerHTML = "<span style='color:var(--warn)'>No customer email found.</span>"; return; }
   const tpl = customerDraftFromLang_(lang);
   const logTitle = `Mail customer ${String(lang||"").toUpperCase()}`;
-
   openMailPicker({
-    to,
+    to, cc,
     subject: tpl.subject,
     body: tpl.body,
     afterOpen: async () => {
-      await logMail_({ to, kind:"customer", language:lang, template:logTitle, subject:tpl.subject });
-      $("mailMsg").textContent = "Mail opened. Saving Completed…";
-      const res = await setCompleted(selected.rowId, true);
-      if(!res.ok){
-        $("mailMsg").innerHTML = `<span style="color:var(--warn)">Mail opened ✓ (could not save Completed)</span>`;
+      await logMail_({ to, cc, kind:"customer", language:lang, template:logTitle, subject:tpl.subject });
+      if(isDropshipMode()){
+        $("mailMsg").textContent = "Mail opened. Saving Completed…";
+        const res = await setCompleted(selected.rowId, true);
+        if(!res.ok) $("mailMsg").innerHTML = `<span style="color:var(--warn)">Mail opened ✓ (could not save Completed)</span>`;
+        else $("mailMsg").innerHTML = `<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>`;
       } else {
-        $("mailMsg").innerHTML = `<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>`;
+        $("mailMsg").innerHTML = `<span style="color:var(--ok)">Mail opened ✓</span>`;
       }
       await loadOrders();
-      await loadMailLog_();
+      if(selected) await loadMailLog_();
     }
   });
 }
 
 async function mailSupplier(lang, clickedBtn){
-  if(!isMasterLogin() || !selected) return;
+  if(!selected || !isDropshipMode()) return;
   if(clickedBtn) setBtnActive_(clickedBtn);
-
-  const supName = getAny(selected, ["Supplier"]) || "";
-  const to = suppliersMailMap[String(supName).toLowerCase()] || getAny(selected, ["Mail Supplier","MailSupplier"]) || "";
-
-  if(!to){
-    $("mailSupplierMsg").innerHTML = "<span style='color:var(--warn)'>No supplier email found.</span>";
-    return;
-  }
-
+  const supName = getAny(selected,["Supplier"]) || "";
+  const to = suppliersMailMap[String(supName).toLowerCase()] || getAny(selected,["Mail Supplier","MailSupplier"]) || "";
+  if(!to){ $("mailSupplierMsg").innerHTML = "<span style='color:var(--warn)'>No supplier email found.</span>"; return; }
   const tpl = supplierDraftFromLang_(lang);
   const logTitle = `Mail supplier ${String(lang||"").toUpperCase()}`;
-
   openMailPicker({
     to,
+    cc: "",
     subject: tpl.subject,
     body: tpl.body,
     afterOpen: async () => {
@@ -1096,54 +1159,103 @@ async function mailSupplier(lang, clickedBtn){
 }
 
 async function sendIndependentTemplate_(tpl){
-  if(!isMasterLogin() || !selected) return;
-
-  const to = getAny(selected, ["Mail Customer","MailCustomer"]);
-  if(!to){
-    $("indepSendMsg").innerHTML = "<span style='color:var(--warn)'>No customer email found.</span>";
-    return;
-  }
-
+  if(!selected) return;
+  const to = selectedCustomerMail_();
+  const cc = selectedAccountmanagerCC_();
+  if(!to){ $("indepSendMsg").innerHTML = "<span style='color:var(--warn)'>No customer email found.</span>"; return; }
   const subject = applyTokens(tpl.subject||"");
   const body = applyTokens(tpl.body||"");
   const lang = String(tpl.language||"").toLowerCase();
   const logTitle = `Template ${tpl.label || ""}`.trim();
-
   openMailPicker({
-    to, subject, body,
+    to, cc, subject, body,
     afterOpen: async () => {
-      await logMail_({ to, kind:"independent", language:lang, template:logTitle, subject });
+      await logMail_({ to, cc, kind:"independent", language:lang, template:logTitle, subject });
       $("indepSendMsg").innerHTML = `<span style="color:var(--ok)">Mail opened ✓</span>`;
       await loadMailLog_();
     }
   });
 }
 
-/* orders */
+async function sendInvoiceTemplate_(tpl){
+  if(!selected) return;
+  const to = selectedCustomerMail_();
+  const cc = selectedAccountmanagerCC_();
+  if(!to){ $("invoiceSendMsg").innerHTML = "<span style='color:var(--warn)'>No customer email found.</span>"; return; }
+  const subject = applyTokens(tpl.subject||"");
+  const body = applyTokens(tpl.body||"");
+  const logTitle = `Invoice template ${tpl.label || ""}`.trim();
+  openMailPicker({
+    to, cc, subject, body,
+    afterOpen: async () => {
+      await logMail_({ to, cc, kind:"invoice-template", language:"", template:logTitle, subject });
+      $("invoiceSendMsg").innerHTML = `<span style="color:var(--ok)">Mail opened ✓</span>`;
+      await loadMailLog_();
+    }
+  });
+}
+
+function applyModeUI_(){
+  $("modeWrap").classList.toggle("hidden", !canUseInvoiceMode());
+  $("modeDropshipBtn").classList.toggle("active", isDropshipMode());
+  $("modeInvoiceBtn").classList.toggle("active", isInvoiceMode());
+  $("supplierBlock").classList.toggle("hidden", !isDropshipMode());
+  $("supplierMailBox").classList.toggle("hidden", !isDropshipMode());
+  $("dropshipTemplatesSection").classList.toggle("hidden", !isDropshipMode() || !isMasterLogin());
+  $("invoiceMailTemplatesSection").classList.toggle("hidden", !isInvoiceMode() || !canUseInvoiceMode());
+  $("trackingFieldsWrap").classList.toggle("hidden", isInvoiceMode());
+  $("accountmanagerBlock").classList.toggle("hidden", !(isInvoiceMode() || isAccountmanagerLogin()));
+  $("surfOrderBlock").classList.toggle("hidden", false);
+  $("completedWrap").classList.toggle("hidden", !isMasterLogin() || isInvoiceMode());
+
+  if(isInvoiceMode()){
+    $("primaryOrderCaption").textContent = "Invoice order";
+    $("newOrderBtnText").textContent = "Add invoice order";
+    $("portalSub").textContent = isAccountmanagerLogin()
+      ? "Invoice portal · add and manage your own orders"
+      : "Open an order or add a new invoice order";
+  } else {
+    $("primaryOrderCaption").textContent = "Dropshipment order";
+    $("newOrderBtnText").textContent = "Add new order";
+    $("portalSub").textContent = "Open an order to enter / check shipment details";
+  }
+}
+
+function setMode(mode){
+  if(mode === ORDER_MODE_INVOICE && !canUseInvoiceMode()) return;
+  currentMode = mode;
+  selected = null;
+  $("form").classList.add("hidden");
+  $("noSelection").classList.remove("hidden");
+  applyModeUI_();
+  loadOrders();
+}
+
 async function loadOrders(){
   selected = null;
   $("form").classList.add("hidden");
   $("noSelection").classList.remove("hidden");
-
   $("customerLabel").textContent = "—";
   $("customerMailLine").textContent = "";
   $("supplierLabel").textContent = "—";
   $("supplierKeyLine").textContent = "";
-  $("dropOrderLabel").textContent = "—";
+  $("accountmanagerLabel").textContent = "—";
+  $("accountmanagerMailLine").textContent = "";
+  $("primaryOrderLabel").textContent = "—";
   $("surfOrderLabel").textContent = "—";
-
   setStatus("No selection", false);
   $("msg").textContent = "";
   $("mailMsg").textContent = "";
   $("mailSupplierMsg").textContent = "";
   $("indepSendMsg").textContent = "";
-
+  $("invoiceSendMsg").textContent = "";
   $("tbodyOpen").innerHTML = "<tr><td colspan='4' class='muted'>Loading…</td></tr>";
   $("tbodyCompleted").innerHTML = "<tr><td colspan='4' class='muted'>Loading…</td></tr>";
 
-  const url = isMasterLogin()
-    ? `${API_BASE}?action=orders&supplier=ALL&supplierKey=${encodeURIComponent(supplierKey)}`
-    : `${API_BASE}?action=orders&supplier=${encodeURIComponent(supplier)}`;
+  let url = `${API_BASE}?action=orders&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}`;
+  if(isMasterLogin()) url += `&supplier=ALL`;
+  if(isSupplierLogin()) url += `&supplier=${encodeURIComponent(supplier)}`;
+  if(isAccountmanagerLogin()) url += `&accountmanager=${encodeURIComponent(accountmanagerName)}`;
 
   const data = await jsonp(url).catch(()=>null);
   if(!data || !data.ok){
@@ -1152,7 +1264,6 @@ async function loadOrders(){
     $("tbodyCompleted").innerHTML = `<tr><td colspan="4" class='muted'>${err}</td></tr>`;
     return;
   }
-
   orders = (data.orders || []).slice();
   orders.sort((a,b)=> Number(b.rowId||0) - Number(a.rowId||0));
   renderOrders();
@@ -1167,30 +1278,31 @@ function renderOrders(){
   const q = ($("historySearch").value || "").trim().toLowerCase();
   const match = (o) => {
     if(!q) return true;
-    const name = (getAny(o,["Customer"]) || "").toLowerCase();
+    const customer = (getAny(o,["Customer"]) || "").toLowerCase();
     const email = (getAny(o,["Mail Customer","MailCustomer"]) || "").toLowerCase();
     const drop = (getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]) || "").toLowerCase();
     const surf = (getAny(o,["Surfcenter order","SurfcenterOrder"]) || "").toLowerCase();
-    return name.includes(q) || email.includes(q) || drop.includes(q) || surf.includes(q);
+    const acc = (getAny(o,["Accountmanager"]) || "").toLowerCase();
+    return customer.includes(q) || email.includes(q) || drop.includes(q) || surf.includes(q) || acc.includes(q);
   };
 
-  const openList = isMasterLogin()
+  const openList = isMasterLogin() && isDropshipMode()
     ? orders.filter(o => !Boolean(o.Completed)).filter(match)
     : orders.filter(match);
 
-  const doneList = isMasterLogin()
+  const doneList = isMasterLogin() && isDropshipMode()
     ? orders.filter(o => Boolean(o.Completed)).filter(match)
     : [];
 
   const renderRow = (o, targetTB)=>{
     const ok = trackingComplete(o);
-    const mailC = getAny(o, ["Mail Customer","MailCustomer"]);
-
-    const drop = getAny(o, ["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]);
-    const surf = getAny(o, ["Surfcenter order","SurfcenterOrder"]);
-    const showOrder = isMasterLogin() ? (surf || drop) : drop;
+    const mailC = getAny(o,["Mail Customer","MailCustomer"]);
+    const drop = getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]);
+    const surf = getAny(o,["Surfcenter order","SurfcenterOrder"]);
+    const acc = getAny(o,["Accountmanager"]);
+    const showOrder = isDropshipMode() ? (surf || drop) : surf;
     const orderLineHtml = showOrder ? `<div class="smallLine">${escapeHTML(showOrder)}</div>` : "";
-
+    const accLineHtml = acc ? `<div class="smallLine">${escapeHTML(acc)}</div>` : "";
     const completed = Boolean(o.Completed);
     const completedHtml = completed ? `<span class="checkPill yes">✓</span>` : `<span class="checkPill">—</span>`;
 
@@ -1202,11 +1314,12 @@ function renderOrders(){
         </div>
         ${mailC ? `<div class="smallLine">${escapeHTML(mailC)}</div>` : ""}
         ${orderLineHtml}
+        ${isInvoiceMode() ? accLineHtml : ""}
       </td>
       <td class="statusCell">
         <div class="statusWrap">
           <span class="status ${ok ? "ready":"missing"}">
-            <span class="dot"></span>${ok ? "Complete" : "Missing tracking"}
+            <span class="dot"></span>${ok ? (isInvoiceMode() ? "Invoice" : "Complete") : "Missing tracking"}
           </span>
         </div>
       </td>
@@ -1215,23 +1328,17 @@ function renderOrders(){
           <button class="btn" data-open="${escapeHTML(o.rowId)}">Open</button>
         </div>
       </td>
-      <td class="completedCell">${completedHtml}</td>
+      <td class="completedCell">${isDropshipMode() ? completedHtml : `<span class="checkPill">—</span>`}</td>
     `;
     targetTB.appendChild(tr);
   };
 
-  if(!openList.length){
-    openTB.innerHTML = `<tr><td colspan="4" class="muted">No orders found.</td></tr>`;
-  } else {
-    openList.forEach(o => renderRow(o, openTB));
-  }
+  if(!openList.length) openTB.innerHTML = `<tr><td colspan="4" class="muted">No orders found.</td></tr>`;
+  else openList.forEach(o => renderRow(o, openTB));
 
-  if(isMasterLogin()){
-    if(!doneList.length){
-      doneTB.innerHTML = `<tr><td colspan="4" class="muted">No completed orders.</td></tr>`;
-    } else {
-      doneList.forEach(o => renderRow(o, doneTB));
-    }
+  if(isMasterLogin() && isDropshipMode()){
+    if(!doneList.length) doneTB.innerHTML = `<tr><td colspan="4" class="muted">No completed orders.</td></tr>`;
+    else doneList.forEach(o => renderRow(o, doneTB));
   }
 
   document.querySelectorAll("button[data-open]").forEach(btn=>{
@@ -1241,24 +1348,19 @@ function renderOrders(){
 
 async function openRow(rowId){
   clearActiveMailButtons_();
-
   selected = orders.find(x => Number(x.rowId) === rowId);
   if(!selected) return;
 
   $("customerLabel").textContent = getAny(selected,["Customer"]) || "—";
   $("customerMailLine").textContent = getAny(selected,["Mail Customer","MailCustomer"]) || "";
+  $("supplierLabel").textContent = getAny(selected,["Supplier"]) || "—";
+  $("supplierKeyLine").textContent = getAny(selected,["Supplier KEY","SupplierKey"]) || "";
+  $("accountmanagerLabel").textContent = getAny(selected,["Accountmanager"]) || accountmanagerName || "—";
+  $("accountmanagerMailLine").textContent = getAny(selected,["Mail Accountmanager","MailAccountmanager"]) || accountmanagerMail || "";
 
-  $("supplierBlock").classList.toggle("hidden", !isMasterLogin());
-  $("surfOrderBlock").classList.toggle("hidden", !isMasterLogin());
-
-  if(isMasterLogin()){
-    $("supplierLabel").textContent = (getAny(selected,["Supplier"]) || "—");
-    $("supplierKeyLine").textContent = "";
-  }
-
-  const drop = getAny(selected, ["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]);
-  const surf = getAny(selected, ["Surfcenter order","SurfcenterOrder"]);
-  $("dropOrderLabel").textContent = drop || "—";
+  const drop = getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]);
+  const surf = getAny(selected,["Surfcenter order","SurfcenterOrder"]);
+  $("primaryOrderLabel").textContent = isDropshipMode() ? (drop || "—") : (surf || "—");
   $("surfOrderLabel").textContent = surf || "—";
 
   $("carrier").value = getAny(selected,["Carrier"]) || "";
@@ -1269,48 +1371,36 @@ async function openRow(rowId){
   $("form").classList.remove("hidden");
 
   const ok = trackingComplete(selected);
-  setStatus(ok ? "Complete" : "Missing tracking", ok);
+  setStatus(ok ? (isInvoiceMode() ? "Invoice order" : "Complete") : "Missing tracking", ok);
 
-  $("mailCustomerWrap").classList.toggle("hidden", !isMasterLogin());
-
+  $("mailCustomerWrap").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
   $("mailMsg").textContent = "";
   $("mailSupplierMsg").textContent = "";
   $("indepSendMsg").textContent = "";
+  $("invoiceSendMsg").textContent = "";
   $("msg").textContent = "";
 
-  if(isMasterLogin()){
-    await loadMailLog_();
-  }
+  if(isMasterLogin() || isAccountmanagerLogin()) await loadMailLog_();
 }
 
-/* save tracking */
 async function save(){
-  if(!selected) return;
-
+  if(!selected || isInvoiceMode()) return;
   const Carrier = $("carrier").value.trim();
   const Trackingnumber = $("trackingNumber").value.trim();
   const Trackinglink = $("trackingLink").value.trim();
-
-  if(!Carrier || !Trackingnumber || !Trackinglink){
-    $("msg").innerHTML = "<span style='color:var(--warn)'>Please fill in all fields.</span>";
-    return;
-  }
-
+  if(!Carrier || !Trackingnumber || !Trackinglink){ $("msg").innerHTML = "<span style='color:var(--warn)'>Please fill in all fields.</span>"; return; }
   $("saveBtn").disabled = true;
   $("msg").textContent = "Saving…";
-
   try{
-    const url =
-      `${API_BASE}?action=update` +
+    const url = `${API_BASE}?action=update` +
       `&rowId=${encodeURIComponent(selected.rowId)}` +
       `&supplier=${encodeURIComponent(supplier)}` +
       `&supplierKey=${encodeURIComponent(supplierKey)}` +
+      `&mode=${encodeURIComponent(currentMode)}` +
       `&Carrier=${encodeURIComponent(Carrier)}` +
       `&Trackingnumber=${encodeURIComponent(Trackingnumber)}` +
       `&Trackinglink=${encodeURIComponent(Trackinglink)}`;
-
     const data = await jsonp(url);
-
     if(data && data.ok){
       selected.Carrier = Carrier;
       selected.Trackingnumber = Trackingnumber;
@@ -1328,46 +1418,57 @@ async function save(){
   }
 }
 
-/* create order */
 async function createOrder(){
-  if(!isMasterLogin()) return;
-
-  const Customer = $("newCustomer").value.trim();
-  const MailCustomer = $("newMailCustomer").value.trim();
-  const Supplier = $("newSupplier").value;
-  const DropshipmentOrder = $("newDropOrder").value.trim();
-  const SurfcenterOrder = $("newSurfOrder").value.trim();
-
-  if(!Customer || !MailCustomer || !Supplier || !DropshipmentOrder || !SurfcenterOrder){
-    $("createMsg").innerHTML = "<span style='color:var(--warn)'>Please fill all fields.</span>";
-    return;
-  }
-
+  if(!canCreateOrders()) return;
   $("createBtn").disabled = true;
   $("createMsg").textContent = "Adding…";
-
   try{
-    const url =
-      `${API_BASE}?action=create` +
-      `&supplierKey=${encodeURIComponent(supplierKey)}` +
-      `&Customer=${encodeURIComponent(Customer)}` +
-      `&MailCustomer=${encodeURIComponent(MailCustomer)}` +
-      `&Supplier=${encodeURIComponent(Supplier)}` +
-      `&DropshipmentOrder=${encodeURIComponent(DropshipmentOrder)}` +
-      `&SurfcenterOrder=${encodeURIComponent(SurfcenterOrder)}`;
+    let url = `${API_BASE}?action=create&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}`;
+
+    if(isDropshipMode()){
+      const Customer = $("newCustomer").value.trim();
+      const MailCustomer = $("newMailCustomer").value.trim();
+      const Supplier = $("newSupplier").value;
+      const DropshipmentOrder = $("newDropOrder").value.trim();
+      const SurfcenterOrder = $("newSurfOrder").value.trim();
+      if(!Customer || !MailCustomer || !Supplier || !DropshipmentOrder || !SurfcenterOrder){
+        $("createMsg").innerHTML = "<span style='color:var(--warn)'>Please fill all fields.</span>";
+        return;
+      }
+      url += `&Customer=${encodeURIComponent(Customer)}` +
+             `&MailCustomer=${encodeURIComponent(MailCustomer)}` +
+             `&Supplier=${encodeURIComponent(Supplier)}` +
+             `&DropshipmentOrder=${encodeURIComponent(DropshipmentOrder)}` +
+             `&SurfcenterOrder=${encodeURIComponent(SurfcenterOrder)}`;
+    } else {
+      const Customer = $("newInvoiceCustomer").value.trim();
+      const MailCustomer = $("newInvoiceMailCustomer").value.trim();
+      const Accountmanager = (accountmanagerName || $("newInvoiceAccountmanager").value || "").trim();
+      const SurfcenterOrder = $("newInvoiceSurfOrder").value.trim();
+      if(!Customer || !MailCustomer || !Accountmanager || !SurfcenterOrder){
+        $("createMsg").innerHTML = "<span style='color:var(--warn)'>Please fill all fields.</span>";
+        return;
+      }
+      url += `&Customer=${encodeURIComponent(Customer)}` +
+             `&MailCustomer=${encodeURIComponent(MailCustomer)}` +
+             `&Accountmanager=${encodeURIComponent(Accountmanager)}` +
+             `&SurfcenterOrder=${encodeURIComponent(SurfcenterOrder)}`;
+    }
 
     const data = await jsonp(url);
-
     if(data && data.ok){
       $("createMsg").innerHTML = "<span style='color:var(--ok)'>Added ✓</span>";
       $("newCustomer").value = "";
       $("newMailCustomer").value = "";
       $("newDropOrder").value = "";
       $("newSurfOrder").value = "";
+      $("newInvoiceCustomer").value = "";
+      $("newInvoiceMailCustomer").value = "";
+      $("newInvoiceSurfOrder").value = "";
       $("newOrderModal").classList.add("hidden");
       await loadOrders();
     } else {
-      $("createMsg").innerHTML = "<span style='color:var(--bad)'>Failed: " + escapeHTML((data && data.error) || "Unknown") + "</span>";
+      $("createMsg").innerHTML = `<span style='color:var(--bad)'>Failed: ${escapeHTML((data && data.error) || "Unknown")}</span>`;
     }
   }catch(_){
     $("createMsg").innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
@@ -1376,7 +1477,14 @@ async function createOrder(){
   }
 }
 
-/* login */
+function prepareCreateModal_(){
+  $("createMsg").textContent = "";
+  $("newOrderModalTitle").textContent = isInvoiceMode() ? "New invoice order" : "New order";
+  $("dropshipCreateFields").classList.toggle("hidden", !isDropshipMode());
+  $("invoiceCreateFields").classList.toggle("hidden", !isInvoiceMode());
+  if(isInvoiceMode()) $("newInvoiceAccountmanager").value = accountmanagerName || "";
+}
+
 function showLogin(){
   $("portalView").classList.add("hidden");
   $("loginView").classList.remove("hidden");
@@ -1390,39 +1498,42 @@ function showPortal(){
 }
 async function doLogin(withKey){
   const key = (withKey ?? $("keyInput").value).trim();
-  if(!key){
-    $("loginMsg").innerHTML = "<span style='color:var(--warn)'>Please enter login.</span>";
-    return;
-  }
-
+  if(!key){ $("loginMsg").innerHTML = "<span style='color:var(--warn)'>Please enter login.</span>"; return; }
   $("loginBtn").disabled = true;
   $("loginMsg").textContent = "Checking…";
-
   try{
     const data = await jsonp(`${API_BASE}?action=auth&supplierKey=${encodeURIComponent(key)}`);
-    if(!data || !data.ok || !data.supplier){
-      $("loginMsg").innerHTML = "<span style='color:var(--bad)'>Invalid login.</span>";
-      return;
-    }
+    if(!data || !data.ok){ $("loginMsg").innerHTML = "<span style='color:var(--bad)'>Invalid login.</span>"; return; }
 
     supplierKey = key;
-    supplier = String(data.supplier).trim();
+    supplier = String(data.supplier || "").trim();
+    loginType = String(data.loginType || (String(data.supplier||"").trim().toLowerCase() === MASTER_NAME.toLowerCase() ? LOGIN_TYPE_MASTER : LOGIN_TYPE_SUPPLIER)).trim().toLowerCase();
+    accountmanagerName = String(data.accountmanager || data.name || "").trim();
+    accountmanagerMail = String(data.mailAccountmanager || data.mail || "").trim();
+    accountmanagerKey = key;
+
     sessionStorage.setItem("supplier_key", supplierKey);
     sessionStorage.setItem("supplier_name", supplier);
+    sessionStorage.setItem("login_type", loginType);
+    sessionStorage.setItem("accountmanager_name", accountmanagerName);
+    sessionStorage.setItem("accountmanager_mail", accountmanagerMail);
 
-    $("headerTitle").textContent = isMasterLogin() ? "Delivery Overview 📦" : (supplier + " 📦");
     showPortal();
 
-    $("newOrderBtn").classList.toggle("hidden", !isMasterLogin());
-    $("mailCustomerWrap").classList.toggle("hidden", !isMasterLogin());
-    $("completedWrap").classList.toggle("hidden", !isMasterLogin());
+    currentMode = isAccountmanagerLogin() ? ORDER_MODE_INVOICE : ORDER_MODE_DROPSHIP;
+    $("newOrderBtn").classList.toggle("hidden", !canCreateOrders());
+    $("mailCustomerWrap").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
+    applyModeUI_();
 
     if(isMasterLogin()){
       await loadSuppliers_();
       await loadAllTemplates_();
+    } else if(isAccountmanagerLogin()){
+      const inv = await api_(`action=invoice_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
+      invoiceTemplates = (inv && inv.ok && Array.isArray(inv.templates)) ? inv.templates : [];
+      renderInvoiceTemplates_();
     }
     await loadOrders();
-
   }catch(_){
     $("loginMsg").innerHTML = "<span style='color:var(--bad)'>Could not reach server.</span>";
   }finally{
@@ -1432,6 +1543,11 @@ async function doLogin(withKey){
 function logout(){
   supplier = "";
   supplierKey = "";
+  loginType = "";
+  accountmanagerName = "";
+  accountmanagerMail = "";
+  accountmanagerKey = "";
+  currentMode = ORDER_MODE_DROPSHIP;
   orders = [];
   selected = null;
   suppliersList = [];
@@ -1440,60 +1556,80 @@ function logout(){
   indepTemplates = [];
   customerTemplates = [];
   supplierTemplates = [];
+  invoiceTemplates = [];
   sessionStorage.removeItem("supplier_key");
   sessionStorage.removeItem("supplier_name");
+  sessionStorage.removeItem("login_type");
+  sessionStorage.removeItem("accountmanager_name");
+  sessionStorage.removeItem("accountmanager_mail");
   showLogin();
 }
 
-/* modal open/close */
-$("newOrderBtn").addEventListener("click", ()=> $("newOrderModal").classList.remove("hidden"));
+$("newOrderBtn").addEventListener("click", ()=>{ prepareCreateModal_(); $("newOrderModal").classList.remove("hidden"); });
 $("newOrderClose").addEventListener("click", ()=> $("newOrderModal").classList.add("hidden"));
 $("newOrderModal").addEventListener("click", (e)=>{ if(e.target === $("newOrderModal")) $("newOrderModal").classList.add("hidden"); });
 
-/* events */
 $("loginBtn").addEventListener("click", ()=> doLogin());
 $("clearBtn").addEventListener("click", ()=>{ $("keyInput").value=""; $("loginMsg").textContent=""; $("keyInput").focus(); });
 $("keyInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") doLogin(); });
-
 $("logoutBtn").addEventListener("click", logout);
 $("saveBtn").addEventListener("click", save);
 $("createBtn").addEventListener("click", createOrder);
-
 $("historySearch").addEventListener("input", renderOrders);
 
 $("indepSave").addEventListener("click", saveIndepTemplate_);
 $("indepCancel").addEventListener("click", resetIndepEditor_);
 $("editCustomerSave").addEventListener("click", saveCustomerTemplate_);
 $("editSupplierSave").addEventListener("click", saveSupplierTemplate_);
+$("invoiceTemplateSave").addEventListener("click", saveInvoiceTemplate_);
+$("invoiceTemplateCancel").addEventListener("click", resetInvoiceTemplateEditor_);
 
-/* flag buttons */
+$("editCustomerLang").addEventListener("change", ()=> fillCustomerEditorFromLang_($("editCustomerLang").value));
+$("editSupplierLang").addEventListener("change", ()=> fillSupplierEditorFromLang_($("editSupplierLang").value));
+
 $("mc_en").addEventListener("click", (e)=> mailCustomer("en", e.currentTarget));
 $("mc_nl").addEventListener("click", (e)=> mailCustomer("nl", e.currentTarget));
 $("mc_de").addEventListener("click", (e)=> mailCustomer("de", e.currentTarget));
 $("mc_fr").addEventListener("click", (e)=> mailCustomer("fr", e.currentTarget));
-
 $("ms_en").addEventListener("click", (e)=> mailSupplier("en", e.currentTarget));
 $("ms_nl").addEventListener("click", (e)=> mailSupplier("nl", e.currentTarget));
 
-/* init */
+$("modeDropshipBtn").addEventListener("click", ()=> setMode(ORDER_MODE_DROPSHIP));
+$("modeInvoiceBtn").addEventListener("click", ()=> setMode(ORDER_MODE_INVOICE));
+
+setupToggle("addIndepToggle","addIndepBody","addIndepPlus", resetIndepEditor_);
+setupToggle("editCustomerToggle","editCustomerBody","editCustomerPlus");
+setupToggle("editSupplierToggle","editSupplierBody","editSupplierPlus");
+setupToggle("mailLogToggle","mailLogBody","mailLogPlus");
+setupToggle("completedToggle","completedBody","completedPlus");
+setupToggle("addInvoiceTemplateToggle","addInvoiceTemplateBody","addInvoiceTemplatePlus", resetInvoiceTemplateEditor_);
+
 (function init(){
   bindTokenButtons_();
   const k = sessionStorage.getItem("supplier_key") || "";
   const s = sessionStorage.getItem("supplier_name") || "";
-  if(k && s){
+  const lt = sessionStorage.getItem("login_type") || "";
+  const am = sessionStorage.getItem("accountmanager_name") || "";
+  const amm = sessionStorage.getItem("accountmanager_mail") || "";
+  if(k){
     supplierKey = k;
     supplier = s;
-    $("headerTitle").textContent = (String(s).toLowerCase() === "all") ? "Delivery Overview 📦" : (supplier + " 📦");
+    loginType = lt;
+    accountmanagerName = am;
+    accountmanagerMail = amm;
+    currentMode = loginType === LOGIN_TYPE_ACCOUNTMANAGER ? ORDER_MODE_INVOICE : ORDER_MODE_DROPSHIP;
     showPortal();
-
-    $("newOrderBtn").classList.toggle("hidden", !isMasterLogin());
-    $("mailCustomerWrap").classList.toggle("hidden", !isMasterLogin());
-    $("completedWrap").classList.toggle("hidden", !isMasterLogin());
-
+    $("newOrderBtn").classList.toggle("hidden", !canCreateOrders());
+    $("mailCustomerWrap").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
+    applyModeUI_();
     (async ()=>{
       if(isMasterLogin()){
         await loadSuppliers_();
         await loadAllTemplates_();
+      } else if(isAccountmanagerLogin()){
+        const inv = await api_(`action=invoice_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
+        invoiceTemplates = (inv && inv.ok && Array.isArray(inv.templates)) ? inv.templates : [];
+        renderInvoiceTemplates_();
       }
       await loadOrders();
     })();
