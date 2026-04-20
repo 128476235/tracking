@@ -87,19 +87,12 @@
       font-weight:500;
       font-size:14px;
     }
-
     textarea{resize:vertical}
     input:focus,select:focus,textarea:focus{
       border-color:rgba(15,23,42,.18);
       box-shadow:0 0 0 4px rgba(15,23,42,.06)
     }
-
-    select{
-      appearance:none;
-      -webkit-appearance:none;
-      -moz-appearance:none;
-      background-image:none;
-    }
+    select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:none}
 
     .btn{
       border:1px solid var(--border);
@@ -118,16 +111,13 @@
       font-weight:700;
       font-size:13px;
     }
-
     .btn:active{transform:translateY(1px)}
-
     .btn.primary{
       background:linear-gradient(180deg,var(--primary),var(--primary2));
       border-color:transparent;
       color:#fff;
       box-shadow:0 8px 16px rgba(15,23,42,.16);
     }
-
     .btn:disabled{opacity:.55;cursor:not-allowed}
     .btn.small{padding:8px 10px;border-radius:10px;font-size:12px;font-weight:500}
 
@@ -144,6 +134,26 @@
 
     .btn.active{border-color:rgba(15,23,42,.2);box-shadow:0 0 0 4px rgba(15,23,42,.05)}
 
+    .btn.lightAction{
+      min-height:40px;
+      padding:0 14px;
+      border-radius:13px;
+      background:#fff;
+      border:1px solid var(--border);
+      color:var(--text);
+      box-shadow:0 4px 10px rgba(15,23,42,.06);
+      font-weight:500;
+    }
+
+    .btn.openBtn{
+      min-height:36px;
+      padding:0 12px;
+      border-radius:11px;
+      font-weight:500;
+      font-size:13px;
+      box-shadow:none;
+    }
+
     #newOrderBtn{
       min-height:46px;
       padding:0 16px;
@@ -152,6 +162,7 @@
       border:1px solid var(--border);
       color:var(--text);
       box-shadow:0 4px 10px rgba(15,23,42,.06);
+      font-weight:500;
     }
 
     .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end}
@@ -166,7 +177,6 @@
       border-radius:999px;
       box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
     }
-
     .modeBtn{
       border:none;
       background:transparent;
@@ -179,7 +189,6 @@
       font-family:inherit;
       font-weight:500;
     }
-
     .modeBtn.active{
       background:var(--pillActive);
       color:#fff;
@@ -199,9 +208,9 @@
     .kvValue{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .smallLine{margin-top:3px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
 
-    .loginCard{max-width:520px;width:100%;padding:26px;border-radius:24px}
-    .loginHeader{text-align:center;margin-bottom:10px}
-    .loginLogo{height:84px;max-width:290px;object-fit:contain;display:block;margin:0 auto 8px}
+    .loginCard{max-width:520px;width:100%;padding:22px;border-radius:24px}
+    .loginHeader{text-align:center;margin-bottom:8px}
+    .loginLogo{height:78px;max-width:280px;object-fit:contain;display:block;margin:0 auto 8px}
     .loginForm{max-width:380px;margin:0 auto}
     .loginActions{justify-content:center}
     .loginMsg{text-align:center;min-height:18px}
@@ -215,21 +224,8 @@
       border:1px solid var(--border);
       background:#fff;
     }
-
-    .table th,.table td{
-      padding:10px 12px;
-      border-bottom:1px solid var(--border);
-      font-size:13px;
-      vertical-align:middle;
-      text-align:left
-    }
-
-    .table th{
-      color:var(--muted);
-      font-weight:700;
-      background:var(--soft)
-    }
-
+    .table th,.table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;text-align:left}
+    .table th{color:var(--muted);font-weight:700;background:var(--soft)}
     .table tr:last-child td{border-bottom:none}
 
     .status{
@@ -245,7 +241,6 @@
       background:#fff;
       font-weight:500;
     }
-
     .dot{width:8px;height:8px;border-radius:999px;background:var(--warn)}
     .status.ready .dot{background:var(--ok)}
     .status.missing .dot{background:var(--bad)}
@@ -262,7 +257,6 @@
     }
 
     .completedCell{text-align:center;width:110px}
-
     .checkPill{
       display:inline-flex;
       align-items:center;
@@ -276,15 +270,9 @@
       font-size:14px;
       font-weight:700;
     }
-
-    .checkPill.yes{
-      border-color:rgba(22,163,74,.35);
-      background:rgba(22,163,74,.08);
-      color:var(--ok)
-    }
+    .checkPill.yes{border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.08);color:var(--ok)}
 
     .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.2px;font-weight:700}
-
     .toggleRow{
       display:flex;
       justify-content:space-between;
@@ -297,7 +285,6 @@
       cursor:pointer;
       user-select:none;
     }
-
     .plusSym{font-weight:700;font-size:18px;line-height:1;color:var(--muted)}
     .flag{font-size:16px;line-height:1}
     .mailGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;margin-top:10px}
@@ -308,64 +295,24 @@
     @media (max-width:520px){.grid2{grid-template-columns:1fr}}
 
     .mailFlagBtn{
-      width:40px;
-      height:40px;
+      width:38px;
+      height:38px;
       padding:0;
-      border-radius:12px;
+      border-radius:11px;
       background:#fff;
       border:1px solid var(--border);
       box-shadow:0 3px 8px rgba(15,23,42,.04);
     }
 
-    .overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(15,23,42,.35);
-      display:grid;
-      place-items:center;
-      padding:18px;
-      z-index:9999
-    }
-
+    .overlay{position:fixed;inset:0;background:rgba(15,23,42,.35);display:grid;place-items:center;padding:18px;z-index:9999}
     .tokenRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-
-    .savedTemplateRow{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius:12px;
-      background:#fff
-    }
-
+    .savedTemplateRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff}
     .savedLeft{min-width:0;display:flex;gap:10px;align-items:flex-start}
     .tplName{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
-    .tplMeta{
-      color:var(--muted);
-      font-size:12px;
-      white-space:normal;
-      overflow-wrap:anywhere;
-      word-break:break-word;
-      max-width:520px;
-      font-weight:500
-    }
+    .tplMeta{color:var(--muted);font-size:12px;white-space:normal;overflow-wrap:anywhere;word-break:break-word;max-width:520px;font-weight:500}
+    #indepTemplatesList,#invoiceTemplatesList,#aftersalesTemplatesList{display:flex;flex-direction:column;gap:10px}
 
-    #indepTemplatesList,#invoiceTemplatesList,#aftersalesTemplatesList{
-      display:flex;
-      flex-direction:column;
-      gap:10px
-    }
-
-    .mailLogRow{
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      align-items:center;
-      width:100%
-    }
-
+    .mailLogRow{display:flex;justify-content:space-between;gap:16px;align-items:center;width:100%}
     .mailLogDate{font-size:13px;font-weight:700;color:var(--text)}
     .mailLogTime{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
   </style>
@@ -429,9 +376,6 @@
                   <div class="kvValue" id="accountmanagerLabel">—</div>
                   <div class="smallLine" id="accountmanagerMailLine"></div>
                 </div>
-                <div id="accountmanagerSelectWrap" class="hidden" style="margin-top:8px">
-                  <select id="accountmanagerSelect"></select>
-                </div>
               </div>
 
               <div style="height:10px"></div>
@@ -445,9 +389,7 @@
             </div>
 
             <div class="kvBlock" style="flex:0 0 auto;display:flex;align-items:flex-start">
-              <span id="statusBadge" class="status missing">
-                <span class="dot"></span><span id="statusText">No selection</span>
-              </span>
+              <span id="statusBadge" class="status missing"><span class="dot"></span><span id="statusText">No selection</span></span>
             </div>
           </div>
 
@@ -458,14 +400,12 @@
             <input id="trackingNumber" />
             <label>Tracking link</label>
             <input id="trackingLink" />
-            <div class="row" style="margin-top:12px">
-              <button id="saveBtn" class="btn primary" type="button">Save</button>
-            </div>
+            <div class="row" style="margin-top:12px"><button id="saveBtn" class="btn primary" type="button">Save</button></div>
           </div>
 
           <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
             <div class="mailGrid" id="dropshipMailGrid">
-              <div>
+              <div id="mailCustomerBox">
                 <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
                 <div class="flagRow" id="defaultCustomerFlags">
                   <button class="btn mailFlagBtn" id="mc_en" type="button"><span class="flag">🇬🇧</span></button>
@@ -494,23 +434,17 @@
               </div>
               <div id="mailTemplatesBody" class="hidden" style="margin-top:10px">
                 <div id="invoiceTemplatesSection" class="hidden">
-                  <div id="invoiceTemplatesList">
-                    <div class="muted" style="font-size:13px">No templates.</div>
-                  </div>
+                  <div id="invoiceTemplatesList"><div class="muted" style="font-size:13px">No templates.</div></div>
                   <div class="hint" id="invoiceSendMsg"></div>
                 </div>
 
                 <div id="dropshipTemplatesSection" class="hidden">
-                  <div id="indepTemplatesList">
-                    <div class="muted" style="font-size:13px">No templates.</div>
-                  </div>
+                  <div id="indepTemplatesList"><div class="muted" style="font-size:13px">No templates.</div></div>
                   <div class="hint" id="indepSendMsg"></div>
                 </div>
 
                 <div id="aftersalesTemplatesSection" class="hidden">
-                  <div id="aftersalesTemplatesList">
-                    <div class="muted" style="font-size:13px">No templates.</div>
-                  </div>
+                  <div id="aftersalesTemplatesList"><div class="muted" style="font-size:13px">No templates.</div></div>
                   <div class="hint" id="aftersalesSendMsg"></div>
                 </div>
               </div>
@@ -546,9 +480,7 @@
                   <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
                   <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
                 </div>
-                <div class="row" style="margin-top:10px;justify-content:flex-end">
-                  <button id="editInvoiceCustomerSave" class="btn primary" type="button">Save</button>
-                </div>
+                <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editInvoiceCustomerSave" class="btn primary" type="button">Save</button></div>
                 <div class="hint" id="editInvoiceCustomerMsg"></div>
               </div>
             </div>
@@ -587,9 +519,7 @@
                   <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
                   <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
                 </div>
-                <div class="row" style="margin-top:10px;justify-content:flex-end">
-                  <button id="editCustomerSave" class="btn primary" type="button">Save</button>
-                </div>
+                <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editCustomerSave" class="btn primary" type="button">Save</button></div>
                 <div class="hint" id="editCustomerMsg"></div>
               </div>
 
@@ -624,9 +554,7 @@
                   <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
                   <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
                 </div>
-                <div class="row" style="margin-top:10px;justify-content:flex-end">
-                  <button id="editSupplierSave" class="btn primary" type="button">Save</button>
-                </div>
+                <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editSupplierSave" class="btn primary" type="button">Save</button></div>
                 <div class="hint" id="editSupplierMsg"></div>
               </div>
             </div>
@@ -659,9 +587,7 @@
               <th class="completedCell">Completed</th>
             </tr>
           </thead>
-          <tbody id="tbodyOpen">
-            <tr><td colspan="4" class="muted">Loading…</td></tr>
-          </tbody>
+          <tbody id="tbodyOpen"><tr><td colspan="4" class="muted">Loading…</td></tr></tbody>
         </table>
 
         <div id="completedWrap" class="hidden" style="margin-top:12px">
@@ -680,9 +606,7 @@
                   <th class="completedCell">Completed</th>
                 </tr>
               </thead>
-              <tbody id="tbodyCompleted">
-                <tr><td colspan="4" class="muted">No completed orders.</td></tr>
-              </tbody>
+              <tbody id="tbodyCompleted"><tr><td colspan="4" class="muted">No completed orders.</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -709,18 +633,16 @@
     <div id="invoiceCreateFields" class="hidden">
       <label>Customer</label><input id="newInvoiceCustomer" />
       <label>Mail Customer</label><input id="newInvoiceMailCustomer" type="email" />
-      <div id="newInvoiceAccountmanagerStaticWrap">
-        <label>Accountmanager</label><input id="newInvoiceAccountmanager" readonly />
-      </div>
-      <div id="newInvoiceAccountmanagerSelectWrap" class="hidden">
+      <div id="newInvoiceAccountmanagerSelectWrap">
         <label>Accountmanager</label><select id="newInvoiceAccountmanagerSelect"></select>
+      </div>
+      <div id="newInvoiceAccountmanagerStaticWrap" class="hidden">
+        <label>Accountmanager</label><input id="newInvoiceAccountmanager" readonly />
       </div>
       <label>Surfcenter order</label><input id="newInvoiceSurfOrder" />
     </div>
 
-    <div class="row" style="margin-top:12px;justify-content:flex-end">
-      <button id="createBtn" class="btn primary" type="button">Add order</button>
-    </div>
+    <div class="row" style="margin-top:12px;justify-content:flex-end"><button id="createBtn" class="btn primary" type="button">Add order</button></div>
     <div class="hint" id="createMsg"></div>
   </div>
 </div>
@@ -745,6 +667,7 @@ const ORDER_MODE_INVOICE = "invoice";
 const LOGIN_TYPE_SUPPLIER = "supplier";
 const LOGIN_TYPE_MASTER = "master";
 const LOGIN_TYPE_ACCOUNTMANAGER = "accountmanager";
+const ACCOUNTMANAGER_TEMPLATE_CC = "jasper@surfcenter";
 const $ = (id)=>document.getElementById(id);
 
 let supplier = "";
@@ -827,9 +750,7 @@ function tokenMap(){
   const rowSupKey = getAny(selected,["Supplier KEY","SupplierKey"]) || "";
   const drop = getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]) || "";
   const surf = getAny(selected,["Surfcenter order","SurfcenterOrder"]) || "";
-  const accName = (isMasterLogin() && isInvoiceMode() && $("accountmanagerSelect").value)
-    ? $("accountmanagerSelect").value
-    : (getAny(selected,["Accountmanager"]) || accountmanagerName || "");
+  const accName = getAny(selected,["Accountmanager"]) || accountmanagerName || "";
   const accMail = accountmanagersMailMap[String(accName).toLowerCase()] ||
     getAny(selected,["Mail Accountmanager","MailAccountmanager"]) ||
     accountmanagerMail || "";
@@ -951,19 +872,12 @@ async function loadSuppliers_(){
   accountmanagersList = am?.ok && Array.isArray(am.accountmanagers) ? am.accountmanagers : [];
   accountmanagersMailMap = am?.ok && typeof am.mailMap === "object" ? am.mailMap : {};
 
-  $("accountmanagerSelect").innerHTML = "";
   $("newInvoiceAccountmanagerSelect").innerHTML = "";
-
   accountmanagersList.forEach(n=>{
-    const o1 = document.createElement("option");
-    o1.value = n;
-    o1.textContent = n;
-    $("accountmanagerSelect").appendChild(o1);
-
-    const o2 = document.createElement("option");
-    o2.value = n;
-    o2.textContent = n;
-    $("newInvoiceAccountmanagerSelect").appendChild(o2);
+    const o = document.createElement("option");
+    o.value = n;
+    o.textContent = n;
+    $("newInvoiceAccountmanagerSelect").appendChild(o);
   });
 }
 
@@ -1034,7 +948,7 @@ function renderTemplateList_(wrapId, list, sendAttr, sendFn){
         </div>
       </div>
       <div class="row" style="gap:8px;flex-wrap:nowrap">
-        <button class="btn" type="button" ${sendAttr}="${escapeHTML(t.id)}">Send</button>
+        <button class="btn openBtn" type="button" ${sendAttr}="${escapeHTML(t.id)}">Send</button>
       </div>
     `;
     wrap.appendChild(row);
@@ -1310,12 +1224,12 @@ async function sendInvoiceTemplate_(tpl){
 async function sendAftersalesTemplate_(tpl){
   const to = selectedCustomerMail_();
   if(!to) return;
+  const cc = ACCOUNTMANAGER_TEMPLATE_CC;
   const subject = applyTokens(tpl.subject||"");
   const body = applyTokens(tpl.body||"");
 
   openMailPicker({
-    to, cc:"",
-    subject, body,
+    to, cc, subject, body,
     afterOpen: async ()=>{
       await logMail_({
         to,
@@ -1340,14 +1254,12 @@ function applyModeUI_(){
   $("primaryOrderLabel").classList.toggle("hidden", !isDropshipMode());
 
   $("supplierMailBox").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
-  $("defaultCustomerFlags").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
+  $("mailCustomerBox").classList.toggle("hidden", isAccountmanagerLogin());
+  $("defaultCustomerFlags").classList.toggle("hidden", !(isMasterLogin()));
   $("trackingFieldsWrap").classList.toggle("hidden", isInvoiceMode() || isAccountmanagerLogin());
 
-  $("accountmanagerBlock").classList.toggle("hidden", !(isInvoiceMode() || isAccountmanagerLogin()));
-  $("accountmanagerStaticWrap").classList.toggle("hidden", isMasterLogin() && isInvoiceMode());
-  $("accountmanagerSelectWrap").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()));
-
-  $("invoiceCustomerEditorSection").classList.toggle("hidden", !isInvoiceMode());
+  $("accountmanagerBlock").classList.toggle("hidden", !isInvoiceMode());
+  $("invoiceCustomerEditorSection").classList.toggle("hidden", !isInvoiceMode() || !isMasterLogin());
   $("mailTemplatesWrap").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
 
   $("invoiceTemplatesSection").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()));
@@ -1418,7 +1330,8 @@ function renderOrders(){
 
     list.forEach(o=>{
       const tr = document.createElement("tr");
-      const mail = getAny(o,["Mail Customer","MailCustomer"]);
+      const showMailLine = !isSupplierLogin();
+      const mail = showMailLine ? getAny(o,["Mail Customer","MailCustomer"]) : "";
       const thirdLine = (isDropshipMode() && !isAccountmanagerLogin())
         ? (getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]) || getAny(o,["Surfcenter order","SurfcenterOrder"]))
         : getAny(o,["Surfcenter order","SurfcenterOrder"]);
@@ -1440,7 +1353,7 @@ function renderOrders(){
         </td>
         <td>
           <div class="actionsCell">
-            <button class="btn" data-open="${escapeHTML(o.rowId)}">Open</button>
+            <button class="btn openBtn" data-open="${escapeHTML(o.rowId)}">Open</button>
           </div>
         </td>
         <td class="completedCell">
@@ -1465,16 +1378,11 @@ async function openRow(rowId){
   if(!selected) return;
 
   $("customerLabel").textContent = getAny(selected,["Customer"]) || "—";
-  $("customerMailLine").textContent = getAny(selected,["Mail Customer","MailCustomer"]) || "";
+  $("customerMailLine").textContent = isSupplierLogin() ? "" : (getAny(selected,["Mail Customer","MailCustomer"]) || "");
   $("supplierLabel").textContent = getAny(selected,["Supplier"]) || "—";
   $("supplierKeyLine").textContent = getAny(selected,["Supplier KEY","SupplierKey"]) || "";
   $("accountmanagerLabel").textContent = getAny(selected,["Accountmanager"]) || accountmanagerName || "—";
   $("accountmanagerMailLine").textContent = getAny(selected,["Mail Accountmanager","MailAccountmanager"]) || accountmanagerMail || "";
-
-  if(isMasterLogin() && isInvoiceMode()){
-    $("accountmanagerSelect").value = getAny(selected,["Accountmanager"]) || "";
-  }
-
   $("primaryOrderLabel").textContent = getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]) || "—";
   $("surfOrderLabel").textContent = getAny(selected,["Surfcenter order","SurfcenterOrder"]) || "—";
 
@@ -1532,8 +1440,8 @@ function prepareCreateModal_(){
   $("newOrderModalTitle").textContent = isInvoiceMode() ? "New invoice order" : "New order";
   $("dropshipCreateFields").classList.toggle("hidden", !isDropshipMode());
   $("invoiceCreateFields").classList.toggle("hidden", !isInvoiceMode());
-  $("newInvoiceAccountmanagerStaticWrap").classList.toggle("hidden", isMasterLogin());
   $("newInvoiceAccountmanagerSelectWrap").classList.toggle("hidden", !isMasterLogin());
+  $("newInvoiceAccountmanagerStaticWrap").classList.toggle("hidden", !isAccountmanagerLogin());
 
   if(isAccountmanagerLogin()){
     $("newInvoiceAccountmanager").value = accountmanagerName || "";
