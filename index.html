@@ -480,7 +480,7 @@
 </div>
 
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbyP5Cjso9pWOAjP4Tci9HpIRkHTkTOFxC7RmO6tYAh8M6nLLpiyaHw7nbrIezQdOcPT6Q/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbyALmyYGDGAozewHK6XolzlSTrlXhdBGsmO88nP1V2t8LJ0D7inZDkbzP4MNr6VaZd7Jw/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -510,7 +510,28 @@ function isTruthy(v){const s=String(v||"").trim().toUpperCase();return s==="TRUE
 function trackingComplete(o){return !!(getAny(o,["Carrier"])&&getAny(o,["Trackingnumber","Tracking Number"])&&getAny(o,["Trackinglink","Tracking Link"]));}
 function setStatus(text, ok){$("statusBadge").classList.remove("ready","missing");$("statusBadge").classList.add(ok?"ready":"missing");$("statusText").textContent=text;}
 function firstNameFromCustomer_(full){const s=String(full||"").trim();return s?s.split(/\s+/)[0]:"";}
-function tokenMap(){const fullCustomer=getAny(selected,["Customer"])||"";const sup=getAny(selected,["Supplier"])||"";const rowSupKey=getAny(selected,["Supplier KEY","SupplierKey"])||"";const drop=getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||"";const surf=getAny(selected,["Surfcenter order","SurfcenterOrder"])||"";const accName=getAny(selected,["Accountmanager"])||accountmanagerName||"";const accMail=accountmanagersMailMap[String(accName).toLowerCase()]||getAny(selected,["Mail Accountmanager","MailAccountmanager"])||accountmanagerMail||"";return {"{{Customer}}":firstNameFromCustomer_(fullCustomer),"{{CustomerFull}}":fullCustomer,"{{DropshipmentOrder}}":drop,"{{SurfcenterOrder}}":surf,"{{Carrier}}":($("carrier").value.trim()||getAny(selected,["Carrier"])||""),"{{Trackingnumber}}":($("trackingNumber").value.trim()||getAny(selected,["Trackingnumber","Tracking Number"])||""),"{{Trackinglink}}":($("trackingLink").value.trim()||getAny(selected,["Trackinglink","Tracking Link"])||""),"{{Supplier}}":sup,"{{SupplierKey}}":rowSupKey||supplierKey,"{{Accountmanager}}":accName,"{{MailAccountmanager}}":accMail};}
+function tokenMap(){
+  const fullCustomer=getAny(selected,["Customer"])||"";
+  const sup=getAny(selected,["Supplier"])||"";
+  const rowSupKey=getAny(selected,["Supplier KEY","SupplierKey"])||"";
+  const drop=getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||"";
+  const surf=getAny(selected,["Surfcenter order","SurfcenterOrder"])||"";
+  const accName=getAny(selected,["Accountmanager"])||accountmanagerName||"";
+  const accMail=accountmanagersMailMap[String(accName).toLowerCase()]||getAny(selected,["Mail Accountmanager","MailAccountmanager"])||accountmanagerMail||"";
+  return {
+    "{{Customer}}":firstNameFromCustomer_(fullCustomer),
+    "{{CustomerFull}}":fullCustomer,
+    "{{DropshipmentOrder}}":drop,
+    "{{SurfcenterOrder}}":surf,
+    "{{Carrier}}":($("carrier").value.trim()||getAny(selected,["Carrier"])||""),
+    "{{Trackingnumber}}":($("trackingNumber").value.trim()||getAny(selected,["Trackingnumber","Tracking Number"])||""),
+    "{{Trackinglink}}":($("trackingLink").value.trim()||getAny(selected,["Trackinglink","Tracking Link"])||""),
+    "{{Supplier}}":sup,
+    "{{SupplierKey}}":rowSupKey||supplierKey,
+    "{{Accountmanager}}":accName,
+    "{{MailAccountmanager}}":accMail
+  };
+}
 function applyTokens(txt){let out=String(txt||"");const m=tokenMap();for(const k of Object.keys(m)) out=out.split(k).join(String(m[k]||""));return out;}
 function insertAtCursor_(el, text){if(!el)return;const start=typeof el.selectionStart==="number"?el.selectionStart:el.value.length;const end=typeof el.selectionEnd==="number"?el.selectionEnd:el.value.length;el.value=el.value.slice(0,start)+text+el.value.slice(end);const pos=start+text.length;if(el.setSelectionRange)el.setSelectionRange(pos,pos);el.focus&&el.focus();}
 function bindTokenButtons_(){document.querySelectorAll("button[data-token]").forEach(btn=>btn.addEventListener("click",()=>{insertAtCursor_(lastFocusedField||$("indepBodyText")||$("invoiceTemplateBodyText")||$("aftersalesTemplateBodyText")||$("editInvoiceCustomerBodyText")||$("editCustomerBodyText")||$("editSupplierBodyText"),btn.getAttribute("data-token"));}));}
@@ -531,6 +552,7 @@ async function loadSuppliers_(){
   suppliersKeyMap=data?.ok&&typeof data.keyMap==="object"?data.keyMap:{};
   $("newSupplier").innerHTML="";
   suppliersList.forEach(s=>{const o=document.createElement("option");o.value=s;o.textContent=s;$("newSupplier").appendChild(o);});
+
   const am=await api_(`action=accountmanagers&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
   accountmanagersList=am?.ok&&Array.isArray(am.accountmanagers)?am.accountmanagers:[];
   accountmanagersMailMap=am?.ok&&typeof am.mailMap==="object"?am.mailMap:{};
@@ -542,18 +564,25 @@ function findTpl_(arr, lang){const l=String(lang||"").toLowerCase();return arr.f
 function langFlag_(lang){const l=String(lang||"").toLowerCase();if(l==="nl")return "🇳🇱";if(l==="de")return "🇩🇪";if(l==="fr")return "🇫🇷";return "🇬🇧";}
 
 async function loadAllTemplates_(){
+  indepTemplates=[]; customerTemplates=[]; supplierTemplates=[]; invoiceTemplates=[]; invoiceCustomerTemplates=[]; aftersalesTemplates=[];
+
   if(isMasterLogin()){
     const a=await api_(`action=indep_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); indepTemplates=a?.ok&&Array.isArray(a.templates)?a.templates:[];
     const c=await api_(`action=customer_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); customerTemplates=c?.ok&&Array.isArray(c.templates)?c.templates:[];
     const s=await api_(`action=supplier_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); supplierTemplates=s?.ok&&Array.isArray(s.templates)?s.templates:[];
     const i=await api_(`action=invoice_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); invoiceTemplates=i?.ok&&Array.isArray(i.templates)?i.templates:[];
     const c2=await api_(`action=customer2_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); invoiceCustomerTemplates=c2?.ok&&Array.isArray(c2.templates)?c2.templates:[];
-  }
-  if(isAccountmanagerLogin()){
+    const a3=await api_(`action=aftersales_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); aftersalesTemplates=a3?.ok&&Array.isArray(a3.templates)?a3.templates:[];
+  } else if(isAccountmanagerLogin()){
     const a3=await api_(`action=aftersales_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); aftersalesTemplates=a3?.ok&&Array.isArray(a3.templates)?a3.templates:[];
   }
-  renderIndepTemplates_(); renderInvoiceTemplates_(); renderAftersalesTemplates_();
-  fillCustomerEditorFromLang_($("editCustomerLang").value); fillSupplierEditorFromLang_($("editSupplierLang").value); fillInvoiceCustomerEditorFromLang_($("editInvoiceCustomerLang").value);
+
+  renderIndepTemplates_();
+  renderInvoiceTemplates_();
+  renderAftersalesTemplates_();
+  fillCustomerEditorFromLang_($("editCustomerLang").value);
+  fillSupplierEditorFromLang_($("editSupplierLang").value);
+  fillInvoiceCustomerEditorFromLang_($("editInvoiceCustomerLang").value);
 }
 
 function renderTemplateList_(wrapId, list, sendAttr, sendFn, editAttr, editFn){
@@ -561,13 +590,15 @@ function renderTemplateList_(wrapId, list, sendAttr, sendFn, editAttr, editFn){
   const items=list.slice().sort((a,b)=>String(a.label||"").localeCompare(String(b.label||"")));
   if(!items.length){wrap.innerHTML='<div class="muted" style="font-size:13px">No templates.</div>';return;}
   items.forEach(t=>{
-    const row=document.createElement("div"); row.className="savedTemplateRow";
+    const row=document.createElement("div");
+    row.className="savedTemplateRow";
     row.innerHTML=`<div class="savedLeft"><div class="flag">${langFlag_(t.language)}</div><div style="min-width:0"><div class="tplName">${escapeHTML(t.label||"")}</div><div class="tplMeta">${escapeHTML(t.subject||"")}</div></div></div><div class="row" style="gap:8px;flex-wrap:nowrap">${editAttr?`<button class="btn openBtn" type="button" ${editAttr}="${escapeHTML(t.id)}">Edit</button>`:""}<button class="btn openBtn" type="button" ${sendAttr}="${escapeHTML(t.id)}">Send</button></div>`;
     wrap.appendChild(row);
   });
   wrap.querySelectorAll(`button[${sendAttr}]`).forEach(btn=>btn.addEventListener("click",()=>{const t=items.find(x=>String(x.id)===String(btn.getAttribute(sendAttr))); if(t) sendFn(t);}));
   if(editAttr&&editFn) wrap.querySelectorAll(`button[${editAttr}]`).forEach(btn=>btn.addEventListener("click",()=>{const t=items.find(x=>String(x.id)===String(btn.getAttribute(editAttr))); if(t) editFn(t);}));
 }
+
 function renderIndepTemplates_(){renderTemplateList_("indepTemplatesList", indepTemplates, "data-indep-send", sendIndependentTemplate_, "data-indep-edit", editIndependentTemplate_);}
 function renderInvoiceTemplates_(){renderTemplateList_("invoiceTemplatesList", invoiceTemplates, "data-invoice-send", sendInvoiceTemplate_, "data-invoice-edit", editInvoiceTemplate_);}
 function renderAftersalesTemplates_(){renderTemplateList_("aftersalesTemplatesList", aftersalesTemplates, "data-aftersales-send", sendAftersalesTemplate_, "data-aftersales-edit", editAftersalesTemplate_);}
@@ -575,92 +606,414 @@ function renderAftersalesTemplates_(){renderTemplateList_("aftersalesTemplatesLi
 function fillCustomerEditorFromLang_(lang){const t=findTpl_(customerTemplates, lang);$("editCustomerSubject").value=t?.subject||"";$("editCustomerBodyText").value=t?.body||"";$("editCustomerMsg").textContent="";}
 function fillSupplierEditorFromLang_(lang){const t=findTpl_(supplierTemplates, lang);$("editSupplierSubject").value=t?.subject||"";$("editSupplierBodyText").value=t?.body||"";$("editSupplierMsg").textContent="";}
 function fillInvoiceCustomerEditorFromLang_(lang){const t=findTpl_(invoiceCustomerTemplates, lang);$("editInvoiceCustomerSubject").value=t?.subject||"";$("editInvoiceCustomerBodyText").value=t?.body||"";$("editInvoiceCustomerMsg").textContent="";}
+
 function resetIndepEditor_(){$("indepLang").value="en";$("indepLabel").value="";$("indepSubject").value="";$("indepBodyText").value="";$("indepSaveMsg").textContent="";delete $("indepSave").dataset.editId;$("indepSave").textContent="Save";}
 function resetInvoiceTemplateEditor_(){$("invoiceTemplateLang").value="en";$("invoiceTemplateLabel").value="";$("invoiceTemplateSubject").value="";$("invoiceTemplateBodyText").value="";$("invoiceTemplateSaveMsg").textContent="";delete $("invoiceTemplateSave").dataset.editId;$("invoiceTemplateSave").textContent="Save";}
 function resetAftersalesTemplateEditor_(){$("aftersalesTemplateLang").value="en";$("aftersalesTemplateLabel").value="";$("aftersalesTemplateSubject").value="";$("aftersalesTemplateBodyText").value="";$("aftersalesTemplateSaveMsg").textContent="";delete $("aftersalesTemplateSave").dataset.editId;$("aftersalesTemplateSave").textContent="Save";}
+
 function editIndependentTemplate_(tpl){$("addIndepBody").classList.remove("hidden");$("addIndepPlus").textContent="–";$("indepLang").value=(tpl.language||"en").toLowerCase();$("indepLabel").value=tpl.label||"";$("indepSubject").value=tpl.subject||"";$("indepBodyText").value=tpl.body||"";$("indepSave").dataset.editId=String(tpl.id||"");$("indepSave").textContent="Update";}
 function editInvoiceTemplate_(tpl){$("addInvoiceTemplateBody").classList.remove("hidden");$("addInvoiceTemplatePlus").textContent="–";$("invoiceTemplateLang").value=(tpl.language||"en").toLowerCase();$("invoiceTemplateLabel").value=tpl.label||"";$("invoiceTemplateSubject").value=tpl.subject||"";$("invoiceTemplateBodyText").value=tpl.body||"";$("invoiceTemplateSave").dataset.editId=String(tpl.id||"");$("invoiceTemplateSave").textContent="Update";}
 function editAftersalesTemplate_(tpl){$("addAftersalesTemplateBody").classList.remove("hidden");$("addAftersalesTemplatePlus").textContent="–";$("aftersalesTemplateLang").value=(tpl.language||"en").toLowerCase();$("aftersalesTemplateLabel").value=tpl.label||"";$("aftersalesTemplateSubject").value=tpl.subject||"";$("aftersalesTemplateBodyText").value=tpl.body||"";$("aftersalesTemplateSave").dataset.editId=String(tpl.id||"");$("aftersalesTemplateSave").textContent="Update";}
 
-async function upsertTemplate_(action, id, lang, label, subject, body, msgEl, done){msgEl.textContent="Saving…";const data=await api_(`action=${action}&supplierKey=${encodeURIComponent(supplierKey)}`+(id?`&id=${encodeURIComponent(id)}`:"")+`&language=${encodeURIComponent(lang)}&label=${encodeURIComponent(label)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`).catch(()=>null);if(!data?.ok){msgEl.innerHTML=`<span style="color:var(--bad)">${escapeHTML(data?.error||"Save failed.")}</span>`;return;}msgEl.innerHTML='<span style="color:var(--ok)">Saved ✓</span>';if(done) await done();}
-function formatMailLogDateTime_(ts){const s=String(ts||"").trim();const m=s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/);if(m) return {date:m[1], time:m[2]};return {date:s,time:""};}
-async function logMail_(payload){if(!selected) return;const RowID=String(selected.rowId||"");const Customer=getAny(selected,["Customer"])||"";const OrderID=getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID","Surfcenter order","SurfcenterOrder"])||"";await api_(`action=log_mail&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}&RowID=${encodeURIComponent(RowID)}&Customer=${encodeURIComponent(Customer)}&OrderID=${encodeURIComponent(OrderID)}&To=${encodeURIComponent(payload.to||"")}&Kind=${encodeURIComponent(payload.kind||"")}&Language=${encodeURIComponent(payload.language||"")}&Template=${encodeURIComponent(payload.template||"")}&Subject=${encodeURIComponent(payload.subject||"")}`).catch(()=>null);}
-async function loadMailLog_(){if(!selected) return;$("mailLogList").textContent="Loading…";const data=await api_(`action=mail_log&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}&RowID=${encodeURIComponent(String(selected.rowId))}`).catch(()=>null);if(!data?.ok){$("mailLogList").textContent="Mail log unavailable.";return;}const rows=Array.isArray(data.rows)?data.rows:[];if(!rows.length){$("mailLogList").textContent="No log.";return;}const wrap=document.createElement("div");wrap.style.display="flex";wrap.style.flexDirection="column";wrap.style.gap="8px";rows.forEach(r=>{const dt=formatMailLogDateTime_(r.Timestamp||"");const line=document.createElement("div");line.className="savedTemplateRow";line.innerHTML=`<div style="width:100%"><div class="mailLogRow"><div class="mailLogDate">${escapeHTML(dt.date)}</div><div class="mailLogTime">${escapeHTML(dt.time)}</div></div><div class="tplMeta" style="margin-top:6px">${escapeHTML(r.Template||"-")} · ${escapeHTML(r.Subject||"-")}</div></div>`;wrap.appendChild(line);});$("mailLogList").innerHTML="";$("mailLogList").appendChild(wrap);}
-async function setCompleted(rowId, val){const data=await api_(`action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&Completed=${encodeURIComponent(val?"TRUE":"FALSE")}&mode=${encodeURIComponent(currentMode)}`).catch(()=>null);return data?.ok?{ok:true}:{ok:false};}
+async function upsertTemplate_(action, id, lang, label, subject, body, msgEl, done){
+  msgEl.textContent="Saving…";
+  const data=await api_(`action=${action}&supplierKey=${encodeURIComponent(supplierKey)}`+(id?`&id=${encodeURIComponent(id)}`:"")+`&language=${encodeURIComponent(lang)}&label=${encodeURIComponent(label)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`).catch(()=>null);
+  if(!data?.ok){msgEl.innerHTML=`<span style="color:var(--bad)">${escapeHTML(data?.error||"Save failed.")}</span>`;return;}
+  msgEl.innerHTML='<span style="color:var(--ok)">Saved ✓</span>';
+  if(done) await done();
+}
+
+function formatMailLogDateTime_(ts){
+  const s=String(ts||"").trim();
+  const m=s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/);
+  if(m) return {date:m[1], time:m[2]};
+  return {date:s,time:""};
+}
+
+async function logMail_(payload){
+  if(!selected) return;
+  const RowID=String(selected.rowId||"");
+  const Customer=getAny(selected,["Customer"])||"";
+  const OrderID=getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID","Surfcenter order","SurfcenterOrder"])||"";
+  await api_(`action=log_mail&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}&RowID=${encodeURIComponent(RowID)}&Customer=${encodeURIComponent(Customer)}&OrderID=${encodeURIComponent(OrderID)}&To=${encodeURIComponent(payload.to||"")}&Kind=${encodeURIComponent(payload.kind||"")}&Language=${encodeURIComponent(payload.language||"")}&Template=${encodeURIComponent(payload.template||"")}&Subject=${encodeURIComponent(payload.subject||"")}`).catch(()=>null);
+}
+
+async function loadMailLog_(){
+  if(!selected) return;
+  $("mailLogList").textContent="Loading…";
+  const data=await api_(`action=mail_log&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}&RowID=${encodeURIComponent(String(selected.rowId))}`).catch(()=>null);
+  if(!data?.ok){$("mailLogList").textContent="Mail log unavailable.";return;}
+  const rows=Array.isArray(data.rows)?data.rows:[];
+  if(!rows.length){$("mailLogList").textContent="No log.";return;}
+  const wrap=document.createElement("div");
+  wrap.style.display="flex";
+  wrap.style.flexDirection="column";
+  wrap.style.gap="8px";
+  rows.forEach(r=>{
+    const dt=formatMailLogDateTime_(r.Timestamp||"");
+    const line=document.createElement("div");
+    line.className="savedTemplateRow";
+    line.innerHTML=`<div style="width:100%"><div class="mailLogRow"><div class="mailLogDate">${escapeHTML(dt.date)}</div><div class="mailLogTime">${escapeHTML(dt.time)}</div></div><div class="tplMeta" style="margin-top:6px">${escapeHTML(r.Template||"-")} · ${escapeHTML(r.Subject||"-")}</div></div>`;
+    wrap.appendChild(line);
+  });
+  $("mailLogList").innerHTML="";
+  $("mailLogList").appendChild(wrap);
+}
+
+async function setCompleted(rowId, val){
+  const data=await api_(`action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&Completed=${encodeURIComponent(val?"TRUE":"FALSE")}&mode=${encodeURIComponent(currentMode)}`).catch(()=>null);
+  return data?.ok?{ok:true}:{ok:false};
+}
+
 function customerDraftFromLang_(lang){const t=findTpl_(customerTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
 function supplierDraftFromLang_(lang){const t=findTpl_(supplierTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
 function invoiceCustomerDraftFromLang_(lang){const t=findTpl_(invoiceCustomerTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
 function selectedCustomerMail_(){return getAny(selected,["Mail Customer","MailCustomer"]);}
-function selectedAccountmanagerCC_(){const m=tokenMap();return m["{{MailAccountmanager}}"]||"";}
 
-async function mailCustomer(lang, btn){if(!selected) return;if(btn) setBtnActive_(btn);const to=selectedCustomerMail_();if(!to){$("mailMsg").innerHTML="<span style='color:var(--warn)'>No customer email found.</span>";return;}const cc=selectedAccountmanagerCC_();const tpl=isInvoiceMode()?invoiceCustomerDraftFromLang_(lang):customerDraftFromLang_(lang);openMailPicker({to,cc,subject:tpl.subject,body:tpl.body,afterOpen:async()=>{await logMail_({to,kind:"customer",language:lang,template:`Mail customer ${lang.toUpperCase()}`,subject:tpl.subject});const res=await setCompleted(selected.rowId,true);$("mailMsg").innerHTML=res.ok?'<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>':'<span style="color:var(--warn)">Mail opened ✓</span>';await loadOrders();}});}
-async function mailSupplier(lang, btn){if(!selected||!isDropshipMode()) return;if(btn) setBtnActive_(btn);const supName=getAny(selected,["Supplier"])||"";const to=suppliersMailMap[String(supName).toLowerCase()]||getAny(selected,["Mail Supplier","MailSupplier"])||"";if(!to){$("mailSupplierMsg").innerHTML="<span style='color:var(--warn)'>No supplier email found.</span>";return;}const tpl=supplierDraftFromLang_(lang);openMailPicker({to,cc:"",subject:tpl.subject,body:tpl.body,afterOpen:async()=>{await logMail_({to,kind:"supplier",language:lang,template:`Mail supplier ${lang.toUpperCase()}`,subject:tpl.subject});$("mailSupplierMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';await loadMailLog_();}});}
-async function sendIndependentTemplate_(tpl){const to=selectedCustomerMail_();if(!to) return;const cc=selectedAccountmanagerCC_();const subject=applyTokens(tpl.subject||"");const body=applyTokens(tpl.body||"");openMailPicker({to,cc,subject,body,afterOpen:async()=>{await logMail_({to,kind:"independent",language:String(tpl.language||"").toLowerCase(),template:tpl.label||"",subject});$("indepSendMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';await loadMailLog_();}});}
-async function sendInvoiceTemplate_(tpl){const to=selectedCustomerMail_();if(!to) return;const cc=selectedAccountmanagerCC_();const subject=applyTokens(tpl.subject||"");const body=applyTokens(tpl.body||"");openMailPicker({to,cc,subject,body,afterOpen:async()=>{await logMail_({to,kind:"independent",language:String(tpl.language||"").toLowerCase(),template:tpl.label||"",subject});$("invoiceSendMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';await loadMailLog_();}});}
-async function sendAftersalesTemplate_(tpl){const to=selectedCustomerMail_();if(!to) return;const cc=ACCOUNTMANAGER_TEMPLATE_CC;const subject=applyTokens(tpl.subject||"");const body=applyTokens(tpl.body||"");openMailPicker({to,cc,subject,body,afterOpen:async()=>{await logMail_({to,kind:"independent",language:String(tpl.language||"").toLowerCase(),template:tpl.label||"",subject});$("aftersalesSendMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';await loadMailLog_();}});}
+async function mailCustomer(lang, btn){
+  if(!selected) return;
+  if(btn) setBtnActive_(btn);
+  const to=selectedCustomerMail_();
+  if(!to){$("mailMsg").innerHTML="<span style='color:var(--warn)'>No customer email found.</span>";return;}
+  const cc=isInvoiceMode() ? (tokenMap()["{{MailAccountmanager}}"]||"") : "";
+  const tpl=isInvoiceMode()?invoiceCustomerDraftFromLang_(lang):customerDraftFromLang_(lang);
+  openMailPicker({
+    to,cc,subject:tpl.subject,body:tpl.body,
+    afterOpen:async()=>{
+      await logMail_({to,kind:"customer",language:lang,template:`Mail customer ${lang.toUpperCase()}`,subject:tpl.subject});
+      const res=await setCompleted(selected.rowId,true);
+      $("mailMsg").innerHTML=res.ok?'<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>':'<span style="color:var(--warn)">Mail opened ✓</span>';
+      await loadOrders();
+    }
+  });
+}
+
+async function mailSupplier(lang, btn){
+  if(!selected||!isDropshipMode()) return;
+  if(btn) setBtnActive_(btn);
+  const supName=getAny(selected,["Supplier"])||"";
+  const to=suppliersMailMap[String(supName).toLowerCase()]||getAny(selected,["Mail Supplier","MailSupplier"])||"";
+  if(!to){$("mailSupplierMsg").innerHTML="<span style='color:var(--warn)'>No supplier email found.</span>";return;}
+  const tpl=supplierDraftFromLang_(lang);
+  openMailPicker({
+    to,cc:"",subject:tpl.subject,body:tpl.body,
+    afterOpen:async()=>{
+      await logMail_({to,kind:"supplier",language:lang,template:`Mail supplier ${lang.toUpperCase()}`,subject:tpl.subject});
+      $("mailSupplierMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';
+      await loadMailLog_();
+    }
+  });
+}
+
+async function sendIndependentTemplate_(tpl){
+  const to=selectedCustomerMail_(); if(!to) return;
+  const subject=applyTokens(tpl.subject||"");
+  const body=applyTokens(tpl.body||"");
+  openMailPicker({
+    to,cc:"",subject,body,
+    afterOpen:async()=>{
+      await logMail_({to,kind:"independent",language:String(tpl.language||"").toLowerCase(),template:tpl.label||"",subject});
+      $("indepSendMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';
+      await loadMailLog_();
+    }
+  });
+}
+
+async function sendInvoiceTemplate_(tpl){
+  const to=selectedCustomerMail_(); if(!to) return;
+  const cc=tokenMap()["{{MailAccountmanager}}"]||"";
+  const subject=applyTokens(tpl.subject||"");
+  const body=applyTokens(tpl.body||"");
+  openMailPicker({
+    to,cc,subject,body,
+    afterOpen:async()=>{
+      await logMail_({to,kind:"independent",language:String(tpl.language||"").toLowerCase(),template:tpl.label||"",subject});
+      $("invoiceSendMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';
+      await loadMailLog_();
+    }
+  });
+}
+
+async function sendAftersalesTemplate_(tpl){
+  const to=selectedCustomerMail_(); if(!to) return;
+  const cc=ACCOUNTMANAGER_TEMPLATE_CC;
+  const subject=applyTokens(tpl.subject||"");
+  const body=applyTokens(tpl.body||"");
+  openMailPicker({
+    to,cc,subject,body,
+    afterOpen:async()=>{
+      await logMail_({to,kind:"independent",language:String(tpl.language||"").toLowerCase(),template:tpl.label||"",subject});
+      $("aftersalesSendMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';
+      await loadMailLog_();
+    }
+  });
+}
 
 function applyModeUI_(){
-  $("surfOrderCaption").textContent=isInvoiceMode()?"Invoice":"Surfcenter order";
-  $("newInvoiceOrderLabel").textContent="Invoice";
-  $("surfOrderCaption").textContent=isInvoiceMode()?"Invoice":"Surfcenter order";
-  $("newInvoiceOrderLabel").textContent="Invoice";
   $("modeWrap").classList.toggle("hidden", !isMasterLogin());
   $("modeDropshipBtn").classList.toggle("active", isDropshipMode());
   $("modeInvoiceBtn").classList.toggle("active", isInvoiceMode());
+
   $("supplierBlock").classList.toggle("hidden", !isDropshipMode());
   $("primaryOrderCaption").classList.toggle("hidden", !isDropshipMode());
   $("primaryOrderLabel").classList.toggle("hidden", !isDropshipMode());
+
+  $("surfOrderCaption").textContent = isInvoiceMode() ? "Invoice" : "Surfcenter order";
+  $("newInvoiceOrderLabel").textContent = "Invoice";
+
   $("supplierMailBox").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
-  $("mailCustomerBox").classList.toggle("hidden", isSupplierLogin() || isAccountmanagerLogin());
-  $("defaultCustomerFlags").classList.toggle("hidden", !(isMasterLogin()));
-  $("trackingFieldsWrap").classList.toggle("hidden", isAccountmanagerLogin());
+  $("mailCustomerBox").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()));
+  $("defaultCustomerFlags").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()));
+
+  $("trackingFieldsWrap").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()) && !(isDropshipMode() && !isAccountmanagerLogin()));
+
   $("accountmanagerBlock").classList.toggle("hidden", !isInvoiceMode());
+
   $("mailTemplatesWrap").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
   $("dropshipTemplatesSection").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
   $("invoiceTemplatesSection").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()));
-  $("aftersalesTemplatesSection").classList.toggle("hidden", !isAccountmanagerLogin());
+  $("aftersalesTemplatesSection").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
+
   $("invoiceCustomerEditorSection").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()));
   $("dropshipEditorsWrap").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
+
   $("mailLogSection").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
   $("completedWrap").classList.remove("hidden");
+
   $("newOrderBtnText").textContent=isInvoiceMode()?"Add invoice order":"Add new order";
 }
-function setMode(mode){if(!isMasterLogin()) return;currentMode=mode;selected=null;$("form").classList.add("hidden");$("noSelection").classList.remove("hidden");applyModeUI_();loadOrders();}
 
-async function loadOrders(){selected=null;$("form").classList.add("hidden");$("noSelection").classList.remove("hidden");$("tbodyOpen").innerHTML="<tr><td colspan='4' class='muted'>Loading…</td></tr>";$("tbodyCompleted").innerHTML="<tr><td colspan='4' class='muted'>Loading…</td></tr>";let url=`${API_BASE}?action=orders&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode)}`;if(isMasterLogin()) url+=`&supplier=${encodeURIComponent(MASTER_NAME)}`;if(isSupplierLogin()) url+=`&supplier=${encodeURIComponent(supplier)}`;if(isAccountmanagerLogin()) url+=`&accountmanager=${encodeURIComponent(accountmanagerName)}`;const data=await jsonp(url).catch(()=>null);if(!data?.ok){const err=escapeHTML(data?.error||"Error");$("tbodyOpen").innerHTML=`<tr><td colspan="4" class='muted'>${err}</td></tr>`;$("tbodyCompleted").innerHTML=`<tr><td colspan="4" class='muted'>${err}</td></tr>`;return;}orders=(data.orders||[]).slice().sort((a,b)=>Number(b.rowId||0)-Number(a.rowId||0));renderOrders();}
-function renderOrders(){const q=($("historySearch").value||"").trim().toLowerCase();const match=o=>!q||[getAny(o,["Customer"]),getAny(o,["Mail Customer","MailCustomer"]),getAny(o,["Surfcenter order","SurfcenterOrder"]),getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]),getAny(o,["Accountmanager"])].join(" ").toLowerCase().includes(q);const openList=orders.filter(o=>!isTruthy(o.Completed)).filter(match);const doneList=orders.filter(o=>isTruthy(o.Completed)).filter(match);const draw=(target,list)=>{target.innerHTML="";if(!list.length){target.innerHTML='<tr><td colspan="4" class="muted">No orders found.</td></tr>';return;}list.forEach(o=>{const tr=document.createElement("tr");const mail=isSupplierLogin()?"":getAny(o,["Mail Customer","MailCustomer"]);const thirdLine=(isDropshipMode()&&!isAccountmanagerLogin())?(getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||getAny(o,["Surfcenter order","SurfcenterOrder"])):getAny(o,["Surfcenter order","SurfcenterOrder"]);tr.innerHTML=`<td><div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(getAny(o,["Customer"]))}</div>${mail?`<div class="smallLine">${escapeHTML(mail)}</div>`:""}${thirdLine?`<div class="smallLine">${escapeHTML(thirdLine)}</div>`:""}</td><td class="statusCell"><div class="statusWrap"><span class="status ${trackingComplete(o)?"ready":"missing"}"><span class="dot"></span>${trackingComplete(o)?"Complete":"Missing tracking"}</span></div></td><td><div class="actionsCell"><button class="btn openBtn" data-open="${escapeHTML(o.rowId)}">Open</button></div></td><td class="completedCell">${isTruthy(o.Completed)?'<span class="checkPill yes">✓</span>':'<span class="checkPill">—</span>'}</td>`;target.appendChild(tr);});};draw($("tbodyOpen"),openList);draw($("tbodyCompleted"),doneList);document.querySelectorAll("button[data-open]").forEach(btn=>btn.addEventListener("click",()=>openRow(Number(btn.dataset.open))));}
-async async function openRow(rowId){clearActiveMailButtons_();selected=orders.find(x=>Number(x.rowId)===rowId);if(!selected)return;$("customerLabel").textContent=getAny(selected,["Customer"])||"—";$("customerMailLine").textContent=isSupplierLogin()?"":(getAny(selected,["Mail Customer","MailCustomer"])||"");$("supplierLabel").textContent=getAny(selected,["Supplier"])||"—";$("supplierKeyLine").textContent=getAny(selected,["Supplier KEY","SupplierKey"])||"";$("accountmanagerLabel").textContent=getAny(selected,["Accountmanager"])||accountmanagerName||"—";$("accountmanagerMailLine").textContent=getAny(selected,["Mail Accountmanager","MailAccountmanager"])||accountmanagerMail||"";$("primaryOrderLabel").textContent=getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||"—";$("surfOrderLabel").textContent=getAny(selected,["Surfcenter order","SurfcenterOrder"])||"—";$("surfOrderCaption").textContent=isInvoiceMode()?"Invoice":"Surfcenter order";$("surfOrderCaption").textContent=isInvoiceMode()?"Invoice":"Surfcenter order";$("carrier").value=getAny(selected,["Carrier"])||"";$("trackingNumber").value=getAny(selected,["Trackingnumber","Tracking Number"])||"";$("trackingLink").value=getAny(selected,["Trackinglink","Tracking Link"])||"";$("noSelection").classList.add("hidden");$("form").classList.remove("hidden");setStatus(trackingComplete(selected)?"Complete":"Missing tracking",trackingComplete(selected));$("mailCustomerWrap").classList.remove("hidden");await loadMailLog_();}
-async async function save(){
-  if(!selected||isAccountmanagerLogin()) return;
-  const Carrier=$("carrier").value.trim(), Trackingnumber=$("trackingNumber").value.trim(), Trackinglink=$("trackingLink").value.trim();
-  if(!Carrier||!Trackingnumber||!Trackinglink){$("msg").innerHTML="<span style='color:var(--warn)'>Please fill in all fields.</span>";return;}
-  $("saveBtn").disabled=true;
-  $("msg").textContent="Saving…";
-  const data=await jsonp(`${API_BASE}?action=update&rowId=${encodeURIComponent(selected.rowId)}&supplier=${encodeURIComponent(supplier)}&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}&Carrier=${encodeURIComponent(Carrier)}&Trackingnumber=${encodeURIComponent(Trackingnumber)}&Trackinglink=${encodeURIComponent(Trackinglink)}`).catch(()=>null);
-  $("saveBtn").disabled=false;
+function setMode(mode){
+  if(!isMasterLogin()) return;
+  currentMode=mode;
+  selected=null;
+  $("form").classList.add("hidden");
+  $("noSelection").classList.remove("hidden");
+  applyModeUI_();
+  loadOrders();
+}
+
+async function loadOrders(){
+  selected=null;
+  $("form").classList.add("hidden");
+  $("noSelection").classList.remove("hidden");
+  $("tbodyOpen").innerHTML="<tr><td colspan='4' class='muted'>Loading…</td></tr>";
+  $("tbodyCompleted").innerHTML="<tr><td colspan='4' class='muted'>Loading…</td></tr>";
+
+  let modeToUse=isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode;
+  let url=`${API_BASE}?action=orders&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(modeToUse)}`;
+  if(isMasterLogin()) url+=`&supplier=${encodeURIComponent(MASTER_NAME)}`;
+  if(isSupplierLogin()) url+=`&supplier=${encodeURIComponent(supplier)}`;
+  if(isAccountmanagerLogin()) url+=`&accountmanager=${encodeURIComponent(accountmanagerName)}`;
+
+  const data=await jsonp(url).catch(()=>null);
   if(!data?.ok){
-    $("msg").innerHTML=isInvoiceMode()
-      ? "<span style='color:var(--bad)'>Save failed. Invoice shipment save also needs Apps Script support in action=update.</span>"
-      : "<span style='color:var(--bad)'>Save failed.</span>";
+    const err=escapeHTML(data?.error||"Error");
+    $("tbodyOpen").innerHTML=`<tr><td colspan="4" class='muted'>${err}</td></tr>`;
+    $("tbodyCompleted").innerHTML=`<tr><td colspan="4" class='muted'>${err}</td></tr>`;
     return;
   }
+  orders=(data.orders||[]).slice().sort((a,b)=>Number(b.rowId||0)-Number(a.rowId||0));
+  renderOrders();
+}
+
+function renderOrders(){
+  const q=($("historySearch").value||"").trim().toLowerCase();
+  const match=o=>!q||[getAny(o,["Customer"]),getAny(o,["Mail Customer","MailCustomer"]),getAny(o,["Surfcenter order","SurfcenterOrder"]),getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]),getAny(o,["Accountmanager"])].join(" ").toLowerCase().includes(q);
+  const openList=orders.filter(o=>!isTruthy(o.Completed)).filter(match);
+  const doneList=orders.filter(o=>isTruthy(o.Completed)).filter(match);
+
+  const draw=(target,list)=>{
+    target.innerHTML="";
+    if(!list.length){
+      target.innerHTML='<tr><td colspan="4" class="muted">No orders found.</td></tr>';
+      return;
+    }
+    list.forEach(o=>{
+      const mail=isSupplierLogin()?"":getAny(o,["Mail Customer","MailCustomer"]);
+      const thirdLine=(isDropshipMode()&&!isAccountmanagerLogin())
+        ? (getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||getAny(o,["Surfcenter order","SurfcenterOrder"]))
+        : getAny(o,["Surfcenter order","SurfcenterOrder"]);
+
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td><div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHTML(getAny(o,["Customer"]))}</div>${mail?`<div class="smallLine">${escapeHTML(mail)}</div>`:""}${thirdLine?`<div class="smallLine">${escapeHTML(thirdLine)}</div>`:""}</td><td class="statusCell"><div class="statusWrap"><span class="status ${trackingComplete(o)?"ready":"missing"}"><span class="dot"></span>${trackingComplete(o)?"Complete":"Missing tracking"}</span></div></td><td><div class="actionsCell"><button class="btn openBtn" data-open="${escapeHTML(o.rowId)}">Open</button></div></td><td class="completedCell">${isTruthy(o.Completed)?'<span class="checkPill yes">✓</span>':'<span class="checkPill">—</span>'}</td>`;
+      target.appendChild(tr);
+    });
+  };
+
+  draw($("tbodyOpen"),openList);
+  draw($("tbodyCompleted"),doneList);
+
+  document.querySelectorAll("button[data-open]").forEach(btn=>btn.addEventListener("click",()=>openRow(Number(btn.dataset.open))));
+}
+
+async function openRow(rowId){
+  clearActiveMailButtons_();
+  selected=orders.find(x=>Number(x.rowId)===rowId);
+  if(!selected)return;
+
+  $("customerLabel").textContent=getAny(selected,["Customer"])||"—";
+  $("customerMailLine").textContent=isSupplierLogin()?"":(getAny(selected,["Mail Customer","MailCustomer"])||"");
+  $("supplierLabel").textContent=getAny(selected,["Supplier"])||"—";
+  $("supplierKeyLine").textContent=getAny(selected,["Supplier KEY","SupplierKey"])||"";
+  $("accountmanagerLabel").textContent=getAny(selected,["Accountmanager"])||accountmanagerName||"—";
+  $("accountmanagerMailLine").textContent=getAny(selected,["Mail Accountmanager","MailAccountmanager"])||accountmanagerMail||"";
+  $("primaryOrderLabel").textContent=getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||"—";
+  $("surfOrderLabel").textContent=getAny(selected,["Surfcenter order","SurfcenterOrder"])||"—";
+
+  $("carrier").value=getAny(selected,["Carrier"])||"";
+  $("trackingNumber").value=getAny(selected,["Trackingnumber","Tracking Number"])||"";
+  $("trackingLink").value=getAny(selected,["Trackinglink","Tracking Link"])||"";
+
+  $("noSelection").classList.add("hidden");
+  $("form").classList.remove("hidden");
+  setStatus(trackingComplete(selected)?"Complete":"Missing tracking",trackingComplete(selected));
+  $("mailCustomerWrap").classList.remove("hidden");
+  await loadMailLog_();
+}
+
+async function save(){
+  if(!selected) return;
+
+  const Carrier=$("carrier").value.trim();
+  const Trackingnumber=$("trackingNumber").value.trim();
+  const Trackinglink=$("trackingLink").value.trim();
+
+  if(!Carrier||!Trackingnumber||!Trackinglink){
+    $("msg").innerHTML="<span style='color:var(--warn)'>Please fill in all fields.</span>";
+    return;
+  }
+
+  $("saveBtn").disabled=true;
+  $("msg").textContent="Saving…";
+
+  const modeToUse=isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode;
+  const data=await jsonp(`${API_BASE}?action=update&rowId=${encodeURIComponent(selected.rowId)}&supplier=${encodeURIComponent(supplier)}&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(modeToUse)}&Carrier=${encodeURIComponent(Carrier)}&Trackingnumber=${encodeURIComponent(Trackingnumber)}&Trackinglink=${encodeURIComponent(Trackinglink)}`).catch(()=>null);
+
+  $("saveBtn").disabled=false;
+  if(!data?.ok){
+    $("msg").innerHTML="<span style='color:var(--bad)'>Save failed.</span>";
+    return;
+  }
+
   $("msg").innerHTML="<span style='color:var(--ok)'>Saved ✓</span>";
   await loadOrders();
 }
-function prepareCreateModal_(){$("createMsg").textContent="";$("newOrderModalTitle").textContent=isInvoiceMode()?"New invoice order":"New order";$("dropshipCreateFields").classList.toggle("hidden",!isDropshipMode());$("invoiceCreateFields").classList.toggle("hidden",!isInvoiceMode());$("newInvoiceAccountmanagerStaticWrap").classList.toggle("hidden",!isAccountmanagerLogin());$("newInvoiceAccountmanagerSelectWrap").classList.toggle("hidden",!isMasterLogin());if(isAccountmanagerLogin()) $("newInvoiceAccountmanager").value=accountmanagerName||"";}
-async function createOrder(){if(!canCreateOrders()) return;$("createBtn").disabled=true;$("createMsg").textContent="Adding…";let url=`${API_BASE}?action=create&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode)}`;if(isDropshipMode()){const Customer=$("newCustomer").value.trim(), MailCustomer=$("newMailCustomer").value.trim(), Supplier=$("newSupplier").value, DropshipmentOrder=$("newDropOrder").value.trim(), SurfcenterOrder=$("newSurfOrder").value.trim();if(!Customer||!MailCustomer||!Supplier||!DropshipmentOrder||!SurfcenterOrder){$("createMsg").innerHTML="<span style='color:var(--warn)'>Please fill all fields.</span>";$("createBtn").disabled=false;return;}url+=`&Customer=${encodeURIComponent(Customer)}&MailCustomer=${encodeURIComponent(MailCustomer)}&Supplier=${encodeURIComponent(Supplier)}&DropshipmentOrder=${encodeURIComponent(DropshipmentOrder)}&SurfcenterOrder=${encodeURIComponent(SurfcenterOrder)}`;}else{const Customer=$("newInvoiceCustomer").value.trim(), MailCustomer=$("newInvoiceMailCustomer").value.trim(), Accountmanager=isMasterLogin()?$("newInvoiceAccountmanagerSelect").value:accountmanagerName, SurfcenterOrder=$("newInvoiceSurfOrder").value.trim();if(!Customer||!MailCustomer||!Accountmanager||!SurfcenterOrder){$("createMsg").innerHTML="<span style='color:var(--warn)'>Please fill all fields.</span>";$("createBtn").disabled=false;return;}url+=`&Customer=${encodeURIComponent(Customer)}&MailCustomer=${encodeURIComponent(MailCustomer)}&Accountmanager=${encodeURIComponent(Accountmanager)}&SurfcenterOrder=${encodeURIComponent(SurfcenterOrder)}`;}const data=await jsonp(url).catch(()=>null);$("createBtn").disabled=false;if(!data?.ok){$("createMsg").innerHTML=`<span style='color:var(--bad)'>Failed: ${escapeHTML(data?.error||"Unknown")}</span>`;return;}$("createMsg").innerHTML="<span style='color:var(--ok)'>Added ✓</span>";$("newOrderModal").classList.add("hidden");await loadOrders();}
+
+function prepareCreateModal_(){
+  $("createMsg").textContent="";
+  $("newOrderModalTitle").textContent=isInvoiceMode()?"New invoice order":"New order";
+  $("dropshipCreateFields").classList.toggle("hidden",!isDropshipMode());
+  $("invoiceCreateFields").classList.toggle("hidden",!isInvoiceMode());
+  $("newInvoiceAccountmanagerStaticWrap").classList.toggle("hidden",!isAccountmanagerLogin());
+  $("newInvoiceAccountmanagerSelectWrap").classList.toggle("hidden",!isMasterLogin());
+  if(isAccountmanagerLogin()) $("newInvoiceAccountmanager").value=accountmanagerName||"";
+}
+
+async function createOrder(){
+  if(!canCreateOrders()) return;
+  $("createBtn").disabled=true;
+  $("createMsg").textContent="Adding…";
+
+  let url=`${API_BASE}?action=create&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode)}`;
+
+  if(isDropshipMode()){
+    const Customer=$("newCustomer").value.trim();
+    const MailCustomer=$("newMailCustomer").value.trim();
+    const Supplier=$("newSupplier").value;
+    const DropshipmentOrder=$("newDropOrder").value.trim();
+    const SurfcenterOrder=$("newSurfOrder").value.trim();
+
+    if(!Customer||!MailCustomer||!Supplier||!DropshipmentOrder||!SurfcenterOrder){
+      $("createMsg").innerHTML="<span style='color:var(--warn)'>Please fill all fields.</span>";
+      $("createBtn").disabled=false;
+      return;
+    }
+
+    url+=`&Customer=${encodeURIComponent(Customer)}&MailCustomer=${encodeURIComponent(MailCustomer)}&Supplier=${encodeURIComponent(Supplier)}&DropshipmentOrder=${encodeURIComponent(DropshipmentOrder)}&SurfcenterOrder=${encodeURIComponent(SurfcenterOrder)}`;
+  } else {
+    const Customer=$("newInvoiceCustomer").value.trim();
+    const MailCustomer=$("newInvoiceMailCustomer").value.trim();
+    const Accountmanager=isMasterLogin()?$("newInvoiceAccountmanagerSelect").value:accountmanagerName;
+    const SurfcenterOrder=$("newInvoiceSurfOrder").value.trim();
+
+    if(!Customer||!MailCustomer||!Accountmanager||!SurfcenterOrder){
+      $("createMsg").innerHTML="<span style='color:var(--warn)'>Please fill all fields.</span>";
+      $("createBtn").disabled=false;
+      return;
+    }
+
+    url+=`&Customer=${encodeURIComponent(Customer)}&MailCustomer=${encodeURIComponent(MailCustomer)}&Accountmanager=${encodeURIComponent(Accountmanager)}&SurfcenterOrder=${encodeURIComponent(SurfcenterOrder)}`;
+  }
+
+  const data=await jsonp(url).catch(()=>null);
+  $("createBtn").disabled=false;
+
+  if(!data?.ok){
+    $("createMsg").innerHTML=`<span style='color:var(--bad)'>Failed: ${escapeHTML(data?.error||"Unknown")}</span>`;
+    return;
+  }
+
+  $("createMsg").innerHTML="<span style='color:var(--ok)'>Added ✓</span>";
+  $("newOrderModal").classList.add("hidden");
+  await loadOrders();
+}
+
 function showLogin(){$("portalView").classList.add("hidden");$("loginView").classList.remove("hidden");$("loginMsg").textContent="";$("keyInput").value="";}
 function showPortal(){$("loginView").classList.add("hidden");$("portalView").classList.remove("hidden");}
-async function doLogin(withKey){const key=(withKey??$("keyInput").value).trim();if(!key){$("loginMsg").innerHTML="<span style='color:var(--warn)'>Please enter password.</span>";return;}$("loginBtn").disabled=true;$("loginMsg").textContent="Checking…";try{const data=await jsonp(`${API_BASE}?action=auth&supplierKey=${encodeURIComponent(key)}`);if(!data?.ok){$("loginMsg").innerHTML="<span style='color:var(--bad)'>Invalid login.</span>";return;}supplierKey=key;supplier=String(data.supplier||"").trim();loginType=String(data.loginType||"").trim().toLowerCase();accountmanagerName=String(data.accountmanager||"").trim();accountmanagerMail=String(data.mailAccountmanager||"").trim();sessionStorage.setItem("supplier_key",supplierKey);sessionStorage.setItem("supplier_name",supplier);sessionStorage.setItem("login_type",loginType);sessionStorage.setItem("accountmanager_name",accountmanagerName);sessionStorage.setItem("accountmanager_mail",accountmanagerMail);currentMode=isAccountmanagerLogin()?ORDER_MODE_INVOICE:ORDER_MODE_DROPSHIP;showPortal();$("newOrderBtn").classList.toggle("hidden",!canCreateOrders());applyModeUI_();if(isMasterLogin()) await loadSuppliers_();await loadAllTemplates_();await loadOrders();}catch(err){console.error(err);$("loginMsg").innerHTML="<span style='color:var(--bad)'>Could not reach server.</span>";}finally{$("loginBtn").disabled=false;}}
-function logout(){supplier="";supplierKey="";loginType="";accountmanagerName="";accountmanagerMail="";currentMode=ORDER_MODE_DROPSHIP;orders=[];selected=null;suppliersList=[];suppliersMailMap={};suppliersKeyMap={};accountmanagersList=[];accountmanagersMailMap={};indepTemplates=[];customerTemplates=[];supplierTemplates=[];invoiceTemplates=[];invoiceCustomerTemplates=[];aftersalesTemplates=[];sessionStorage.clear();showLogin();}
+
+async function doLogin(withKey){
+  const key=(withKey??$("keyInput").value).trim();
+  if(!key){$("loginMsg").innerHTML="<span style='color:var(--warn)'>Please enter password.</span>";return;}
+  $("loginBtn").disabled=true;
+  $("loginMsg").textContent="Checking…";
+  try{
+    const data=await jsonp(`${API_BASE}?action=auth&supplierKey=${encodeURIComponent(key)}`);
+    if(!data?.ok){$("loginMsg").innerHTML="<span style='color:var(--bad)'>Invalid login.</span>";return;}
+    supplierKey=key;
+    supplier=String(data.supplier||"").trim();
+    loginType=String(data.loginType||"").trim().toLowerCase();
+    accountmanagerName=String(data.accountmanager||"").trim();
+    accountmanagerMail=String(data.mailAccountmanager||"").trim();
+
+    sessionStorage.setItem("supplier_key",supplierKey);
+    sessionStorage.setItem("supplier_name",supplier);
+    sessionStorage.setItem("login_type",loginType);
+    sessionStorage.setItem("accountmanager_name",accountmanagerName);
+    sessionStorage.setItem("accountmanager_mail",accountmanagerMail);
+
+    currentMode=isAccountmanagerLogin()?ORDER_MODE_INVOICE:ORDER_MODE_DROPSHIP;
+    showPortal();
+    $("newOrderBtn").classList.toggle("hidden",!canCreateOrders());
+    applyModeUI_();
+    if(isMasterLogin()) await loadSuppliers_();
+    await loadAllTemplates_();
+    await loadOrders();
+  } catch(err){
+    console.error(err);
+    $("loginMsg").innerHTML="<span style='color:var(--bad)'>Could not reach server.</span>";
+  } finally {
+    $("loginBtn").disabled=false;
+  }
+}
+
+function logout(){
+  supplier=""; supplierKey=""; loginType=""; accountmanagerName=""; accountmanagerMail=""; currentMode=ORDER_MODE_DROPSHIP;
+  orders=[]; selected=null; suppliersList=[]; suppliersMailMap={}; suppliersKeyMap={}; accountmanagersList=[]; accountmanagersMailMap={};
+  indepTemplates=[]; customerTemplates=[]; supplierTemplates=[]; invoiceTemplates=[]; invoiceCustomerTemplates=[]; aftersalesTemplates=[];
+  sessionStorage.clear();
+  showLogin();
+}
 
 $("pickGmail").addEventListener("click",()=>{if(!pendingMail)return;openGmailCompose(pendingMail.to,pendingMail.cc||"",pendingMail.subject,pendingMail.body);const cb=pendingMail.afterOpen;closeMailPicker();clearActiveMailButtons_();if(typeof cb==="function") cb();});
 $("pickApple").addEventListener("click",()=>{if(!pendingMail)return;openAppleMail(pendingMail.to,pendingMail.cc||"",pendingMail.subject,pendingMail.body);const cb=pendingMail.afterOpen;closeMailPicker();clearActiveMailButtons_();if(typeof cb==="function") cb();});
 $("pickCancel").addEventListener("click",closeMailPicker);
 $("mailPicker").addEventListener("click",e=>{if(e.target===$("mailPicker")) closeMailPicker();});
+
 $("newOrderBtn").addEventListener("click",()=>{prepareCreateModal_();$("newOrderModal").classList.remove("hidden");});
 $("newOrderClose").addEventListener("click",()=>$("newOrderModal").classList.add("hidden"));
 $("newOrderModal").addEventListener("click",e=>{if(e.target===$("newOrderModal")) $("newOrderModal").classList.add("hidden");});
+
 $("loginBtn").addEventListener("click",()=>doLogin());
 $("keyInput").addEventListener("keydown",e=>{if(e.key==="Enter") doLogin();});
 $("logoutBtn").addEventListener("click",logout);
@@ -674,6 +1027,7 @@ $("editInvoiceCustomerSave").addEventListener("click",()=>upsertTemplate_("custo
 $("indepSave").addEventListener("click",()=>upsertTemplate_("indep_upsert",$("indepSave").dataset.editId||"",$("indepLang").value,$("indepLabel").value.trim(),$("indepSubject").value.trim(),$("indepBodyText").value.trim(),$("indepSaveMsg"),async()=>{resetIndepEditor_();await loadAllTemplates_();}));
 $("invoiceTemplateSave").addEventListener("click",()=>upsertTemplate_("invoice_template_upsert",$("invoiceTemplateSave").dataset.editId||"",$("invoiceTemplateLang").value,$("invoiceTemplateLabel").value.trim(),$("invoiceTemplateSubject").value.trim(),$("invoiceTemplateBodyText").value.trim(),$("invoiceTemplateSaveMsg"),async()=>{resetInvoiceTemplateEditor_();await loadAllTemplates_();}));
 $("aftersalesTemplateSave").addEventListener("click",()=>upsertTemplate_("aftersales_template_upsert",$("aftersalesTemplateSave").dataset.editId||"",$("aftersalesTemplateLang").value,$("aftersalesTemplateLabel").value.trim(),$("aftersalesTemplateSubject").value.trim(),$("aftersalesTemplateBodyText").value.trim(),$("aftersalesTemplateSaveMsg"),async()=>{resetAftersalesTemplateEditor_();await loadAllTemplates_();}));
+
 $("indepCancel").addEventListener("click",resetIndepEditor_);
 $("invoiceTemplateCancel").addEventListener("click",resetInvoiceTemplateEditor_);
 $("aftersalesTemplateCancel").addEventListener("click",resetAftersalesTemplateEditor_);
@@ -681,12 +1035,14 @@ $("aftersalesTemplateCancel").addEventListener("click",resetAftersalesTemplateEd
 $("editCustomerLang").addEventListener("change",()=>fillCustomerEditorFromLang_($("editCustomerLang").value));
 $("editSupplierLang").addEventListener("change",()=>fillSupplierEditorFromLang_($("editSupplierLang").value));
 $("editInvoiceCustomerLang").addEventListener("change",()=>fillInvoiceCustomerEditorFromLang_($("editInvoiceCustomerLang").value));
+
 $("mc_en").addEventListener("click",e=>mailCustomer("en",e.currentTarget));
 $("mc_nl").addEventListener("click",e=>mailCustomer("nl",e.currentTarget));
 $("mc_de").addEventListener("click",e=>mailCustomer("de",e.currentTarget));
 $("mc_fr").addEventListener("click",e=>mailCustomer("fr",e.currentTarget));
 $("ms_en").addEventListener("click",e=>mailSupplier("en",e.currentTarget));
 $("ms_nl").addEventListener("click",e=>mailSupplier("nl",e.currentTarget));
+
 $("modeDropshipBtn").addEventListener("click",()=>setMode(ORDER_MODE_DROPSHIP));
 $("modeInvoiceBtn").addEventListener("click",()=>setMode(ORDER_MODE_INVOICE));
 
@@ -700,7 +1056,20 @@ setupToggle("editInvoiceCustomerToggle","editInvoiceCustomerBody","editInvoiceCu
 setupToggle("mailLogToggle","mailLogBody","mailLogPlus");
 setupToggle("completedToggle","completedBody","completedPlus");
 
-(function init(){bindTokenButtons_();const k=sessionStorage.getItem("supplier_key")||"", s=sessionStorage.getItem("supplier_name")||"", lt=sessionStorage.getItem("login_type")||"", am=sessionStorage.getItem("accountmanager_name")||"", amm=sessionStorage.getItem("accountmanager_mail")||"";if(k){supplierKey=k;supplier=s;loginType=lt;accountmanagerName=am;accountmanagerMail=amm;currentMode=isAccountmanagerLogin()?ORDER_MODE_INVOICE:ORDER_MODE_DROPSHIP;showPortal();$("newOrderBtn").classList.toggle("hidden",!canCreateOrders());applyModeUI_();(async()=>{if(isMasterLogin()) await loadSuppliers_();await loadAllTemplates_();await loadOrders();})();}else{showLogin();}})();
+(function init(){
+  bindTokenButtons_();
+  const k=sessionStorage.getItem("supplier_key")||"", s=sessionStorage.getItem("supplier_name")||"", lt=sessionStorage.getItem("login_type")||"", am=sessionStorage.getItem("accountmanager_name")||"", amm=sessionStorage.getItem("accountmanager_mail")||"";
+  if(k){
+    supplierKey=k; supplier=s; loginType=lt; accountmanagerName=am; accountmanagerMail=amm;
+    currentMode=isAccountmanagerLogin()?ORDER_MODE_INVOICE:ORDER_MODE_DROPSHIP;
+    showPortal();
+    $("newOrderBtn").classList.toggle("hidden",!canCreateOrders());
+    applyModeUI_();
+    (async()=>{ if(isMasterLogin()) await loadSuppliers_(); await loadAllTemplates_(); await loadOrders(); })();
+  } else {
+    showLogin();
+  }
+})();
 </script>
 </body>
 </html>
