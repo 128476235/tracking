@@ -1,970 +1,1195 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Delivery Overview</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#ffffff;
-      --card:#ffffff;
-      --text:#171717;
-      --muted:#6b7280;
-      --border:#e5e7eb;
-      --primary:#1f2024;
-      --primary2:#111214;
-      --ok:#16a34a;
-      --warn:#d97706;
-      --bad:#dc2626;
-      --soft:#f8fafc;
-      --pill:#ececec;
-      --pillText:#4b5563;
-      --pillActive:#1f2024;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
-    body{
-      font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      font-weight:500;
-      background:linear-gradient(180deg,#ffffff 0%, #f7f7f8 100%);
-      color:var(--text);
-      min-height:100vh;
-    }
-    .wrap{max-width:1120px;margin:0 auto;padding:26px 16px}
-    .hidden{display:none !important}
-    .muted{color:var(--muted)}
-    .center{min-height:100vh;display:grid;place-items:center;padding:18px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .divider{height:1px;background:var(--border);margin:12px 0}
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:14px;
-      box-shadow:0 10px 22px rgba(2,6,23,.06);
-    }
-    header{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
-    .brand{display:flex;align-items:center;gap:12px;min-height:42px}
-    .brand img{height:42px;max-width:220px;object-fit:contain;display:block}
-    label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px;font-weight:500}
-    input,select,textarea{
-      width:100%;border:1px solid var(--border);background:#fff;color:var(--text);
-      padding:11px 13px;border-radius:12px;outline:none;
-      font-family:inherit;font-weight:500;font-size:14px;
-    }
-    textarea{resize:vertical}
-    input:focus,select:focus,textarea:focus{border-color:rgba(15,23,42,.18);box-shadow:0 0 0 4px rgba(15,23,42,.06)}
-    select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:none}
-    .btn{
-      border:1px solid var(--border);background:#fff;color:var(--text);
-      padding:10px 14px;border-radius:14px;cursor:pointer;white-space:nowrap;
-      transition:transform .05s ease, box-shadow .15s ease, background .15s ease;
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      font-family:inherit;font-weight:700;font-size:13px;
-    }
-    .btn:active{transform:translateY(1px)}
-    .btn.primary{background:linear-gradient(180deg,var(--primary),var(--primary2));border-color:transparent;color:#fff;box-shadow:0 8px 16px rgba(15,23,42,.16)}
-    .btn:disabled{opacity:.55;cursor:not-allowed}
-    .btn.small{padding:8px 10px;border-radius:10px;font-size:12px;font-weight:500}
-    .btn.icon{width:46px;height:46px;padding:0;border-radius:14px;background:#fff;border:1px solid var(--border);color:var(--text);box-shadow:0 4px 10px rgba(15,23,42,.06)}
-    .btn.active{border-color:rgba(15,23,42,.2);box-shadow:0 0 0 4px rgba(15,23,42,.05)}
-    .btn.openBtn{min-height:36px;padding:0 12px;border-radius:11px;font-weight:500;font-size:13px;box-shadow:none}
-    #newOrderBtn{min-height:46px;padding:0 16px;border-radius:14px;background:#fff;border:1px solid var(--border);color:var(--text);box-shadow:0 4px 10px rgba(15,23,42,.06);font-weight:500}
-    .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end}
-    .modeWrap{display:flex;justify-content:flex-start;margin-bottom:14px}
-    .modeSwitch{display:inline-flex;align-items:center;gap:8px;padding:8px;background:var(--pill);border-radius:999px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
-    .modeBtn{border:none;background:transparent;color:var(--pillText);padding:12px 22px;border-radius:999px;font-size:14px;cursor:pointer;min-width:140px;font-family:inherit;font-weight:500}
-    .modeBtn.active{background:var(--pillActive);color:#fff;font-weight:700;box-shadow:0 4px 12px rgba(15,23,42,.18)}
-    .two{display:grid;grid-template-columns:440px 1fr;gap:14px;align-items:stretch}
-    .colStretch{height:100%;display:flex;flex-direction:column}
-    @media (max-width:980px){.two{grid-template-columns:1fr}}
-    .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.5;font-weight:500}
-    .kvRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin:10px 0 6px}
-    .kvBlock{min-width:0}
-    .kvLabel{color:var(--muted);font-size:12px;font-weight:500}
-    .kvValue{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .smallLine{margin-top:3px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
-    .loginCard{max-width:520px;width:100%;padding:22px;border-radius:24px}
-    .loginHeader{text-align:center;margin-bottom:8px}
-    .loginLogo{height:78px;max-width:280px;object-fit:contain;display:block;margin:0 auto 8px}
-    .loginForm{max-width:380px;margin:0 auto}
-    .loginActions{justify-content:center}
-    .loginMsg{text-align:center;min-height:18px}
-    .table{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:#fff}
-    .table th,.table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;text-align:left}
-    .table th{color:var(--muted);font-weight:700;background:var(--soft)}
-    .table tr:last-child td{border-bottom:none}
-    .status{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--muted);white-space:nowrap;background:#fff;font-weight:500}
-    .dot{width:8px;height:8px;border-radius:999px;background:var(--warn)}
-    .status.ready .dot{background:var(--ok)}
-    .status.missing .dot{background:var(--bad)}
-    .statusCell{text-align:center}
-    .statusWrap{width:100%;display:flex;justify-content:center}
-    .actionsCell{white-space:nowrap;display:flex;gap:8px;justify-content:flex-start;align-items:center;flex-wrap:nowrap}
-    .completedCell{text-align:center;width:110px}
-    .checkPill{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted);font-size:14px;font-weight:700}
-    .checkPill.yes{border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.08);color:var(--ok)}
-    .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.2px;font-weight:700}
-    .toggleRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px dashed var(--border);background:var(--soft);border-radius:12px;cursor:pointer;user-select:none}
-    .plusSym{font-weight:700;font-size:18px;line-height:1;color:var(--muted)}
-    .flag{font-size:16px;line-height:1}
-    .mailGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;margin-top:10px}
-    @media (max-width:520px){.mailGrid{grid-template-columns:1fr}}
-    .flagRow{display:flex;gap:8px;flex-wrap:wrap}
-    .rightBox{display:flex;flex-direction:column;align-items:flex-end}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    @media (max-width:520px){.grid2{grid-template-columns:1fr}}
-    .mailFlagBtn{width:38px;height:38px;padding:0;border-radius:11px;background:#fff;border:1px solid var(--border);box-shadow:0 3px 8px rgba(15,23,42,.04)}
-    .overlay{position:fixed;inset:0;background:rgba(15,23,42,.35);display:grid;place-items:center;padding:18px;z-index:9999}
-    .tokenRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .savedTemplateRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff}
-    .savedLeft{min-width:0;display:flex;gap:10px;align-items:flex-start}
-    .tplName{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
-    .tplMeta{color:var(--muted);font-size:12px;white-space:normal;overflow-wrap:anywhere;word-break:break-word;max-width:520px;font-weight:500}
-    #indepTemplatesList,#invoiceTemplatesList,#aftersalesTemplatesList{display:flex;flex-direction:column;gap:10px}
-    .mailLogRow{display:flex;justify-content:space-between;gap:16px;align-items:center;width:100%}
-    .mailLogDate{font-size:13px;font-weight:700;color:var(--text)}
-    .mailLogTime{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
-  </style>
-</head>
-<body>
-<section id="loginView" class="center">
-  <div class="card loginCard">
-    <div class="loginHeader"><img src="logo.png" alt="Logo" class="loginLogo"></div>
-    <div class="loginForm">
-      <input id="keyInput" type="password" autocomplete="current-password" placeholder="Enter password" />
-      <div class="row loginActions" style="margin-top:14px"><button id="loginBtn" class="btn primary" type="button" style="min-width:160px">Login</button></div>
-      <div id="loginMsg" class="hint loginMsg"></div>
-    </div>
-  </div>
-</section>
-<section id="portalView" class="hidden">
-  <div class="wrap">
-    <header>
-      <div class="brand"><img src="logo.png" alt="Logo"></div>
-      <div class="row topRightTools">
-        <button id="newOrderBtn" class="btn hidden" type="button"><span style="font-weight:700;font-size:16px;line-height:1">+</span><span id="newOrderBtnText">Add new order</span></button>
-        <button id="logoutBtn" class="btn icon" type="button" title="Logout">⏻</button>
-      </div>
-    </header>
-    <div id="modeWrap" class="modeWrap hidden">
-      <div class="modeSwitch">
-        <button id="modeDropshipBtn" class="modeBtn active" type="button">Dropshipment</button>
-        <button id="modeInvoiceBtn" class="modeBtn" type="button">Invoice</button>
-      </div>
-    </div>
-    <div class="two">
-      <section class="card colStretch">
-        <div id="noSelection" class="hint">Open an order from the table.</div>
-        <div id="form" class="hidden" style="flex:1;display:flex;flex-direction:column;">
-          <div class="kvRow">
-            <div class="kvBlock" style="flex:1;min-width:0">
-              <div class="kvLabel">Customer</div>
-              <div class="kvValue" id="customerLabel">—</div>
-              <div class="smallLine" id="customerMailLine"></div>
-              <div id="supplierBlock" class="hidden" style="margin-top:10px">
-                <div class="kvLabel">Supplier</div>
-                <div class="kvValue" id="supplierLabel">—</div>
-                <div class="smallLine" id="supplierKeyLine"></div>
-              </div>
-              <div id="accountmanagerBlock" class="hidden" style="margin-top:10px">
-                <div class="kvLabel">Accountmanager</div>
-                <div class="kvValue" id="accountmanagerLabel">—</div>
-                <div class="smallLine" id="accountmanagerMailLine"></div>
-              </div>
-              <div style="height:10px"></div>
-              <div class="kvLabel hidden" id="primaryOrderCaption">Dropshipment order</div>
-              <div class="kvValue hidden" id="primaryOrderLabel">—</div>
-              <div id="surfOrderBlock" style="margin-top:10px">
-                <div class="kvLabel" id="surfOrderCaption">Surfcenter order</div>
-                <div class="kvValue" id="surfOrderLabel">—</div>
-              </div>
-            </div>
-            <div class="kvBlock" style="flex:0 0 auto;display:flex;align-items:flex-start">
-              <span id="statusBadge" class="status missing"><span class="dot"></span><span id="statusText">No selection</span></span>
-            </div>
-          </div>
-          <div id="trackingFieldsWrap">
-            <label>Carrier</label><input id="carrier" />
-            <label>Tracking number</label><input id="trackingNumber" />
-            <label>Tracking link</label><input id="trackingLink" />
-            <div class="row" style="margin-top:12px"><button id="saveBtn" class="btn primary" type="button">Save</button></div>
-          </div>
-          <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
-            <div class="mailGrid" id="dropshipMailGrid">
-              <div id="mailCustomerBox">
-                <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
-                <div class="flagRow" id="defaultCustomerFlags">
-                  <button class="btn mailFlagBtn" id="mc_en" type="button"><span class="flag">🇬🇧</span></button>
-                  <button class="btn mailFlagBtn" id="mc_nl" type="button"><span class="flag">🇳🇱</span></button>
-                  <button class="btn mailFlagBtn" id="mc_de" type="button"><span class="flag">🇩🇪</span></button>
-                  <button class="btn mailFlagBtn" id="mc_fr" type="button"><span class="flag">🇫🇷</span></button>
-                </div>
-                <div class="hint" id="mailMsg"></div>
-              </div>
-              <div class="rightBox" id="supplierMailBox">
-                <div class="sectionTitle" style="margin-bottom:8px">Mail supplier</div>
-                <div class="flagRow">
-                  <button class="btn mailFlagBtn" id="ms_en" type="button"><span class="flag">🇬🇧</span></button>
-                  <button class="btn mailFlagBtn" id="ms_nl" type="button"><span class="flag">🇳🇱</span></button>
-                </div>
-                <div class="hint" id="mailSupplierMsg"></div>
-              </div>
-            </div>
-            <div id="mailTemplatesWrap" class="hidden">
-              <div class="divider"></div>
-              <div class="toggleRow" id="mailTemplatesToggle"><div class="sectionTitle">Mail templates</div><div class="plusSym" id="mailTemplatesPlus">+</div></div>
-              <div id="mailTemplatesBody" class="hidden" style="margin-top:10px">
-                <div id="dropshipTemplatesSection" class="hidden">
-                  <div id="indepTemplatesList"><div class="muted" style="font-size:13px">No templates.</div></div>
-                  <div class="hint" id="indepSendMsg"></div>
-                  <div class="divider"></div>
-                  <div class="toggleRow" id="addIndepToggle"><div class="sectionTitle">Add template</div><div class="plusSym" id="addIndepPlus">+</div></div>
-                  <div id="addIndepBody" class="hidden" style="margin-top:10px">
-                    <div class="grid2">
-                      <div><label style="margin-top:0">Language</label><select id="indepLang"><option value="en">EN</option><option value="nl">NL</option><option value="de">DE</option><option value="fr">FR</option></select></div>
-                      <div><label style="margin-top:0">Template name</label><input id="indepLabel" /></div>
-                    </div>
-                    <label>Subject</label><input id="indepSubject" />
-                    <label>Body</label><textarea id="indepBodyText" rows="7"></textarea>
-                    <div class="tokenRow">
-                      <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                      <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                      <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
-                      <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                      <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
-                      <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
-                      <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
-                    </div>
-                    <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px"><button id="indepCancel" class="btn" type="button">Cancel</button><button id="indepSave" class="btn primary" type="button">Save</button></div>
-                    <div class="hint" id="indepSaveMsg"></div>
-                  </div>
-                </div>
-                <div id="invoiceTemplatesSection" class="hidden">
-                  <div id="invoiceTemplatesList"><div class="muted" style="font-size:13px">No templates.</div></div>
-                  <div class="hint" id="invoiceSendMsg"></div>
-                  <div class="divider"></div>
-                  <div class="toggleRow" id="addInvoiceTemplateToggle"><div class="sectionTitle">Add template</div><div class="plusSym" id="addInvoiceTemplatePlus">+</div></div>
-                  <div id="addInvoiceTemplateBody" class="hidden" style="margin-top:10px">
-                    <div class="grid2">
-                      <div><label style="margin-top:0">Language</label><select id="invoiceTemplateLang"><option value="en">EN</option><option value="nl">NL</option><option value="de">DE</option><option value="fr">FR</option></select></div>
-                      <div><label style="margin-top:0">Template name</label><input id="invoiceTemplateLabel" /></div>
-                    </div>
-                    <label>Subject</label><input id="invoiceTemplateSubject" />
-                    <label>Body</label><textarea id="invoiceTemplateBodyText" rows="7"></textarea>
-                    <div class="tokenRow">
-                      <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                      <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                      <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                      <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
-                      <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
-                    </div>
-                    <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px"><button id="invoiceTemplateCancel" class="btn" type="button">Cancel</button><button id="invoiceTemplateSave" class="btn primary" type="button">Save</button></div>
-                    <div class="hint" id="invoiceTemplateSaveMsg"></div>
-                  </div>
-                </div>
-                <div id="aftersalesTemplatesSection" class="hidden">
-                  <div id="aftersalesTemplatesList"><div class="muted" style="font-size:13px">No templates.</div></div>
-                  <div class="hint" id="aftersalesSendMsg"></div>
-                  <div class="divider"></div>
-                  <div class="toggleRow" id="addAftersalesTemplateToggle"><div class="sectionTitle">Add template</div><div class="plusSym" id="addAftersalesTemplatePlus">+</div></div>
-                  <div id="addAftersalesTemplateBody" class="hidden" style="margin-top:10px">
-                    <div class="grid2">
-                      <div><label style="margin-top:0">Language</label><select id="aftersalesTemplateLang"><option value="en">EN</option><option value="nl">NL</option><option value="de">DE</option><option value="fr">FR</option></select></div>
-                      <div><label style="margin-top:0">Template name</label><input id="aftersalesTemplateLabel" /></div>
-                    </div>
-                    <label>Subject</label><input id="aftersalesTemplateSubject" />
-                    <label>Body</label><textarea id="aftersalesTemplateBodyText" rows="7"></textarea>
-                    <div class="tokenRow">
-                      <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                      <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                      <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                      <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
-                    </div>
-                    <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px"><button id="aftersalesTemplateCancel" class="btn" type="button">Cancel</button><button id="aftersalesTemplateSave" class="btn primary" type="button">Save</button></div>
-                    <div class="hint" id="aftersalesTemplateSaveMsg"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div id="invoiceCustomerEditorSection" class="hidden">
-              <div class="divider"></div>
-              <div class="toggleRow" id="editInvoiceCustomerToggle"><div class="sectionTitle">Edit Mail customer</div><div class="plusSym" id="editInvoiceCustomerPlus">+</div></div>
-              <div id="editInvoiceCustomerBody" class="hidden" style="margin-top:10px">
-                <div class="grid2">
-                  <div><label style="margin-top:0">Language</label><select id="editInvoiceCustomerLang"><option value="en">EN</option><option value="nl">NL</option><option value="de">DE</option><option value="fr">FR</option></select></div>
-                  <div></div>
-                </div>
-                <label>Subject</label><input id="editInvoiceCustomerSubject" />
-                <label>Body</label><textarea id="editInvoiceCustomerBodyText" rows="7"></textarea>
-                <div class="tokenRow">
-                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
-                  <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
-                </div>
-                <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editInvoiceCustomerSave" class="btn primary" type="button">Save</button></div>
-                <div class="hint" id="editInvoiceCustomerMsg"></div>
-              </div>
-            </div>
-            <div id="dropshipEditorsWrap" class="hidden">
-              <div class="divider"></div>
-              <div class="toggleRow" id="editCustomerToggle"><div class="sectionTitle">Edit Mail customer</div><div class="plusSym" id="editCustomerPlus">+</div></div>
-              <div id="editCustomerBody" class="hidden" style="margin-top:10px">
-                <div class="grid2">
-                  <div><label style="margin-top:0">Language</label><select id="editCustomerLang"><option value="en">EN</option><option value="nl">NL</option><option value="de">DE</option><option value="fr">FR</option></select></div>
-                  <div></div>
-                </div>
-                <label>Subject</label><input id="editCustomerSubject" />
-                <label>Body</label><textarea id="editCustomerBodyText" rows="7"></textarea>
-                <div class="tokenRow">
-                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                  <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
-                  <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
-                  <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
-                  <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
-                  <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
-                </div>
-                <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editCustomerSave" class="btn primary" type="button">Save</button></div>
-                <div class="hint" id="editCustomerMsg"></div>
-              </div>
-              <div class="divider"></div>
-              <div class="toggleRow" id="editSupplierToggle"><div class="sectionTitle">Edit Mail supplier</div><div class="plusSym" id="editSupplierPlus">+</div></div>
-              <div id="editSupplierBody" class="hidden" style="margin-top:10px">
-                <div class="grid2">
-                  <div><label style="margin-top:0">Language</label><select id="editSupplierLang"><option value="en">EN</option><option value="nl">NL</option></select></div>
-                  <div></div>
-                </div>
-                <label>Subject</label><input id="editSupplierSubject" />
-                <label>Body</label><textarea id="editSupplierBodyText" rows="7"></textarea>
-                <div class="tokenRow">
-                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                  <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
-                  <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
-                  <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
-                  <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
-                  <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
-                </div>
-                <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editSupplierSave" class="btn primary" type="button">Save</button></div>
-                <div class="hint" id="editSupplierMsg"></div>
-              </div>
-            </div>
-            <div id="mailLogSection" class="hidden">
-              <div class="divider"></div>
-              <div class="toggleRow" id="mailLogToggle"><div class="sectionTitle">Mail log</div><div class="plusSym" id="mailLogPlus">+</div></div>
-              <div id="mailLogBody" class="hidden" style="margin-top:10px">
-                <div id="mailLogList" class="muted" style="font-size:13px">No log.</div>
-                <div class="hint" id="mailLogMsg"></div>
-              </div>
-            </div>
-          </div>
-          <div class="hint" id="msg" style="margin-top:auto"></div>
-        </div>
-      </section>
-      <section class="card colStretch">
-        <input id="historySearch" placeholder="Search…" style="width:100%;margin-bottom:12px" />
-        <table class="table">
-          <thead><tr><th style="width:60%">Customer</th><th style="width:170px;text-align:center">Status</th><th style="width:260px">Action</th><th class="completedCell">Completed</th></tr></thead>
-          <tbody id="tbodyOpen"><tr><td colspan="4" class="muted">Loading…</td></tr></tbody>
-        </table>
-        <div id="completedWrap" class="hidden" style="margin-top:12px">
-          <div class="divider"></div>
-          <div class="toggleRow" id="completedToggle"><div class="sectionTitle">Completed</div><div class="plusSym" id="completedPlus">+</div></div>
-          <div id="completedBody" class="hidden" style="margin-top:10px">
-            <table class="table">
-              <thead><tr><th style="width:60%">Customer</th><th style="width:170px;text-align:center">Status</th><th style="width:260px">Action</th><th class="completedCell">Completed</th></tr></thead>
-              <tbody id="tbodyCompleted"><tr><td colspan="4" class="muted">No completed orders.</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-    </div>
-  </div>
-</section>
-<div id="newOrderModal" class="overlay hidden">
-  <div class="card" style="max-width:520px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-      <div style="font-weight:700" id="newOrderModalTitle">New order</div>
-      <button id="newOrderClose" class="btn" type="button">Close</button>
-    </div>
-    <div id="dropshipCreateFields">
-      <label>Customer</label><input id="newCustomer" />
-      <label>Mail Customer</label><input id="newMailCustomer" type="email" />
-      <label>Supplier</label><select id="newSupplier"></select>
-      <label>Dropshipment order</label><input id="newDropOrder" />
-      <label>Surfcenter order</label><input id="newSurfOrder" />
-    </div>
-    <div id="invoiceCreateFields" class="hidden">
-      <label>Customer</label><input id="newInvoiceCustomer" />
-      <label>Mail Customer</label><input id="newInvoiceMailCustomer" type="email" />
-      <label>Language</label>
-      <select id="newInvoiceLanguage">
-        <option value="English">English</option>
-        <option value="Dutch">Dutch</option>
-        <option value="German">German</option>
-        <option value="French">French</option>
-      </select>
-      <div id="newInvoiceAccountmanagerStaticWrap"><label>Accountmanager</label><input id="newInvoiceAccountmanager" readonly /></div>
-      <div id="newInvoiceAccountmanagerSelectWrap" class="hidden"><label>Accountmanager</label><select id="newInvoiceAccountmanagerSelect"></select></div>
-      <label id="newInvoiceOrderLabel">Invoice</label><input id="newInvoiceSurfOrder" />
-    </div>
-    <div class="row" style="margin-top:12px;justify-content:flex-end"><button id="createBtn" class="btn primary" type="button">Add order</button></div>
-    <div class="hint" id="createMsg"></div>
-  </div>
-</div>
-<div id="mailPicker" class="hidden" style="position:fixed;inset:0;background:rgba(15,23,42,.35);display:grid;place-items:center;padding:18px;z-index:9999">
-  <div class="card" style="max-width:420px;width:100%">
-    <div style="font-weight:700;font-size:14px">Choose mail app</div>
-    <div class="row" style="margin-top:12px;justify-content:center">
-      <button id="pickGmail" class="btn" type="button">Gmail</button>
-      <button id="pickApple" class="btn" type="button">Apple Mail</button>
-      <button id="pickCancel" class="btn primary" type="button">Cancel</button>
-    </div>
-    <div class="hint" id="pickHint"></div>
-  </div>
-</div>
-<script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbwHyvMqAcAbA1WrwOuf4ehNqvj3V-cbArY8jZHbzad_8TfJdS56bkHlqQgXuVtA7ZM_5g/exec";
+/***************************************
+ * Delivery Overview - Apps Script (v4.2)
+ * + Garanties & Reparaties module
+ * + Invoice extras: Phone / Products / Notes
+ ***************************************/
+
+const DROPSHIP_SHEET = "Sheet1";
+const INVOICE_SHEET = "Sheet2";
+const SUPPLIERS_SHEET = "Suppliers";
+const ACCOUNTMANAGER_SHEET = "Accountmanager";
+const MASTER_KEYS = ["SC76", "Jasper"];
 const MASTER_NAME = "Jasper";
-const ORDER_MODE_DROPSHIP = "dropshipment";
-const ORDER_MODE_INVOICE = "invoice";
-const LOGIN_TYPE_SUPPLIER = "supplier";
-const LOGIN_TYPE_MASTER = "master";
-const LOGIN_TYPE_ACCOUNTMANAGER = "accountmanager";
-const ACCOUNTMANAGER_TEMPLATE_CC = "jasper@surf-center.com";
-const $ = (id)=>document.getElementById(id);
-let supplier="", supplierKey="", loginType="", accountmanagerName="", accountmanagerMail="", currentMode=ORDER_MODE_DROPSHIP;
-let orders=[], selected=null, suppliersList=[], suppliersMailMap={}, suppliersKeyMap={}, accountmanagersList=[], accountmanagersMailMap={};
-let indepTemplates=[], customerTemplates=[], supplierTemplates=[], invoiceTemplates=[], invoiceCustomerTemplates=[], aftersalesTemplates=[];
-let lastFocusedField=null, pendingMail=null;
-function escapeHTML(s){return String(s||"").replace(/[&<>\"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
-function normalizeKey(k){return String(k||"").trim().toLowerCase().replace(/\s+/g," ");}
-function getAny(obj, keys){if(!obj)return "";const map={};for(const k of Object.keys(obj)) map[normalizeKey(k)]=k;for(const want of keys){const hit=map[normalizeKey(want)];if(hit){const v=obj[hit];if(v!==undefined&&v!==null&&String(v).trim()!=="") return String(v).trim();}}return "";}
-function jsonp(url){return new Promise((resolve,reject)=>{const cb="cb_"+Math.random().toString(36).slice(2);const s=document.createElement("script");window[cb]=(data)=>{try{delete window[cb]}catch(_){}s.remove();resolve(data);};s.src=url+(url.includes("?")?"&":"?")+"callback="+cb;s.onerror=()=>{try{delete window[cb]}catch(_){}s.remove();reject(new Error("JSONP failed"));};document.head.appendChild(s);});}
-function api_(qs){return jsonp(`${API_BASE}${API_BASE.includes("?")?"&":"?"}${qs}`);}
-function isMasterLogin(){return loginType===LOGIN_TYPE_MASTER;}
-function isSupplierLogin(){return loginType===LOGIN_TYPE_SUPPLIER;}
-function isAccountmanagerLogin(){return loginType===LOGIN_TYPE_ACCOUNTMANAGER;}
-function canCreateOrders(){return isMasterLogin()||isAccountmanagerLogin();}
-function isDropshipMode(){return currentMode===ORDER_MODE_DROPSHIP;}
-function isInvoiceMode(){return currentMode===ORDER_MODE_INVOICE;}
-function isTruthy(v){const s=String(v||"").trim().toUpperCase();return s==="TRUE"||s==="YES"||s==="1";}
-function trackingComplete(o){return !!(getAny(o,["Carrier"])&&getAny(o,["Trackingnumber","Tracking Number"])&&getAny(o,["Trackinglink","Tracking Link"]));}
-function setStatus(text, ok){$("statusBadge").classList.remove("ready","missing");$("statusBadge").classList.add(ok?"ready":"missing");$("statusText").textContent=text;}
-function firstNameFromCustomer_(full){const s=String(full||"").trim();return s?s.split(/\s+/)[0]:"";}
-function tokenMap(){
-  const fullCustomer=getAny(selected,["Customer"])||"";
-  const sup=getAny(selected,["Supplier"])||"";
-  const rowSupKey=getAny(selected,["Supplier KEY","SupplierKey"])||"";
-  const drop=getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||"";
-  const surf=getAny(selected,["Surfcenter order","SurfcenterOrder"])||"";
-  const accName=getAny(selected,["Accountmanager"])||accountmanagerName||"";
-  const accMail=accountmanagersMailMap[String(accName).toLowerCase()]||getAny(selected,["Mail Accountmanager","MailAccountmanager"])||accountmanagerMail||"";
-  return {
-    "{{Customer}}":firstNameFromCustomer_(fullCustomer),
-    "{{CustomerFull}}":fullCustomer,
-    "{{DropshipmentOrder}}":drop,
-    "{{SurfcenterOrder}}":surf,
-    "{{Carrier}}":($("carrier").value.trim()||getAny(selected,["Carrier"])||""),
-    "{{Trackingnumber}}":($("trackingNumber").value.trim()||getAny(selected,["Trackingnumber","Tracking Number"])||""),
-    "{{Trackinglink}}":($("trackingLink").value.trim()||getAny(selected,["Trackinglink","Tracking Link"])||""),
-    "{{Supplier}}":sup,
-    "{{SupplierKey}}":rowSupKey||supplierKey,
-    "{{Accountmanager}}":accName,
-    "{{MailAccountmanager}}":accMail
-  };
-}
-function applyTokens(txt){let out=String(txt||"");const m=tokenMap();for(const k of Object.keys(m)) out=out.split(k).join(String(m[k]||""));return out;}
-function insertAtCursor_(el, text){if(!el)return;const start=typeof el.selectionStart==="number"?el.selectionStart:el.value.length;const end=typeof el.selectionEnd==="number"?el.selectionEnd:el.value.length;el.value=el.value.slice(0,start)+text+el.value.slice(end);const pos=start+text.length;if(el.setSelectionRange)el.setSelectionRange(pos,pos);el.focus&&el.focus();}
-function bindTokenButtons_(){document.querySelectorAll("button[data-token]").forEach(btn=>btn.addEventListener("click",()=>{insertAtCursor_(lastFocusedField||$("indepBodyText")||$("invoiceTemplateBodyText")||$("aftersalesTemplateBodyText")||$("editInvoiceCustomerBodyText")||$("editCustomerBodyText")||$("editSupplierBodyText"),btn.getAttribute("data-token"));}));}
-document.addEventListener("focusin",e=>{const el=e.target;const tag=(el?.tagName||"").toLowerCase();if(tag==="input"||tag==="textarea") lastFocusedField=el;});
-function setupToggle(toggleId, bodyId, plusId, onOpen){const t=$(toggleId), b=$(bodyId), p=$(plusId);if(!t||!b||!p)return;t.addEventListener("click",()=>{const hidden=b.classList.toggle("hidden");p.textContent=hidden?"+":"–";if(!hidden&&typeof onOpen==="function") onOpen();});}
-function clearActiveMailButtons_(){document.querySelectorAll(".flagRow .btn.active").forEach(b=>b.classList.remove("active"));}
-function setBtnActive_(btn){const row=btn.closest(".flagRow");if(!row)return;row.querySelectorAll(".btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");}
-function openGmailCompose(to, cc, subject, body){let url="https://mail.google.com/mail/?view=cm&fs=1"+`&to=${encodeURIComponent(to)}`+`&su=${encodeURIComponent(subject)}`+`&body=${encodeURIComponent(body)}`;if(cc) url+=`&cc=${encodeURIComponent(cc)}`;window.open(url,"_blank","noopener,noreferrer");}
-function openAppleMail(to, cc, subject, body){let url="mailto:"+encodeURIComponent(to)+`?subject=${encodeURIComponent(subject)}`+`&body=${encodeURIComponent(body)}`;if(cc) url+=`&cc=${encodeURIComponent(cc)}`;window.location.href=url;}
-function openMailPicker(payload){pendingMail=payload;$("pickHint").textContent=payload.cc?`CC: ${payload.cc}`:"";$("mailPicker").classList.remove("hidden");}
-function closeMailPicker(){pendingMail=null;$("mailPicker").classList.add("hidden");}
-async function loadSuppliers_(){
-  if(!isMasterLogin()) return;
-  const data=await api_(`action=suppliers&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
-  suppliersList=data?.ok&&Array.isArray(data.suppliers)?data.suppliers:[];
-  suppliersMailMap=data?.ok&&typeof data.mailMap==="object"?data.mailMap:{};
-  suppliersKeyMap=data?.ok&&typeof data.keyMap==="object"?data.keyMap:{};
-  $("newSupplier").innerHTML="";
-  suppliersList.forEach(s=>{const o=document.createElement("option");o.value=s;o.textContent=s;$("newSupplier").appendChild(o);});
-  const am=await api_(`action=accountmanagers&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
-  accountmanagersList=am?.ok&&Array.isArray(am.accountmanagers)?am.accountmanagers:[];
-  accountmanagersMailMap=am?.ok&&typeof am.mailMap==="object"?am.mailMap:{};
-  $("newInvoiceAccountmanagerSelect").innerHTML="";
-  accountmanagersList.forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;$("newInvoiceAccountmanagerSelect").appendChild(o);});
-}
-function findTpl_(arr, lang){const l=String(lang||"").toLowerCase();return arr.find(x=>String(x.language||"").toLowerCase()===l&&String(x.label||"").toUpperCase()==="DEFAULT")||arr.find(x=>String(x.language||"").toLowerCase()===l)||null;}
-function langFlag_(lang){const l=String(lang||"").toLowerCase().trim();if(l==="nl"||l==="dutch"||l==="nederlands")return "🇳🇱";if(l==="de"||l==="german"||l==="deutsch")return "🇩🇪";if(l==="fr"||l==="french"||l==="francais"||l==="français")return "🇫🇷";if(l==="en"||l==="english")return "🇬🇧";return "";}
-async function loadAllTemplates_(){
-  if(isMasterLogin()){
-    const a=await api_(`action=indep_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); indepTemplates=a?.ok&&Array.isArray(a.templates)?a.templates:[];
-    const c=await api_(`action=customer_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); customerTemplates=c?.ok&&Array.isArray(c.templates)?c.templates:[];
-    const s=await api_(`action=supplier_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); supplierTemplates=s?.ok&&Array.isArray(s.templates)?s.templates:[];
-    const i=await api_(`action=invoice_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); invoiceTemplates=i?.ok&&Array.isArray(i.templates)?i.templates:[];
-    const c2=await api_(`action=customer2_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); invoiceCustomerTemplates=c2?.ok&&Array.isArray(c2.templates)?c2.templates:[];
+const INDEP_TPL_SHEET = "Mail templates";
+const CUSTOMER_TPL_SHEET = "Customer";
+const SUPPLIER_TPL_SHEET = "Supplier";
+const INVOICE_TPL_SHEET = "Mail Templates 2";
+const CUSTOMER2_TPL_SHEET = "Customer 2";
+const AFTERSALES_TPL_SHEET = "Mail Templates 3";
+const MAIL_LOG_SHEET = "Mail log";
+const MAIL_LOG_2_SHEET = "Mail log 2";
+const MODE_DROPSHIP = "dropshipment";
+const MODE_INVOICE = "invoice";
+const LOGIN_MASTER = "master";
+const LOGIN_SUPPLIER = "supplier";
+const LOGIN_ACCOUNTMANAGER = "accountmanager";
+
+// ------ Garanties sheets ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+const WAR_CASES_SHEET    = "Warranties";
+const WAR_SUPPLIERS_SHEET= "Warranty Suppliers";
+const WAR_SUP_TPL_SHEET  = "Warranty Sup Templates";
+const WAR_CUST_TPL_SHEET = "Warranty Cust Templates";
+const WAR_LOG_SHEET      = "Warranty Mail Log";
+
+const HD = {
+  customer: "Customer",
+  mailCustomer: "Mail Customer",
+  supplier: "Supplier",
+  supplierKey: "Supplier KEY",
+  carrier: "Carrier",
+  trackingNumber: "Trackingnumber",
+  trackingLink: "Trackinglink",
+  dropOrder: "Dropshipment order",
+  surfOrder: "Surfcenter order",
+  completed: "Completed",
+};
+
+const HI = {
+  customer: "Customer",
+  mailCustomer: "Mail Customer",
+  accountmanager: "Accountmanager",
+  surfOrder: "Surfcenter order",
+  trackingLink: "Trackinglink",
+  trackingNumber: "Trackingnumber",
+  carrier: "Carrier",
+  completed: "Completed",
+  language: "Language",
+  phone: "Phone",
+};
+
+function doGet(e) {
+  try {
+    const action = String(e?.parameter?.action || "").trim().toLowerCase();
+
+    // ------ Bestaande delivery acties ------------------------------------------------------------------------------------------------------------------------------------
+    if (action === "auth") return authGet_(e);
+    if (action === "suppliers") return listSuppliers_(e);
+    if (action === "accountmanagers") return listAccountmanagers_(e);
+    if (action === "orders") return listOrders_(e);
+    if (action === "update") return updateTrackingGet_(e);
+    if (action === "update_phone") return updatePhoneGet_(e);
+    if (action === "save_items") return saveItemsGet_(e);
+    if (action === "add_note") return addNoteGet_(e);
+    if (action === "create") return createOrderGet_(e);
+    if (action === "complete") return setCompletedGet_(e);
+    if (action === "indep_templates") return listTemplates_(e, INDEP_TPL_SHEET, [LOGIN_MASTER]);
+    if (action === "indep_upsert") return upsertTemplate_(e, INDEP_TPL_SHEET, 10, [LOGIN_MASTER]);
+    if (action === "customer_templates") return listTemplates_(e, CUSTOMER_TPL_SHEET, [LOGIN_MASTER]);
+    if (action === "customer_upsert") return upsertTemplate_(e, CUSTOMER_TPL_SHEET, null, [LOGIN_MASTER]);
+    if (action === "supplier_templates") return listTemplates_(e, SUPPLIER_TPL_SHEET, [LOGIN_MASTER]);
+    if (action === "supplier_upsert") return upsertTemplate_(e, SUPPLIER_TPL_SHEET, null, [LOGIN_MASTER]);
+    if (action === "invoice_templates") return listTemplates_(e, INVOICE_TPL_SHEET, [LOGIN_MASTER]);
+    if (action === "invoice_template_upsert") return upsertTemplate_(e, INVOICE_TPL_SHEET, null, [LOGIN_MASTER]);
+    if (action === "customer2_templates") return listTemplates_(e, CUSTOMER2_TPL_SHEET, [LOGIN_MASTER]);
+    if (action === "customer2_upsert") return upsertTemplate_(e, CUSTOMER2_TPL_SHEET, null, [LOGIN_MASTER]);
+    if (action === "aftersales_templates") {
+      return listTemplates_(e, AFTERSALES_TPL_SHEET, [LOGIN_MASTER, LOGIN_ACCOUNTMANAGER]);
+    }
+    if (action === "aftersales_template_upsert") {
+      return upsertTemplate_(e, AFTERSALES_TPL_SHEET, null, [LOGIN_MASTER, LOGIN_ACCOUNTMANAGER]);
+    }
+    if (action === "log_mail") return logMail_(e);
+    if (action === "mail_log") return listMailLog_(e);
+
+    // ------ Garanties & Reparaties acties ------------------------------------------------------------------------------------------------------------------------
+    if (action === "warranty_orders")                    return war_getOrders_(e);
+    if (action === "warranty_create")                    return war_create_(e);
+    if (action === "update_status")                      return war_updateField_(e, "Status");
+    if (action === "update_notes")                       return war_updateField_(e, "Notes");
+    if (action === "update_ref")                         return war_updateField_(e, "SupplierRef");
+    if (action === "update_photos")                      return war_updateField_(e, "Photos");
+    if (action === "warranty_complete")                  return war_updateField_(e, "Completed");
+    if (action === "warranty_suppliers")                 return war_getSuppliers_(e);
+    if (action === "warranty_supplier_upsert")           return war_upsertSupplier_(e);
+    if (action === "warranty_supplier_delete")           return war_deleteSupplier_(e);
+    if (action === "warranty_supplier_templates")        return war_getTemplates_(e, WAR_SUP_TPL_SHEET);
+    if (action === "warranty_supplier_template_upsert")  return war_upsertTemplate_(e, WAR_SUP_TPL_SHEET);
+    if (action === "warranty_customer_templates")        return war_getTemplates_(e, WAR_CUST_TPL_SHEET);
+    if (action === "warranty_customer_template_upsert")  return war_upsertTemplate_(e, WAR_CUST_TPL_SHEET);
+    if (action === "warranty_log_mail")                  return war_logMail_(e);
+    if (action === "warranty_mail_log")                  return war_getMailLog_(e);
+
+    return output_({ ok: false, error: "Unknown action", gotAction: action }, e);
+  } catch (err) {
+    return output_({ ok: false, error: String(err && err.message ? err.message : err) }, e);
   }
-  if(isAccountmanagerLogin()){
-    const a3=await api_(`action=aftersales_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); aftersalesTemplates=a3?.ok&&Array.isArray(a3.templates)?a3.templates:[];
+}
+
+/* =========================
+ * AUTH
+ * ========================= */
+function authGet_(e) {
+  const supplierKey = String(e?.parameter?.supplierKey || "").trim();
+  if (!supplierKey) return output_({ ok: false, error: "Missing supplierKey" }, e);
+  if (MASTER_KEYS.includes(supplierKey)) {
+    return output_({
+      ok: true,
+      loginType: LOGIN_MASTER,
+      supplier: MASTER_NAME,
+      accountmanager: "",
+      mailAccountmanager: "",
+    }, e);
   }
-  renderIndepTemplates_();
-  renderInvoiceTemplates_();
-  renderAftersalesTemplates_();
-  fillCustomerEditorFromLang_($("editCustomerLang").value);
-  fillSupplierEditorFromLang_($("editSupplierLang").value);
-  fillInvoiceCustomerEditorFromLang_($("editInvoiceCustomerLang").value);
-}
-function renderTemplateList_(wrapId, list, sendAttr, sendFn, editAttr, editFn){
-  const wrap=$(wrapId); wrap.innerHTML="";
-  const items=list.slice().sort((a,b)=>String(a.label||"").localeCompare(String(b.label||"")));
-  if(!items.length){wrap.innerHTML='<div class="muted" style="font-size:13px">No templates.</div>';return;}
-  items.forEach(t=>{
-    const row=document.createElement("div");
-    row.className="savedTemplateRow";
-    row.innerHTML=`<div class="savedLeft"><div class="flag">${langFlag_(t.language)}</div><div style="min-width:0"><div class="tplName">${escapeHTML(t.label||"")}</div><div class="tplMeta">${escapeHTML(t.subject||"")}</div></div></div><div class="row" style="gap:8px;flex-wrap:nowrap">${editAttr?`<button class="btn openBtn" type="button" ${editAttr}="${escapeHTML(t.id)}">Edit</button>`:""}<button class="btn openBtn" type="button" ${sendAttr}="${escapeHTML(t.id)}">Send</button></div>`;
-    wrap.appendChild(row);
-  });
-  wrap.querySelectorAll(`button[${sendAttr}]`).forEach(btn=>btn.addEventListener("click",()=>{const t=items.find(x=>String(x.id)===String(btn.getAttribute(sendAttr)));if(t) sendFn(t);}));
-  if(editAttr&&editFn) wrap.querySelectorAll(`button[${editAttr}]`).forEach(btn=>btn.addEventListener("click",()=>{const t=items.find(x=>String(x.id)===String(btn.getAttribute(editAttr)));if(t) editFn(t);}));
-}
-function renderIndepTemplates_(){renderTemplateList_("indepTemplatesList", indepTemplates, "data-indep-send", sendIndependentTemplate_, "data-indep-edit", editIndependentTemplate_);}
-function renderInvoiceTemplates_(){renderTemplateList_("invoiceTemplatesList", invoiceTemplates, "data-invoice-send", sendInvoiceTemplate_, "data-invoice-edit", editInvoiceTemplate_);}
-function renderAftersalesTemplates_(){renderTemplateList_("aftersalesTemplatesList", aftersalesTemplates, "data-aftersales-send", sendAftersalesTemplate_, "data-aftersales-edit", editAftersalesTemplate_);}
-function fillCustomerEditorFromLang_(lang){const t=findTpl_(customerTemplates, lang);$("editCustomerSubject").value=t?.subject||"";$("editCustomerBodyText").value=t?.body||"";$("editCustomerMsg").textContent="";}
-function fillSupplierEditorFromLang_(lang){const t=findTpl_(supplierTemplates, lang);$("editSupplierSubject").value=t?.subject||"";$("editSupplierBodyText").value=t?.body||"";$("editSupplierMsg").textContent="";}
-function fillInvoiceCustomerEditorFromLang_(lang){const t=findTpl_(invoiceCustomerTemplates, lang);$("editInvoiceCustomerSubject").value=t?.subject||"";$("editInvoiceCustomerBodyText").value=t?.body||"";$("editInvoiceCustomerMsg").textContent="";}
-function resetIndepEditor_(){$("indepLang").value="en";$("indepLabel").value="";$("indepSubject").value="";$("indepBodyText").value="";$("indepSaveMsg").textContent="";delete $("indepSave").dataset.editId;$("indepSave").textContent="Save";}
-function resetInvoiceTemplateEditor_(){$("invoiceTemplateLang").value="en";$("invoiceTemplateLabel").value="";$("invoiceTemplateSubject").value="";$("invoiceTemplateBodyText").value="";$("invoiceTemplateSaveMsg").textContent="";delete $("invoiceTemplateSave").dataset.editId;$("invoiceTemplateSave").textContent="Save";}
-function resetAftersalesTemplateEditor_(){$("aftersalesTemplateLang").value="en";$("aftersalesTemplateLabel").value="";$("aftersalesTemplateSubject").value="";$("aftersalesTemplateBodyText").value="";$("aftersalesTemplateSaveMsg").textContent="";delete $("aftersalesTemplateSave").dataset.editId;$("aftersalesTemplateSave").textContent="Save";}
-function editIndependentTemplate_(tpl){$("addIndepBody").classList.remove("hidden");$("addIndepPlus").textContent="–";$("indepLang").value=(tpl.language||"en").toLowerCase();$("indepLabel").value=tpl.label||"";$("indepSubject").value=tpl.subject||"";$("indepBodyText").value=tpl.body||"";$("indepSave").dataset.editId=String(tpl.id||"");$("indepSave").textContent="Update";}
-function editInvoiceTemplate_(tpl){$("addInvoiceTemplateBody").classList.remove("hidden");$("addInvoiceTemplatePlus").textContent="–";$("invoiceTemplateLang").value=(tpl.language||"en").toLowerCase();$("invoiceTemplateLabel").value=tpl.label||"";$("invoiceTemplateSubject").value=tpl.subject||"";$("invoiceTemplateBodyText").value=tpl.body||"";$("invoiceTemplateSave").dataset.editId=String(tpl.id||"");$("invoiceTemplateSave").textContent="Update";}
-function editAftersalesTemplate_(tpl){$("addAftersalesTemplateBody").classList.remove("hidden");$("addAftersalesTemplatePlus").textContent="–";$("aftersalesTemplateLang").value=(tpl.language||"en").toLowerCase();$("aftersalesTemplateLabel").value=tpl.label||"";$("aftersalesTemplateSubject").value=tpl.subject||"";$("aftersalesTemplateBodyText").value=tpl.body||"";$("aftersalesTemplateSave").dataset.editId=String(tpl.id||"");$("aftersalesTemplateSave").textContent="Update";}
-async function upsertTemplate_(action, id, lang, label, subject, body, msgEl, done){
-  msgEl.textContent="Saving…";
-  const data=await api_(`action=${action}&supplierKey=${encodeURIComponent(supplierKey)}`+(id?`&id=${encodeURIComponent(id)}`:"")+`&language=${encodeURIComponent(lang)}&label=${encodeURIComponent(label)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`).catch(()=>null);
-  if(!data?.ok){msgEl.innerHTML=`<span style="color:var(--bad)">${escapeHTML(data?.error||"Save failed.")}</span>`;return;}
-  msgEl.innerHTML='<span style="color:var(--ok)">Saved ✓</span>';
-  if(done) await done();
-}
-function formatMailLogDateTime_(ts){
-  const s=String(ts||"").trim();
-  const m=s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/);
-  if(m) return {date:m[1], time:m[2]};
-  return {date:s,time:""};
-}
-async function logMail_(payload){
-  if(!selected) return;
-  const RowID=String(selected.rowId||"");
-  const Customer=getAny(selected,["Customer"])||"";
-  const OrderID=getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID","Surfcenter order","SurfcenterOrder"])||"";
-  await api_(`action=log_mail&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}&RowID=${encodeURIComponent(RowID)}&Customer=${encodeURIComponent(Customer)}&OrderID=${encodeURIComponent(OrderID)}&To=${encodeURIComponent(payload.to||"")}&Kind=${encodeURIComponent(payload.kind||"")}&Language=${encodeURIComponent(payload.language||"")}&Template=${encodeURIComponent(payload.template||"")}&Subject=${encodeURIComponent(payload.subject||"")}`).catch(()=>null);
-}
-async function loadMailLog_(){
-  if(!selected) return;
-  $("mailLogList").textContent="Loading…";
-  const data=await api_(`action=mail_log&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(currentMode)}&RowID=${encodeURIComponent(String(selected.rowId))}`).catch(()=>null);
-  if(!data?.ok){$("mailLogList").textContent="Mail log unavailable.";return;}
-  const rows=Array.isArray(data.rows)?data.rows:[];
-  if(!rows.length){$("mailLogList").textContent="No log.";return;}
-  const wrap=document.createElement("div");
-  wrap.style.display="flex";
-  wrap.style.flexDirection="column";
-  wrap.style.gap="8px";
-  rows.forEach(r=>{
-    const dt=formatMailLogDateTime_(r.Timestamp||"");
-    const line=document.createElement("div");
-    line.className="savedTemplateRow";
-    line.innerHTML=`<div style="width:100%"><div class="mailLogRow"><div class="mailLogDate">${escapeHTML(dt.date)}</div><div class="mailLogTime">${escapeHTML(dt.time)}</div></div><div class="tplMeta" style="margin-top:6px">${escapeHTML(r.Template||"-")} · ${escapeHTML(r.Subject||"-")}</div></div>`;
-    wrap.appendChild(line);
-  });
-  $("mailLogList").innerHTML="";
-  $("mailLogList").appendChild(wrap);
-}
-async function setCompleted(rowId, val){
-  const modeToUse=isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode;
-  const data=await api_(`action=complete&supplierKey=${encodeURIComponent(supplierKey)}&rowId=${encodeURIComponent(rowId)}&Completed=${encodeURIComponent(val?"TRUE":"FALSE")}&mode=${encodeURIComponent(modeToUse)}`).catch(()=>null);
-  return data?.ok?{ok:true}:{ok:false};
-}
-function customerDraftFromLang_(lang){const t=findTpl_(customerTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
-function supplierDraftFromLang_(lang){const t=findTpl_(supplierTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
-function invoiceCustomerDraftFromLang_(lang){const t=findTpl_(invoiceCustomerTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
-function selectedCustomerMail_(){return getAny(selected,["Mail Customer","MailCustomer"]);}
-function selectedAccountmanagerCC_(){const m=tokenMap();return m["{{MailAccountmanager}}"]||"";}
-async function mailCustomer(lang, btn){
-  if(!selected) return;
-  if(btn) setBtnActive_(btn);
-  const to=selectedCustomerMail_();
-  if(!to){$("mailMsg").innerHTML="<span style='color:var(--warn)'>No customer email found.</span>";return;}
-  const cc=selectedAccountmanagerCC_();
-  const invoiceLike = isInvoiceMode() || isAccountmanagerLogin();
-  const tpl=invoiceLike?invoiceCustomerDraftFromLang_(lang):customerDraftFromLang_(lang);
-  openMailPicker({
-    to,cc,subject:tpl.subject,body:tpl.body,
-    afterOpen:async()=>{
-      await logMail_({to,kind:"customer",language:lang,template:`Mail customer ${lang.toUpperCase()}`,subject:tpl.subject});
-      const res=await setCompleted(selected.rowId,true);
-      $("mailMsg").innerHTML=res.ok?'<span style="color:var(--ok)">Mail opened ✓ Completed saved ✓</span>':'<span style="color:var(--warn)">Mail opened ✓</span>';
-      await loadOrders();
-    }
-  });
-}
-async function mailSupplier(lang, btn){
-  if(!selected||!isDropshipMode()) return;
-  if(btn) setBtnActive_(btn);
-  const supName=getAny(selected,["Supplier"])||"";
-  const to=suppliersMailMap[String(supName).toLowerCase()]||getAny(selected,["Mail Supplier","MailSupplier"])||"";
-  if(!to){$("mailSupplierMsg").innerHTML="<span style='color:var(--warn)'>No supplier email found.</span>";return;}
-  const tpl=supplierDraftFromLang_(lang);
-  openMailPicker({
-    to,cc:"",subject:tpl.subject,body:tpl.body,
-    afterOpen:async()=>{
-      await logMail_({to,kind:"supplier",language:lang,template:`Mail supplier ${lang.toUpperCase()}`,subject:tpl.subject});
-      $("mailSupplierMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';
-      await loadMailLog_();
-    }
-  });
-}
-async function sendIndependentTemplate_(tpl){
-  const to=selectedCustomerMail_(); if(!to) return;
-  const cc=selectedAccountmanagerCC_();
-  const subject=applyTokens(tpl.subject||"");
-  const body=applyTokens(tpl.body||"");
-  openMailPicker({
-    to,cc,subject,body,
-    afterOpen:async()=>{
-      await logMail_({to,kind:"independent",language:String(tpl.language||"").toLowerCase(),template:tpl.label||"",subject});
-      $("indepSendMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';
-      await loadMailLog_();
-    }
-  });
-}
-async function sendInvoiceTemplate_(tpl){
-  const to=selectedCustomerMail_(); if(!to) return;
-  const cc=selectedAccountmanagerCC_();
-  const subject=applyTokens(tpl.subject||"");
-  const body=applyTokens(tpl.body||"");
-  openMailPicker({
-    to,cc,subject,body,
-    afterOpen:async()=>{
-      await logMail_({to,kind:"independent",language:String(tpl.language||"").toLowerCase(),template:tpl.label||"",subject});
-      $("invoiceSendMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';
-      await loadMailLog_();
-    }
-  });
-}
-async function sendAftersalesTemplate_(tpl){
-  const to=selectedCustomerMail_(); if(!to) return;
-  const cc=ACCOUNTMANAGER_TEMPLATE_CC;
-  const subject=applyTokens(tpl.subject||"");
-  const body=applyTokens(tpl.body||"");
-  openMailPicker({
-    to,cc,subject,body,
-    afterOpen:async()=>{
-      await logMail_({to,kind:"independent",language:String(tpl.language||"").toLowerCase(),template:tpl.label||"",subject});
-      $("aftersalesSendMsg").innerHTML='<span style="color:var(--ok)">Mail opened ✓</span>';
-      await loadMailLog_();
-    }
-  });
-}
-function applyModeUI_(){
-  const forcedInvoice = isAccountmanagerLogin();
-  const invoiceLike = isInvoiceMode() || forcedInvoice;
-  $("modeWrap").classList.toggle("hidden", !isMasterLogin());
-  $("modeDropshipBtn").classList.toggle("active", isDropshipMode());
-  $("modeInvoiceBtn").classList.toggle("active", isInvoiceMode());
-  $("supplierBlock").classList.toggle("hidden", !isDropshipMode());
-  $("primaryOrderCaption").classList.toggle("hidden", !isDropshipMode());
-  $("primaryOrderLabel").classList.toggle("hidden", !isDropshipMode());
-  $("supplierMailBox").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
-  $("mailCustomerBox").classList.toggle("hidden", isSupplierLogin());
-  $("trackingFieldsWrap").classList.toggle("hidden", false);
-  $("saveBtn").parentElement.classList.toggle("hidden", !(isMasterLogin() || isSupplierLogin() || isAccountmanagerLogin()));
-  $("accountmanagerBlock").classList.toggle("hidden", !invoiceLike);
-  $("mailTemplatesWrap").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
-  $("dropshipTemplatesSection").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
-  $("invoiceTemplatesSection").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()));
-  $("aftersalesTemplatesSection").classList.toggle("hidden", !isAccountmanagerLogin());
-  $("invoiceCustomerEditorSection").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()));
-  $("dropshipEditorsWrap").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
-  $("mailLogSection").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
-  $("completedWrap").classList.remove("hidden");
-  $("newOrderBtnText").textContent=invoiceLike?"Add invoice order":"Add new order";
-  $("surfOrderCaption").textContent=invoiceLike?"Invoice":"Surfcenter order";
-  $("newInvoiceOrderLabel").textContent="Invoice";
-}
-function setMode(mode){
-  if(!isMasterLogin()) return;
-  currentMode=mode;
-  selected=null;
-  $("form").classList.add("hidden");
-  $("noSelection").classList.remove("hidden");
-  applyModeUI_();
-  loadOrders();
-}
-async function loadOrders(){
-  selected=null;
-  $("form").classList.add("hidden");
-  $("noSelection").classList.remove("hidden");
-  $("tbodyOpen").innerHTML="<tr><td colspan='4' class='muted'>Loading…</td></tr>";
-  $("tbodyCompleted").innerHTML="<tr><td colspan='4' class='muted'>Loading…</td></tr>";
-  let modeToUse=isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode;
-  let url=`${API_BASE}?action=orders&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(modeToUse)}`;
-  if(isMasterLogin()) url+=`&supplier=${encodeURIComponent(MASTER_NAME)}`;
-  if(isSupplierLogin()) url+=`&supplier=${encodeURIComponent(supplier)}`;
-  if(isAccountmanagerLogin()) url+=`&accountmanager=${encodeURIComponent(accountmanagerName)}`;
-  const data=await jsonp(url).catch(()=>null);
-  if(!data?.ok){
-    const err=escapeHTML(data?.error||"Error");
-    $("tbodyOpen").innerHTML=`<tr><td colspan="4" class='muted'>${err}</td></tr>`;
-    $("tbodyCompleted").innerHTML=`<tr><td colspan="4" class='muted'>${err}</td></tr>`;
-    return;
+  const supplierName = findSupplierByKey_(supplierKey);
+  if (supplierName) {
+    return output_({
+      ok: true,
+      loginType: LOGIN_SUPPLIER,
+      supplier: supplierName,
+      accountmanager: "",
+      mailAccountmanager: "",
+    }, e);
   }
-  orders=(data.orders||[]).slice().sort((a,b)=>Number(b.rowId||0)-Number(a.rowId||0));
-  renderOrders();
+  const am = findAccountmanagerByKey_(supplierKey);
+  if (am) {
+    return output_({
+      ok: true,
+      loginType: LOGIN_ACCOUNTMANAGER,
+      supplier: "",
+      accountmanager: am.accountmanager,
+      mailAccountmanager: am.mailAccountmanager,
+    }, e);
+  }
+  return output_({ ok: false, error: "Invalid key" }, e);
 }
-function renderOrders(){
-  const q=($("historySearch").value||"").trim().toLowerCase();
-  const match=o=>!q||[getAny(o,["Customer"]),getAny(o,["Mail Customer","MailCustomer"]),getAny(o,["Surfcenter order","SurfcenterOrder"]),getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]),getAny(o,["Accountmanager"])].join(" ").toLowerCase().includes(q);
-  const openList=orders.filter(o=>!isTruthy(o.Completed)).filter(match);
-  const doneList=orders.filter(o=>isTruthy(o.Completed)).filter(match);
-  const draw=(target,list)=>{
-    target.innerHTML="";
-    if(!list.length){target.innerHTML='<tr><td colspan="4" class="muted">No orders found.</td></tr>';return;}
-    list.forEach(o=>{
-      const tr=document.createElement("tr");
-      const mail=isSupplierLogin()?"":getAny(o,["Mail Customer","MailCustomer"]);
-      const thirdLine=isDropshipMode()
-        ? (getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||getAny(o,["Surfcenter order","SurfcenterOrder"]))
-        : getAny(o,["Surfcenter order","SurfcenterOrder"]);
-      const lang=getAny(o,["Language"]);
-      const flag=lang?langFlag_(lang):"";
-      tr.innerHTML=`<td><div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${flag?`<span style="margin-right:6px;font-weight:400">${flag}</span>`:""}${escapeHTML(getAny(o,["Customer"]))}</div>${mail?`<div class="smallLine">${escapeHTML(mail)}</div>`:""}${thirdLine?`<div class="smallLine">${escapeHTML(thirdLine)}</div>`:""}</td><td class="statusCell"><div class="statusWrap"><span class="status ${trackingComplete(o)?"ready":"missing"}"><span class="dot"></span>${trackingComplete(o)?"Complete":"Missing tracking"}</span></div></td><td><div class="actionsCell"><button class="btn openBtn" data-open="${escapeHTML(o.rowId)}">Open</button></div></td><td class="completedCell">${isTruthy(o.Completed)?'<span class="checkPill yes">✓</span>':'<span class="checkPill">—</span>'}</td>`;
-      target.appendChild(tr);
+
+/* =========================
+ * LISTS
+ * ========================= */
+function listSuppliers_(e) {
+  requireRoles_(e, [LOGIN_MASTER]);
+  const sh = suppliersSheet_();
+  const values = sh.getDataRange().getValues();
+  if (values.length < 2) {
+    return output_({ ok: true, suppliers: [], mailMap: {}, keyMap: {} }, e);
+  }
+  const suppliers = [];
+  const mailMap = {};
+  const keyMap = {};
+  for (let i = 1; i < values.length; i++) {
+    const supplier = String(values[i][0] || "").trim();
+    const mail = String(values[i][1] || "").trim();
+    const key = String(values[i][2] || "").trim();
+    if (!supplier) continue;
+    suppliers.push(supplier);
+    if (mail) mailMap[supplier.toLowerCase()] = mail;
+    if (key) keyMap[supplier.toLowerCase()] = key;
+  }
+  return output_({ ok: true, suppliers, mailMap, keyMap }, e);
+}
+
+function listAccountmanagers_(e) {
+  requireRoles_(e, [LOGIN_MASTER]);
+  const sh = accountmanagerSheet_();
+  const values = sh.getDataRange().getValues();
+  if (values.length < 2) {
+    return output_({ ok: true, accountmanagers: [], mailMap: {} }, e);
+  }
+  const accountmanagers = [];
+  const mailMap = {};
+  for (let i = 1; i < values.length; i++) {
+    const name = String(values[i][0] || "").trim();
+    const mail = String(values[i][1] || "").trim();
+    if (!name) continue;
+    accountmanagers.push(name);
+    if (mail) mailMap[name.toLowerCase()] = mail;
+  }
+  return output_({ ok: true, accountmanagers, mailMap }, e);
+}
+
+/* =========================
+ * ORDERS
+ * ========================= */
+function listOrders_(e) {
+  const mode = normalizeMode_(e?.parameter?.mode);
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  return mode === MODE_DROPSHIP
+    ? listDropshipOrders_(e, auth)
+    : listInvoiceOrders_(e, auth);
+}
+
+function listDropshipOrders_(e, auth) {
+  if (auth.loginType === LOGIN_ACCOUNTMANAGER) {
+    return output_({ ok: true, orders: [] }, e);
+  }
+  const sh = dropshipSheet_();
+  const { rows, idx } = read_(sh);
+  mustHave_(idx, [
+    HD.customer,
+    HD.supplier,
+    HD.carrier,
+    HD.trackingNumber,
+    HD.trackingLink,
+    HD.dropOrder,
+    HD.surfOrder,
+    HD.completed,
+  ]);
+  const hasMailCustomer = idx[HD.mailCustomer] !== undefined;
+  const supplierMailMap = buildSupplierMailMap_();
+  const supplierKeyMap = buildSupplierKeyMap_();
+  const orders = [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const rowSupplier = String(row[idx[HD.supplier]] || "").trim();
+    if (auth.loginType === LOGIN_SUPPLIER && rowSupplier.toLowerCase() !== auth.supplier.toLowerCase()) {
+      continue;
+    }
+    const customer = String(row[idx[HD.customer]] || "").trim();
+    if (!customer && !rowSupplier) continue;
+    orders.push({
+      rowId: i + 2,
+      Customer: customer,
+      Supplier: rowSupplier,
+      "Mail Customer": hasMailCustomer ? String(row[idx[HD.mailCustomer]] || "").trim() : "",
+      "Dropshipment order": String(row[idx[HD.dropOrder]] || "").trim(),
+      "Surfcenter order": String(row[idx[HD.surfOrder]] || "").trim(),
+      Carrier: String(row[idx[HD.carrier]] || "").trim(),
+      Trackingnumber: String(row[idx[HD.trackingNumber]] || "").trim(),
+      Trackinglink: String(row[idx[HD.trackingLink]] || "").trim(),
+      "Mail Supplier": supplierMailMap[rowSupplier.toLowerCase()] || "",
+      "Supplier KEY": supplierKeyMap[rowSupplier.toLowerCase()] || "",
+      Completed: isTruthy_(row[idx[HD.completed]]),
     });
-  };
-  draw($("tbodyOpen"),openList);
-  draw($("tbodyCompleted"),doneList);
-  document.querySelectorAll("button[data-open]").forEach(btn=>btn.addEventListener("click",()=>openRow(Number(btn.dataset.open))));
-}
-async function openRow(rowId){
-  clearActiveMailButtons_();
-  selected=orders.find(x=>Number(x.rowId)===rowId);
-  if(!selected)return;
-  $("customerLabel").textContent=getAny(selected,["Customer"])||"—";
-  $("customerMailLine").textContent=isSupplierLogin()?"":(getAny(selected,["Mail Customer","MailCustomer"])||"");
-  $("supplierLabel").textContent=getAny(selected,["Supplier"])||"—";
-  $("supplierKeyLine").textContent=getAny(selected,["Supplier KEY","SupplierKey"])||"";
-  $("accountmanagerLabel").textContent=getAny(selected,["Accountmanager"])||accountmanagerName||"—";
-  $("accountmanagerMailLine").textContent=getAny(selected,["Mail Accountmanager","MailAccountmanager"])||accountmanagerMail||"";
-  $("primaryOrderLabel").textContent=getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||"—";
-  $("surfOrderLabel").textContent=getAny(selected,["Surfcenter order","SurfcenterOrder"])||"—";
-  $("carrier").value=getAny(selected,["Carrier"])||"";
-  $("trackingNumber").value=getAny(selected,["Trackingnumber","Tracking Number"])||"";
-  $("trackingLink").value=getAny(selected,["Trackinglink","Tracking Link"])||"";
-  $("noSelection").classList.add("hidden");
-  $("form").classList.remove("hidden");
-  setStatus(trackingComplete(selected)?"Complete":"Missing tracking",trackingComplete(selected));
-  $("mailCustomerWrap").classList.remove("hidden");
-  await loadMailLog_();
-}
-async function save(){
-  if(!selected) return;
-  const Carrier=$("carrier").value.trim();
-  const Trackingnumber=$("trackingNumber").value.trim();
-  const Trackinglink=$("trackingLink").value.trim();
-  if(!Carrier||!Trackingnumber||!Trackinglink){
-    $("msg").innerHTML="<span style='color:var(--warn)'>Please fill in all fields.</span>";
-    return;
   }
-  const modeToUse=isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode;
-  const data=await jsonp(`${API_BASE}?action=update&rowId=${encodeURIComponent(selected.rowId)}&supplier=${encodeURIComponent(supplier)}&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(modeToUse)}&Carrier=${encodeURIComponent(Carrier)}&Trackingnumber=${encodeURIComponent(Trackingnumber)}&Trackinglink=${encodeURIComponent(Trackinglink)}`).catch(()=>null);
-  if(!data?.ok){
-    $("msg").innerHTML="<span style='color:var(--bad)'>Save failed.</span>";
-    return;
-  }
-  $("msg").innerHTML="<span style='color:var(--ok)'>Saved ✓</span>";
-  await loadOrders();
+  return output_({ ok: true, orders }, e);
 }
-function prepareCreateModal_(){
-  $("createMsg").textContent="";
-  const invoiceLike = isInvoiceMode() || isAccountmanagerLogin();
-  $("newOrderModalTitle").textContent=invoiceLike?"New invoice order":"New order";
-  $("dropshipCreateFields").classList.toggle("hidden",!(isDropshipMode() && !isAccountmanagerLogin()));
-  $("invoiceCreateFields").classList.toggle("hidden",!invoiceLike);
-  $("newInvoiceAccountmanagerStaticWrap").classList.toggle("hidden",!isAccountmanagerLogin());
-  $("newInvoiceAccountmanagerSelectWrap").classList.toggle("hidden",!isMasterLogin());
-  if(isAccountmanagerLogin()) $("newInvoiceAccountmanager").value=accountmanagerName||"";
-  if(invoiceLike){
-    $("newInvoiceCustomer").value="";
-    $("newInvoiceMailCustomer").value="";
-    $("newInvoiceSurfOrder").value="";
-    $("newInvoiceLanguage").value="English";
+
+function listInvoiceOrders_(e, auth) {
+  if (auth.loginType === LOGIN_SUPPLIER) {
+    return output_({ ok: true, orders: [] }, e);
   }
-}
-async function createOrder(){
-  if(!canCreateOrders()) return;
-  $("createBtn").disabled=true;
-  $("createMsg").textContent="Adding…";
-  const modeToUse=isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode;
-  let url=`${API_BASE}?action=create&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(modeToUse)}`;
-  if(isDropshipMode() && !isAccountmanagerLogin()){
-    const Customer=$("newCustomer").value.trim();
-    const MailCustomer=$("newMailCustomer").value.trim();
-    const Supplier=$("newSupplier").value;
-    const DropshipmentOrder=$("newDropOrder").value.trim();
-    const SurfcenterOrder=$("newSurfOrder").value.trim();
-    if(!Customer||!MailCustomer||!Supplier||!DropshipmentOrder||!SurfcenterOrder){
-      $("createMsg").innerHTML="<span style='color:var(--warn)'>Please fill all fields.</span>";
-      $("createBtn").disabled=false;
-      return;
+  const sh = invoiceSheet_();
+  const { rows, idx } = read_(sh);
+  mustHave_(idx, [
+    HI.customer,
+    HI.mailCustomer,
+    HI.accountmanager,
+    HI.surfOrder,
+    HI.trackingLink,
+    HI.trackingNumber,
+    HI.carrier,
+    HI.completed,
+  ]);
+  const hasLanguage = idx[HI.language] !== undefined;
+  const hasPhone = idx[HI.phone] !== undefined;
+  const orders = [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const rowAccountmanager = String(row[idx[HI.accountmanager]] || "").trim();
+    if (auth.loginType === LOGIN_ACCOUNTMANAGER &&
+      rowAccountmanager.toLowerCase() !== auth.accountmanager.toLowerCase()) {
+      continue;
     }
-    url+=`&Customer=${encodeURIComponent(Customer)}&MailCustomer=${encodeURIComponent(MailCustomer)}&Supplier=${encodeURIComponent(Supplier)}&DropshipmentOrder=${encodeURIComponent(DropshipmentOrder)}&SurfcenterOrder=${encodeURIComponent(SurfcenterOrder)}`;
-  } else {
-    const Customer=$("newInvoiceCustomer").value.trim();
-    const MailCustomer=$("newInvoiceMailCustomer").value.trim();
-    const Accountmanager=isMasterLogin()?$("newInvoiceAccountmanagerSelect").value:accountmanagerName;
-    const SurfcenterOrder=$("newInvoiceSurfOrder").value.trim();
-    const Language=$("newInvoiceLanguage").value;
-    if(!Customer||!MailCustomer||!Accountmanager||!SurfcenterOrder||!Language){
-      $("createMsg").innerHTML="<span style='color:var(--warn)'>Please fill all fields.</span>";
-      $("createBtn").disabled=false;
-      return;
+    const customer = String(row[idx[HI.customer]] || "").trim();
+    if (!customer && !rowAccountmanager) continue;
+    const order = {
+      rowId: i + 2,
+      Customer: customer,
+      "Mail Customer": String(row[idx[HI.mailCustomer]] || "").trim(),
+      Accountmanager: rowAccountmanager,
+      "Mail Accountmanager": findMailByAccountmanager_(rowAccountmanager),
+      "Surfcenter order": String(row[idx[HI.surfOrder]] || "").trim(),
+      Carrier: String(row[idx[HI.carrier]] || "").trim(),
+      Trackingnumber: String(row[idx[HI.trackingNumber]] || "").trim(),
+      Trackinglink: String(row[idx[HI.trackingLink]] || "").trim(),
+      Language: hasLanguage ? String(row[idx[HI.language]] || "").trim() : "",
+      Phone: hasPhone ? String(row[idx[HI.phone]] || "").trim() : "",
+      Completed: isTruthy_(row[idx[HI.completed]]),
+    };
+    for (let p = 1; p <= 10; p++) {
+      const col = "Product " + p;
+      if (idx[col] === undefined) continue;
+      const val = String(row[idx[col]] || "").trim();
+      if (val) order[col] = val;
     }
-    url+=`&Customer=${encodeURIComponent(Customer)}&MailCustomer=${encodeURIComponent(MailCustomer)}&Accountmanager=${encodeURIComponent(Accountmanager)}&SurfcenterOrder=${encodeURIComponent(SurfcenterOrder)}&Language=${encodeURIComponent(Language)}`;
+    for (let n = 1; n <= 10; n++) {
+      const col = "Note " + n;
+      if (idx[col] === undefined) continue;
+      const val = String(row[idx[col]] || "").trim();
+      if (val) order[col] = val;
+    }
+    orders.push(order);
   }
-  const data=await jsonp(url).catch(()=>null);
-  $("createBtn").disabled=false;
-  if(!data?.ok){
-    $("createMsg").innerHTML=`<span style='color:var(--bad)'>Failed: ${escapeHTML(data?.error||"Unknown")}</span>`;
-    return;
+  return output_({ ok: true, orders }, e);
+}
+
+/* =========================
+ * UPDATE
+ * ========================= */
+function updateTrackingGet_(e) {
+  const mode = normalizeMode_(e?.parameter?.mode);
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  const rowId = Number(e?.parameter?.rowId);
+  if (!rowId || rowId < 2) {
+    return output_({ ok: false, error: "Invalid rowId" }, e);
   }
-  $("createMsg").innerHTML="<span style='color:var(--ok)'>Added ✓</span>";
-  $("newOrderModal").classList.add("hidden");
-  await loadOrders();
+  const Carrier = String(e?.parameter?.Carrier || "").trim();
+  const Trackingnumber = String(e?.parameter?.Trackingnumber || "").trim();
+  const Trackinglink = String(e?.parameter?.Trackinglink || "").trim();
+  if (!Carrier || !Trackingnumber || !Trackinglink) {
+    return output_({ ok: false, error: "Missing tracking fields" }, e);
+  }
+  if (mode === MODE_DROPSHIP) {
+    if (auth.loginType === LOGIN_ACCOUNTMANAGER) {
+      return output_({ ok: false, error: "Unauthorized" }, e);
+    }
+    const sh = dropshipSheet_();
+    const { idx } = read_(sh);
+    mustHave_(idx, [HD.supplier, HD.carrier, HD.trackingNumber, HD.trackingLink]);
+    if (auth.loginType === LOGIN_SUPPLIER) {
+      const sheetSupplier = String(sh.getRange(rowId, idx[HD.supplier] + 1).getValue() || "")
+        .trim()
+        .toLowerCase();
+      if (sheetSupplier !== auth.supplier.toLowerCase()) {
+        return output_({ ok: false, error: "Unauthorized" }, e);
+      }
+    }
+    sh.getRange(rowId, idx[HD.carrier] + 1).setValue(Carrier);
+    sh.getRange(rowId, idx[HD.trackingNumber] + 1).setValue(Trackingnumber);
+    sh.getRange(rowId, idx[HD.trackingLink] + 1).setValue(Trackinglink);
+    return output_({ ok: true }, e);
+  }
+  if (auth.loginType !== LOGIN_MASTER && auth.loginType !== LOGIN_ACCOUNTMANAGER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const sh = invoiceSheet_();
+  const { idx } = read_(sh);
+  mustHave_(idx, [HI.accountmanager, HI.carrier, HI.trackingNumber, HI.trackingLink]);
+  if (auth.loginType === LOGIN_ACCOUNTMANAGER) {
+    const rowAm = String(sh.getRange(rowId, idx[HI.accountmanager] + 1).getValue() || "")
+      .trim()
+      .toLowerCase();
+    if (rowAm !== auth.accountmanager.toLowerCase()) {
+      return output_({ ok: false, error: "Unauthorized" }, e);
+    }
+  }
+  sh.getRange(rowId, idx[HI.carrier] + 1).setValue(Carrier);
+  sh.getRange(rowId, idx[HI.trackingNumber] + 1).setValue(Trackingnumber);
+  sh.getRange(rowId, idx[HI.trackingLink] + 1).setValue(Trackinglink);
+  return output_({ ok: true }, e);
 }
-function showLogin(){$("portalView").classList.add("hidden");$("loginView").classList.remove("hidden");$("loginMsg").textContent="";$("keyInput").value="";}
-function showPortal(){$("loginView").classList.add("hidden");$("portalView").classList.remove("hidden");}
-async function doLogin(withKey){
-  const key=(withKey??$("keyInput").value).trim();
-  if(!key){$("loginMsg").innerHTML="<span style='color:var(--warn)'>Please enter password.</span>";return;}
-  $("loginBtn").disabled=true;
-  $("loginMsg").textContent="Checking…";
-  try{
-    const data=await jsonp(`${API_BASE}?action=auth&supplierKey=${encodeURIComponent(key)}`);
-    if(!data?.ok){$("loginMsg").innerHTML="<span style='color:var(--bad)'>Invalid login.</span>";return;}
-    supplierKey=key;
-    supplier=String(data.supplier||"").trim();
-    loginType=String(data.loginType||"").trim().toLowerCase();
-    accountmanagerName=String(data.accountmanager||"").trim();
-    accountmanagerMail=String(data.mailAccountmanager||"").trim();
-    sessionStorage.setItem("supplier_key",supplierKey);
-    sessionStorage.setItem("supplier_name",supplier);
-    sessionStorage.setItem("login_type",loginType);
-    sessionStorage.setItem("accountmanager_name",accountmanagerName);
-    sessionStorage.setItem("accountmanager_mail",accountmanagerMail);
-    currentMode=isAccountmanagerLogin()?ORDER_MODE_INVOICE:ORDER_MODE_DROPSHIP;
-    showPortal();
-    $("newOrderBtn").classList.toggle("hidden",!canCreateOrders());
-    applyModeUI_();
-    if(isMasterLogin()) await loadSuppliers_();
-    await loadAllTemplates_();
-    await loadOrders();
-  }catch(err){
-    console.error(err);
-    $("loginMsg").innerHTML="<span style='color:var(--bad)'>Could not reach server.</span>";
-  }finally{
-    $("loginBtn").disabled=false;
+
+/* =========================
+ * INVOICE EXTRAS: PHONE / ITEMS / NOTES
+ * ========================= */
+function updatePhoneGet_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  if (auth.loginType !== LOGIN_MASTER && auth.loginType !== LOGIN_ACCOUNTMANAGER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const rowId = Number(e?.parameter?.rowId);
+  if (!rowId || rowId < 2) return output_({ ok: false, error: "Invalid rowId" }, e);
+  const sh = invoiceSheet_();
+  const { idx } = read_(sh);
+  mustHave_(idx, [HI.accountmanager, HI.phone]);
+  if (auth.loginType === LOGIN_ACCOUNTMANAGER) {
+    const rowAm = String(sh.getRange(rowId, idx[HI.accountmanager] + 1).getValue() || "")
+      .trim()
+      .toLowerCase();
+    if (rowAm !== auth.accountmanager.toLowerCase()) {
+      return output_({ ok: false, error: "Unauthorized" }, e);
+    }
+  }
+  const Phone = String(e?.parameter?.Phone || "").trim();
+  sh.getRange(rowId, idx[HI.phone] + 1).setValue(Phone);
+  return output_({ ok: true }, e);
+}
+
+function saveItemsGet_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  if (auth.loginType !== LOGIN_MASTER && auth.loginType !== LOGIN_ACCOUNTMANAGER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const rowId = Number(e?.parameter?.rowId);
+  if (!rowId || rowId < 2) return output_({ ok: false, error: "Invalid rowId" }, e);
+  const sh = invoiceSheet_();
+  const { idx } = read_(sh);
+  mustHave_(idx, [HI.accountmanager]);
+  if (auth.loginType === LOGIN_ACCOUNTMANAGER) {
+    const rowAm = String(sh.getRange(rowId, idx[HI.accountmanager] + 1).getValue() || "")
+      .trim()
+      .toLowerCase();
+    if (rowAm !== auth.accountmanager.toLowerCase()) {
+      return output_({ ok: false, error: "Unauthorized" }, e);
+    }
+  }
+  let wrote = false;
+  for (let i = 1; i <= 10; i++) {
+    const col = "Product " + i;
+    if (idx[col] === undefined) continue;
+    const val = String(e?.parameter?.["Product" + i] || "").trim();
+    sh.getRange(rowId, idx[col] + 1).setValue(val);
+    wrote = true;
+  }
+  if (!wrote) return output_({ ok: false, error: "No 'Product 1'..'Product 10' columns found on Sheet2" }, e);
+  return output_({ ok: true }, e);
+}
+
+function addNoteGet_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  if (auth.loginType !== LOGIN_MASTER && auth.loginType !== LOGIN_ACCOUNTMANAGER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const rowId = Number(e?.parameter?.rowId);
+  if (!rowId || rowId < 2) return output_({ ok: false, error: "Invalid rowId" }, e);
+  const sh = invoiceSheet_();
+  const { idx } = read_(sh);
+  mustHave_(idx, [HI.accountmanager]);
+  if (auth.loginType === LOGIN_ACCOUNTMANAGER) {
+    const rowAm = String(sh.getRange(rowId, idx[HI.accountmanager] + 1).getValue() || "")
+      .trim()
+      .toLowerCase();
+    if (rowAm !== auth.accountmanager.toLowerCase()) {
+      return output_({ ok: false, error: "Unauthorized" }, e);
+    }
+  }
+  const noteText = String(e?.parameter?.Note || "").trim();
+  if (!noteText) return output_({ ok: false, error: "Missing note text" }, e);
+  const author = String(e?.parameter?.Accountmanager || "").trim();
+  const combined = author ? (noteText + " — " + author) : noteText;
+  for (let i = 1; i <= 10; i++) {
+    const col = "Note " + i;
+    if (idx[col] === undefined) continue;
+    const current = sh.getRange(rowId, idx[col] + 1).getValue();
+    if (!current) {
+      sh.getRange(rowId, idx[col] + 1).setValue(combined);
+      return output_({ ok: true }, e);
+    }
+  }
+  return output_({ ok: false, error: "All 10 note slots are full, or no 'Note 1'..'Note 10' columns found on Sheet2" }, e);
+}
+
+/* =========================
+ * CREATE
+ * ========================= */
+function createOrderGet_(e) {
+  const mode = normalizeMode_(e?.parameter?.mode);
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  return mode === MODE_DROPSHIP
+    ? createDropshipOrder_(e, auth)
+    : createInvoiceOrder_(e, auth);
+}
+
+function createDropshipOrder_(e, auth) {
+  if (auth.loginType !== LOGIN_MASTER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const Customer = String(e?.parameter?.Customer || "").trim();
+  const MailCustomer = String(e?.parameter?.MailCustomer || "").trim();
+  const Supplier = String(e?.parameter?.Supplier || "").trim();
+  const DropshipmentOrder = String(e?.parameter?.DropshipmentOrder || "").trim();
+  const SurfcenterOrder = String(e?.parameter?.SurfcenterOrder || "").trim();
+  if (!Customer || !MailCustomer || !Supplier || !DropshipmentOrder || !SurfcenterOrder) {
+    return output_({ ok: false, error: "Missing fields" }, e);
+  }
+  const sh = dropshipSheet_();
+  const { idx } = read_(sh);
+  mustHave_(idx, [HD.customer, HD.mailCustomer, HD.supplier, HD.dropOrder, HD.surfOrder, HD.completed]);
+  const newRow = new Array(sh.getLastColumn()).fill("");
+  newRow[idx[HD.customer]] = Customer;
+  newRow[idx[HD.mailCustomer]] = MailCustomer;
+  newRow[idx[HD.supplier]] = Supplier;
+  newRow[idx[HD.dropOrder]] = DropshipmentOrder;
+  newRow[idx[HD.surfOrder]] = SurfcenterOrder;
+  if (idx[HD.supplierKey] !== undefined) {
+    const key = findKeyBySupplier_(Supplier);
+    if (key) newRow[idx[HD.supplierKey]] = key;
+  }
+  newRow[idx[HD.completed]] = "FALSE";
+  sh.appendRow(newRow);
+  return output_({ ok: true }, e);
+}
+
+function createInvoiceOrder_(e, auth) {
+  if (auth.loginType !== LOGIN_MASTER && auth.loginType !== LOGIN_ACCOUNTMANAGER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const Customer = String(e?.parameter?.Customer || "").trim();
+  const MailCustomer = String(e?.parameter?.MailCustomer || "").trim();
+  const SurfcenterOrder = String(e?.parameter?.SurfcenterOrder || "").trim();
+  const Language = String(e?.parameter?.Language || "").trim();
+  const Phone = String(e?.parameter?.Phone || "").trim();
+  let Accountmanager = String(e?.parameter?.Accountmanager || "").trim();
+  if (auth.loginType === LOGIN_ACCOUNTMANAGER) {
+    Accountmanager = auth.accountmanager;
+  }
+  if (!Customer || !MailCustomer || !Accountmanager || !SurfcenterOrder) {
+    return output_({ ok: false, error: "Missing fields" }, e);
+  }
+  const sh = invoiceSheet_();
+  const { idx } = read_(sh);
+  mustHave_(idx, [HI.customer, HI.mailCustomer, HI.accountmanager, HI.surfOrder, HI.completed]);
+  const newRow = new Array(sh.getLastColumn()).fill("");
+  newRow[idx[HI.customer]] = Customer;
+  newRow[idx[HI.mailCustomer]] = MailCustomer;
+  newRow[idx[HI.accountmanager]] = Accountmanager;
+  newRow[idx[HI.surfOrder]] = SurfcenterOrder;
+  if (idx[HI.language] !== undefined && Language) {
+    newRow[idx[HI.language]] = Language;
+  }
+  if (idx[HI.phone] !== undefined && Phone) {
+    newRow[idx[HI.phone]] = Phone;
+  }
+  newRow[idx[HI.completed]] = "FALSE";
+  sh.appendRow(newRow);
+  return output_({ ok: true }, e);
+}
+
+/* =========================
+ * COMPLETED
+ * ========================= */
+function setCompletedGet_(e) {
+  const mode = normalizeMode_(e?.parameter?.mode);
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  const rowId = Number(e?.parameter?.rowId);
+  if (!rowId || rowId < 2) {
+    return output_({ ok: false, error: "Invalid rowId" }, e);
+  }
+  const CompletedRaw = String(e?.parameter?.Completed ?? e?.parameter?.completed ?? "").trim().toUpperCase();
+  if (CompletedRaw !== "TRUE" && CompletedRaw !== "FALSE") {
+    return output_({ ok: false, error: "Completed must be TRUE or FALSE" }, e);
+  }
+  if (mode === MODE_DROPSHIP) {
+    if (auth.loginType !== LOGIN_MASTER && auth.loginType !== LOGIN_SUPPLIER) {
+      return output_({ ok: false, error: "Unauthorized" }, e);
+    }
+    const sh = dropshipSheet_();
+    const { idx } = read_(sh);
+    mustHave_(idx, [HD.completed, HD.supplier]);
+    if (auth.loginType === LOGIN_SUPPLIER) {
+      const sheetSupplier = String(sh.getRange(rowId, idx[HD.supplier] + 1).getValue() || "").trim().toLowerCase();
+      if (sheetSupplier !== auth.supplier.toLowerCase()) {
+        return output_({ ok: false, error: "Unauthorized" }, e);
+      }
+    }
+    sh.getRange(rowId, idx[HD.completed] + 1).setValue(CompletedRaw);
+    return output_({ ok: true }, e);
+  }
+  if (auth.loginType !== LOGIN_MASTER && auth.loginType !== LOGIN_ACCOUNTMANAGER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const sh = invoiceSheet_();
+  const { idx } = read_(sh);
+  mustHave_(idx, [HI.completed, HI.accountmanager]);
+  if (auth.loginType === LOGIN_ACCOUNTMANAGER) {
+    const rowAm = String(sh.getRange(rowId, idx[HI.accountmanager] + 1).getValue() || "").trim().toLowerCase();
+    if (rowAm !== auth.accountmanager.toLowerCase()) {
+      return output_({ ok: false, error: "Unauthorized" }, e);
+    }
+  }
+  sh.getRange(rowId, idx[HI.completed] + 1).setValue(CompletedRaw);
+  return output_({ ok: true }, e);
+}
+
+/* =========================
+ * TEMPLATES
+ * ========================= */
+function listTemplates_(e, sheetName, allowedRoles) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  if (!allowedRoles.includes(auth.loginType)) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const sh = getSheetOrThrow_(sheetName);
+  const values = sh.getDataRange().getValues();
+  if (values.length < 2) return output_({ ok: true, templates: [] }, e);
+  const hdr = values[0].map(String);
+  const idx = indexMap_(hdr);
+  mustHave_(idx, ["ID", "Language", "Label", "Subject", "Body"]);
+  const templates = [];
+  for (let i = 1; i < values.length; i++) {
+    const r = values[i];
+    const id = String(r[idx["ID"]] || "").trim();
+    const language = String(r[idx["Language"]] || "").trim().toLowerCase();
+    const label = String(r[idx["Label"]] || "").trim();
+    const subject = String(r[idx["Subject"]] || "").trim();
+    const body = String(r[idx["Body"]] || "").trim();
+    if (!id || !label) continue;
+    templates.push({ id, language, label, subject, body });
+  }
+  return output_({ ok: true, templates }, e);
+}
+
+function upsertTemplate_(e, sheetName, maxCount, allowedRoles) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  if (!allowedRoles.includes(auth.loginType)) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const sh = getSheetOrThrow_(sheetName);
+  const values = sh.getDataRange().getValues();
+  if (values.length < 1) throw new Error(`Sheet is empty: ${sheetName}`);
+  const hdr = values[0].map(String);
+  const idx = indexMap_(hdr);
+  mustHave_(idx, ["ID", "Language", "Label", "Subject", "Body"]);
+  const idParam = String(e?.parameter?.id || "").trim();
+  const language = String(e?.parameter?.language || "en").trim().toLowerCase();
+  const label = String(e?.parameter?.label || "").trim();
+  const subject = String(e?.parameter?.subject || "").trim();
+  const body = String(e?.parameter?.body || "").trim();
+  if (!label) return output_({ ok: false, error: "Missing label" }, e);
+  let foundRow = 0;
+  if (idParam) {
+    for (let r = 2; r <= values.length; r++) {
+      const cur = String(values[r - 1][idx["ID"]] || "").trim();
+      if (cur === idParam) {
+        foundRow = r;
+        break;
+      }
+    }
+  }
+  if (!foundRow && typeof maxCount === "number") {
+    let count = 0;
+    for (let i = 1; i < values.length; i++) {
+      if (String(values[i][idx["ID"]] || "").trim()) count++;
+    }
+    if (count >= maxCount) {
+      return output_({ ok: false, error: `Max ${maxCount} templates reached` }, e);
+    }
+  }
+  const id = foundRow ? idParam : Utilities.getUuid();
+  if (!foundRow) {
+    const newRow = new Array(sh.getLastColumn()).fill("");
+    newRow[idx["ID"]] = id;
+    newRow[idx["Language"]] = language;
+    newRow[idx["Label"]] = label;
+    newRow[idx["Subject"]] = subject;
+    newRow[idx["Body"]] = body;
+    sh.appendRow(newRow);
+    return output_({ ok: true, id, mode: "insert" }, e);
+  }
+  sh.getRange(foundRow, idx["Language"] + 1).setValue(language);
+  sh.getRange(foundRow, idx["Label"] + 1).setValue(label);
+  sh.getRange(foundRow, idx["Subject"] + 1).setValue(subject);
+  sh.getRange(foundRow, idx["Body"] + 1).setValue(body);
+  return output_({ ok: true, id, mode: "update" }, e);
+}
+
+/* =========================
+ * MAIL LOG
+ * ========================= */
+function logMail_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  if (auth.loginType !== LOGIN_MASTER && auth.loginType !== LOGIN_ACCOUNTMANAGER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const mode = normalizeMode_(e?.parameter?.mode);
+  const sheetName = mode === MODE_INVOICE ? MAIL_LOG_2_SHEET : MAIL_LOG_SHEET;
+  const sh = getSheetOrThrow_(sheetName);
+  const { idx } = read_(sh);
+  mustHave_(idx, ["Timestamp", "RowID", "Customer", "OrderID", "To", "Kind", "Language", "Template", "Subject"]);
+  const RowID = String(e?.parameter?.RowID || "").trim();
+  if (!RowID) return output_({ ok: false, error: "Missing RowID" }, e);
+  const newRow = new Array(sh.getLastColumn()).fill("");
+  newRow[idx["Timestamp"]] = new Date();
+  newRow[idx["RowID"]] = RowID;
+  newRow[idx["Customer"]] = String(e?.parameter?.Customer || "").trim();
+  newRow[idx["OrderID"]] = String(e?.parameter?.OrderID || "").trim();
+  newRow[idx["To"]] = String(e?.parameter?.To || "").trim();
+  newRow[idx["Kind"]] = String(e?.parameter?.Kind || "").trim();
+  newRow[idx["Language"]] = String(e?.parameter?.Language || "").trim();
+  newRow[idx["Template"]] = String(e?.parameter?.Template || "").trim();
+  newRow[idx["Subject"]] = String(e?.parameter?.Subject || "").trim();
+  sh.appendRow(newRow);
+  return output_({ ok: true }, e);
+}
+
+function listMailLog_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  if (auth.loginType !== LOGIN_MASTER && auth.loginType !== LOGIN_ACCOUNTMANAGER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const mode = normalizeMode_(e?.parameter?.mode);
+  const sheetName = mode === MODE_INVOICE ? MAIL_LOG_2_SHEET : MAIL_LOG_SHEET;
+  const sh = getSheetOrThrow_(sheetName);
+  const RowID = String(e?.parameter?.RowID || "").trim();
+  if (!RowID) return output_({ ok: false, error: "Missing RowID" }, e);
+  const values = sh.getDataRange().getValues();
+  if (values.length < 2) return output_({ ok: true, rows: [] }, e);
+  const hdr = values[0].map(String);
+  const idx = indexMap_(hdr);
+  mustHave_(idx, ["Timestamp", "RowID", "Template", "Subject"]);
+  const out = [];
+  for (let i = values.length - 1; i >= 1; i--) {
+    const r = values[i];
+    if (String(r[idx["RowID"]] || "").trim() !== RowID) continue;
+    out.push({
+      Timestamp: formatTs_(r[idx["Timestamp"]]),
+      Template: String(r[idx["Template"]] || "").trim() || "-",
+      Subject: String(r[idx["Subject"]] || "").trim() || "-",
+    });
+    if (out.length >= 50) break;
+  }
+  return output_({ ok: true, rows: out }, e);
+}
+
+/* =========================
+ * HELPERS — DELIVERY
+ * ========================= */
+function suppliersSheet_() { return getSheetOrThrow_(SUPPLIERS_SHEET); }
+function accountmanagerSheet_() { return getSheetOrThrow_(ACCOUNTMANAGER_SHEET); }
+function dropshipSheet_() { return getSheetOrThrow_(DROPSHIP_SHEET); }
+function invoiceSheet_() { return getSheetOrThrow_(INVOICE_SHEET); }
+
+function findSupplierByKey_(key) {
+  const sh = suppliersSheet_();
+  const values = sh.getDataRange().getValues();
+  for (let i = 1; i < values.length; i++) {
+    const supplier = String(values[i][0] || "").trim();
+    const k = String(values[i][2] || "").trim();
+    if (k && k === key && supplier) return supplier;
+  }
+  return "";
+}
+
+function findKeyBySupplier_(supplierName) {
+  const needle = String(supplierName || "").trim().toLowerCase();
+  if (!needle) return "";
+  const sh = suppliersSheet_();
+  const values = sh.getDataRange().getValues();
+  for (let i = 1; i < values.length; i++) {
+    const supplier = String(values[i][0] || "").trim().toLowerCase();
+    const key = String(values[i][2] || "").trim();
+    if (supplier === needle) return key;
+  }
+  return "";
+}
+
+function buildSupplierMailMap_() {
+  const sh = suppliersSheet_();
+  const values = sh.getDataRange().getValues();
+  const map = {};
+  for (let i = 1; i < values.length; i++) {
+    const supplier = String(values[i][0] || "").trim();
+    const mail = String(values[i][1] || "").trim();
+    if (supplier && mail) map[supplier.toLowerCase()] = mail;
+  }
+  return map;
+}
+
+function buildSupplierKeyMap_() {
+  const sh = suppliersSheet_();
+  const values = sh.getDataRange().getValues();
+  const map = {};
+  for (let i = 1; i < values.length; i++) {
+    const supplier = String(values[i][0] || "").trim();
+    const key = String(values[i][2] || "").trim();
+    if (supplier && key) map[supplier.toLowerCase()] = key;
+  }
+  return map;
+}
+
+function findAccountmanagerByKey_(key) {
+  const sh = accountmanagerSheet_();
+  const values = sh.getDataRange().getValues();
+  for (let i = 1; i < values.length; i++) {
+    const accountmanager = String(values[i][0] || "").trim();
+    const mailAccountmanager = String(values[i][1] || "").trim();
+    const amKey = String(values[i][2] || "").trim();
+    if (amKey && amKey === key && accountmanager) {
+      return { accountmanager, mailAccountmanager };
+    }
+  }
+  return null;
+}
+
+function findMailByAccountmanager_(accountmanagerName) {
+  const needle = String(accountmanagerName || "").trim().toLowerCase();
+  if (!needle) return "";
+  const sh = accountmanagerSheet_();
+  const values = sh.getDataRange().getValues();
+  for (let i = 1; i < values.length; i++) {
+    const name = String(values[i][0] || "").trim().toLowerCase();
+    const mail = String(values[i][1] || "").trim();
+    if (name === needle) return mail;
+  }
+  return "";
+}
+
+function resolveAuthFromKey_(e) {
+  const supplierKey = String(e?.parameter?.supplierKey || "").trim();
+  if (!supplierKey) return { ok: false, error: "Missing supplierKey" };
+  if (MASTER_KEYS.includes(supplierKey)) {
+    return {
+      ok: true,
+      loginType: LOGIN_MASTER,
+      supplierKey,
+      supplier: MASTER_NAME,
+      accountmanager: "",
+      mailAccountmanager: "",
+    };
+  }
+  const supplier = findSupplierByKey_(supplierKey);
+  if (supplier) {
+    return {
+      ok: true,
+      loginType: LOGIN_SUPPLIER,
+      supplierKey,
+      supplier,
+      accountmanager: "",
+      mailAccountmanager: "",
+    };
+  }
+  const am = findAccountmanagerByKey_(supplierKey);
+  if (am) {
+    return {
+      ok: true,
+      loginType: LOGIN_ACCOUNTMANAGER,
+      supplierKey,
+      supplier: "",
+      accountmanager: am.accountmanager,
+      mailAccountmanager: am.mailAccountmanager,
+    };
+  }
+  return { ok: false, error: "Unauthorized" };
+}
+
+function requireRoles_(e, roles) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok || !roles.includes(auth.loginType)) {
+    throw new Error("Unauthorized");
+  }
+  return auth;
+}
+
+function normalizeMode_(mode) {
+  const m = String(mode || MODE_DROPSHIP).trim().toLowerCase();
+  return m === MODE_INVOICE ? MODE_INVOICE : MODE_DROPSHIP;
+}
+
+function getSheetOrThrow_(name) {
+  const sh = SpreadsheetApp.getActive().getSheetByName(name);
+  if (!sh) throw new Error(`Sheet not found: ${name}`);
+  return sh;
+}
+
+function read_(sh) {
+  const values = sh.getDataRange().getValues();
+  const headers = values[0].map(String);
+  const rows = values.slice(1);
+  const idx = {};
+  headers.forEach((h, i) => (idx[h] = i));
+  return { headers, rows, idx };
+}
+
+function mustHave_(idx, headers) {
+  for (const h of headers) {
+    if (idx[h] === undefined) throw new Error(`Missing column header: ${h}`);
   }
 }
-function logout(){
-  supplier="";supplierKey="";loginType="";accountmanagerName="";accountmanagerMail="";currentMode=ORDER_MODE_DROPSHIP;
-  orders=[];selected=null;suppliersList=[];suppliersMailMap={};suppliersKeyMap={};accountmanagersList=[];accountmanagersMailMap={};
-  indepTemplates=[];customerTemplates=[];supplierTemplates=[];invoiceTemplates=[];invoiceCustomerTemplates=[];aftersalesTemplates=[];
-  sessionStorage.clear();
-  showLogin();
+
+function indexMap_(headers) {
+  const idx = {};
+  headers.forEach((h, i) => (idx[String(h)] = i));
+  return idx;
 }
-$("pickGmail").addEventListener("click",()=>{if(!pendingMail)return;openGmailCompose(pendingMail.to,pendingMail.cc||"",pendingMail.subject,pendingMail.body);const cb=pendingMail.afterOpen;closeMailPicker();clearActiveMailButtons_();if(typeof cb==="function") cb();});
-$("pickApple").addEventListener("click",()=>{if(!pendingMail)return;openAppleMail(pendingMail.to,pendingMail.cc||"",pendingMail.subject,pendingMail.body);const cb=pendingMail.afterOpen;closeMailPicker();clearActiveMailButtons_();if(typeof cb==="function") cb();});
-$("pickCancel").addEventListener("click",closeMailPicker);
-$("mailPicker").addEventListener("click",e=>{if(e.target===$("mailPicker")) closeMailPicker();});
-$("newOrderBtn").addEventListener("click",()=>{prepareCreateModal_();$("newOrderModal").classList.remove("hidden");});
-$("newOrderClose").addEventListener("click",()=>$("newOrderModal").classList.add("hidden"));
-$("newOrderModal").addEventListener("click",e=>{if(e.target===$("newOrderModal")) $("newOrderModal").classList.add("hidden");});
-$("loginBtn").addEventListener("click",()=>doLogin());
-$("keyInput").addEventListener("keydown",e=>{if(e.key==="Enter") doLogin();});
-$("logoutBtn").addEventListener("click",logout);
-$("saveBtn").addEventListener("click",save);
-$("createBtn").addEventListener("click",createOrder);
-$("historySearch").addEventListener("input",renderOrders);
-$("editCustomerSave").addEventListener("click",()=>upsertTemplate_("customer_upsert",findTpl_(customerTemplates,$("editCustomerLang").value)?.id||"",$("editCustomerLang").value,"DEFAULT",$("editCustomerSubject").value.trim(),$("editCustomerBodyText").value.trim(),$("editCustomerMsg"),loadAllTemplates_));
-$("editSupplierSave").addEventListener("click",()=>upsertTemplate_("supplier_upsert",findTpl_(supplierTemplates,$("editSupplierLang").value)?.id||"",$("editSupplierLang").value,"DEFAULT",$("editSupplierSubject").value.trim(),$("editSupplierBodyText").value.trim(),$("editSupplierMsg"),loadAllTemplates_));
-$("editInvoiceCustomerSave").addEventListener("click",()=>upsertTemplate_("customer2_upsert",findTpl_(invoiceCustomerTemplates,$("editInvoiceCustomerLang").value)?.id||"",$("editInvoiceCustomerLang").value,"DEFAULT",$("editInvoiceCustomerSubject").value.trim(),$("editInvoiceCustomerBodyText").value.trim(),$("editInvoiceCustomerMsg"),loadAllTemplates_));
-$("indepSave").addEventListener("click",()=>upsertTemplate_("indep_upsert",$("indepSave").dataset.editId||"",$("indepLang").value,$("indepLabel").value.trim(),$("indepSubject").value.trim(),$("indepBodyText").value.trim(),$("indepSaveMsg"),async()=>{resetIndepEditor_();await loadAllTemplates_();}));
-$("invoiceTemplateSave").addEventListener("click",()=>upsertTemplate_("invoice_template_upsert",$("invoiceTemplateSave").dataset.editId||"",$("invoiceTemplateLang").value,$("invoiceTemplateLabel").value.trim(),$("invoiceTemplateSubject").value.trim(),$("invoiceTemplateBodyText").value.trim(),$("invoiceTemplateSaveMsg"),async()=>{resetInvoiceTemplateEditor_();await loadAllTemplates_();}));
-$("aftersalesTemplateSave").addEventListener("click",()=>upsertTemplate_("aftersales_template_upsert",$("aftersalesTemplateSave").dataset.editId||"",$("aftersalesTemplateLang").value,$("aftersalesTemplateLabel").value.trim(),$("aftersalesTemplateSubject").value.trim(),$("aftersalesTemplateBodyText").value.trim(),$("aftersalesTemplateSaveMsg"),async()=>{resetAftersalesTemplateEditor_();await loadAllTemplates_();}));
-$("indepCancel").addEventListener("click",resetIndepEditor_);
-$("invoiceTemplateCancel").addEventListener("click",resetInvoiceTemplateEditor_);
-$("aftersalesTemplateCancel").addEventListener("click",resetAftersalesTemplateEditor_);
-$("editCustomerLang").addEventListener("change",()=>fillCustomerEditorFromLang_($("editCustomerLang").value));
-$("editSupplierLang").addEventListener("change",()=>fillSupplierEditorFromLang_($("editSupplierLang").value));
-$("editInvoiceCustomerLang").addEventListener("change",()=>fillInvoiceCustomerEditorFromLang_($("editInvoiceCustomerLang").value));
-$("mc_en").addEventListener("click",e=>mailCustomer("en",e.currentTarget));
-$("mc_nl").addEventListener("click",e=>mailCustomer("nl",e.currentTarget));
-$("mc_de").addEventListener("click",e=>mailCustomer("de",e.currentTarget));
-$("mc_fr").addEventListener("click",e=>mailCustomer("fr",e.currentTarget));
-$("ms_en").addEventListener("click",e=>mailSupplier("en",e.currentTarget));
-$("ms_nl").addEventListener("click",e=>mailSupplier("nl",e.currentTarget));
-$("modeDropshipBtn").addEventListener("click",()=>setMode(ORDER_MODE_DROPSHIP));
-$("modeInvoiceBtn").addEventListener("click",()=>setMode(ORDER_MODE_INVOICE));
-setupToggle("mailTemplatesToggle","mailTemplatesBody","mailTemplatesPlus");
-setupToggle("addIndepToggle","addIndepBody","addIndepPlus",resetIndepEditor_);
-setupToggle("addInvoiceTemplateToggle","addInvoiceTemplateBody","addInvoiceTemplatePlus",resetInvoiceTemplateEditor_);
-setupToggle("addAftersalesTemplateToggle","addAftersalesTemplateBody","addAftersalesTemplatePlus",resetAftersalesTemplateEditor_);
-setupToggle("editCustomerToggle","editCustomerBody","editCustomerPlus");
-setupToggle("editSupplierToggle","editSupplierBody","editSupplierPlus");
-setupToggle("editInvoiceCustomerToggle","editInvoiceCustomerBody","editInvoiceCustomerPlus");
-setupToggle("mailLogToggle","mailLogBody","mailLogPlus");
-setupToggle("completedToggle","completedBody","completedPlus");
-(function init(){
-  bindTokenButtons_();
-  const k=sessionStorage.getItem("supplier_key")||"";
-  const s=sessionStorage.getItem("supplier_name")||"";
-  const lt=sessionStorage.getItem("login_type")||"";
-  const am=sessionStorage.getItem("accountmanager_name")||"";
-  const amm=sessionStorage.getItem("accountmanager_mail")||"";
-  if(k){
-    supplierKey=k; supplier=s; loginType=lt; accountmanagerName=am; accountmanagerMail=amm;
-    currentMode=isAccountmanagerLogin()?ORDER_MODE_INVOICE:ORDER_MODE_DROPSHIP;
-    showPortal();
-    $("newOrderBtn").classList.toggle("hidden",!canCreateOrders());
-    applyModeUI_();
-    (async()=>{
-      if(isMasterLogin()) await loadSuppliers_();
-      await loadAllTemplates_();
-      await loadOrders();
-    })();
+
+function isTruthy_(v) {
+  const s = String(v || "").trim().toUpperCase();
+  return s === "TRUE" || s === "YES" || s === "1";
+}
+
+function formatTs_(v) {
+  if (!v) return "";
+  try {
+    const d = v instanceof Date ? v : new Date(v);
+    return Utilities.formatDate(d, Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm:ss");
+  } catch (_) {
+    return String(v);
+  }
+}
+
+function output_(obj, e) {
+  const json = JSON.stringify(obj);
+  const cb = e && e.parameter && e.parameter.callback ? String(e.parameter.callback) : "";
+  const body = cb ? `${cb}(${json});` : json;
+  const out = ContentService.createTextOutput(body);
+  out.setMimeType(ContentService.MimeType.JAVASCRIPT);
+  return out;
+}
+
+/* ============================================================================================================================================================================================
+ * GARANTIES & REPARATIES
+ * ============================================================================================================================================================================================ */
+
+// ------ Sheet aanmaken als die nog niet bestaat ---------------------------------------------------------------------------------------------------------
+function war_getOrCreate_(name, headers) {
+  let sh = SpreadsheetApp.getActive().getSheetByName(name);
+  if (!sh) {
+    sh = SpreadsheetApp.getActive().insertSheet(name);
+    sh.getRange(1, 1, 1, headers.length).setValues([headers])
+      .setFontWeight("bold").setBackground("#f0f4f8");
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
+// ------ Cases ophalen ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function war_getOrders_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  const sh = war_getOrCreate_(WAR_CASES_SHEET, [
+    "CaseNumber","Customer","MailCustomer","Supplier","Product","PurchaseDate",
+    "InvoiceNumber","InvoiceLink","Complaint","Photos","Status","SupplierRef",
+    "Notes","Completed","Created"
+  ]);
+  const values = sh.getDataRange().getValues();
+  if (values.length < 2) return output_({ ok: true, orders: [] }, e);
+  const headers = values[0].map(String);
+  const idx = indexMap_(headers);
+  const orders = [];
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+    const customer = String(row[idx["Customer"]] || "").trim();
+    const supplier  = String(row[idx["Supplier"]] || "").trim();
+    if (!customer) continue;
+    // Leverancier ziet alleen zijn eigen cases
+    if (auth.loginType === LOGIN_SUPPLIER &&
+        supplier.toLowerCase() !== auth.supplier.toLowerCase()) continue;
+    const obj = { rowId: i + 1 };
+    headers.forEach((h, j) => { obj[h] = row[j]; });
+    obj.Completed = isTruthy_(row[idx["Completed"]]);
+    orders.push(obj);
+  }
+  return output_({ ok: true, orders }, e);
+}
+
+// ------ Nieuwe case aanmaken ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function war_create_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  if (auth.loginType !== LOGIN_MASTER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const sh = war_getOrCreate_(WAR_CASES_SHEET, [
+    "CaseNumber","Customer","MailCustomer","Supplier","Product","PurchaseDate",
+    "InvoiceNumber","InvoiceLink","Complaint","Photos","Status","SupplierRef",
+    "Notes","Completed","Created"
+  ]);
+  const now  = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm");
+  const cnum = "WG" + new Date().getTime().toString().slice(-6);
+  sh.appendRow([
+    cnum,
+    String(e?.parameter?.Customer     || ""),
+    String(e?.parameter?.MailCustomer || ""),
+    String(e?.parameter?.Supplier     || ""),
+    String(e?.parameter?.Product      || ""),
+    String(e?.parameter?.PurchaseDate || ""),
+    String(e?.parameter?.InvoiceNumber|| ""),
+    String(e?.parameter?.InvoiceLink  || ""),
+    String(e?.parameter?.Complaint    || ""),
+    String(e?.parameter?.Photos       || ""),
+    "new", "", "", "FALSE", now
+  ]);
+  return output_({ ok: true }, e);
+}
+
+// ------ Veld updaten (status, notes, ref, photos, completed) ---------------------------------------------------------------
+function war_updateField_(e, fieldName) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  const rowId = Number(e?.parameter?.rowId);
+  if (!rowId || rowId < 2) return output_({ ok: false, error: "Invalid rowId" }, e);
+  const sh = SpreadsheetApp.getActive().getSheetByName(WAR_CASES_SHEET);
+  if (!sh) return output_({ ok: false, error: "Warranties sheet niet gevonden" }, e);
+  const headers = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String);
+  const idx = indexMap_(headers);
+  if (idx[fieldName] === undefined) {
+    return output_({ ok: false, error: `Kolom niet gevonden: ${fieldName}` }, e);
+  }
+  // Leverancier mag alleen zijn eigen rijen aanpassen
+  if (auth.loginType === LOGIN_SUPPLIER) {
+    const supCol = idx["Supplier"];
+    if (supCol !== undefined) {
+      const rowSupplier = String(sh.getRange(rowId, supCol + 1).getValue() || "").trim().toLowerCase();
+      if (rowSupplier !== auth.supplier.toLowerCase()) {
+        return output_({ ok: false, error: "Unauthorized" }, e);
+      }
+    }
+  }
+  const val = e?.parameter?.[fieldName] !== undefined
+    ? String(e.parameter[fieldName])
+    : String(e?.parameter?.value || "");
+  sh.getRange(rowId, idx[fieldName] + 1).setValue(val);
+  return output_({ ok: true }, e);
+}
+
+// ------ Leveranciers ophalen ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function war_getSuppliers_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  const sh = war_getOrCreate_(WAR_SUPPLIERS_SHEET, [
+    "ID","Name","Brand","Email","EmailGeneral","Contact","Phone",
+    "Website","Country","RmaLink","Warranty","Address","Notes"
+  ]);
+  const values = sh.getDataRange().getValues();
+  if (values.length < 2) return output_({ ok: true, suppliers: [], mailMap: {} }, e);
+  const headers = values[0].map(String);
+  const idx = indexMap_(headers);
+  const suppliers = [];
+  const mailMap   = {};
+  for (let i = 1; i < values.length; i++) {
+    const row  = values[i];
+    const name = String(row[idx["Name"]] || "").trim();
+    if (!name) continue;
+    const obj = { id: i + 1 };
+    headers.forEach((h, j) => { obj[h] = row[j]; });
+    suppliers.push(obj);
+    mailMap[name.toLowerCase()] = String(row[idx["Email"]] || "").trim();
+  }
+  return output_({ ok: true, suppliers, mailMap }, e);
+}
+
+// ------ Leverancier aanmaken / bijwerken ---------------------------------------------------------------------------------------------------------------------------
+function war_upsertSupplier_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  if (auth.loginType !== LOGIN_MASTER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const sh  = war_getOrCreate_(WAR_SUPPLIERS_SHEET, [
+    "ID","Name","Brand","Email","EmailGeneral","Contact","Phone",
+    "Website","Country","RmaLink","Warranty","Address","Notes"
+  ]);
+  const id  = Number(e?.parameter?.id || 0);
+  const row = [
+    id || (sh.getLastRow() + 1),
+    String(e?.parameter?.Name         || ""),
+    String(e?.parameter?.Brand        || ""),
+    String(e?.parameter?.Email        || ""),
+    String(e?.parameter?.EmailGeneral || ""),
+    String(e?.parameter?.Contact      || ""),
+    String(e?.parameter?.Phone        || ""),
+    String(e?.parameter?.Website      || ""),
+    String(e?.parameter?.Country      || ""),
+    String(e?.parameter?.RmaLink      || ""),
+    String(e?.parameter?.Warranty     || ""),
+    String(e?.parameter?.Address      || ""),
+    String(e?.parameter?.Notes        || ""),
+  ];
+  if (id && id > 1) {
+    sh.getRange(id, 1, 1, row.length).setValues([row]);
   } else {
-    showLogin();
+    row[0] = sh.getLastRow() + 1;
+    sh.appendRow(row);
   }
-})();
-</script>
-</body>
-</html>
+  return output_({ ok: true }, e);
+}
+
+// ------ Leverancier verwijderen ---------------------------------------------------------------------------------------------------------------------------------------------------------
+function war_deleteSupplier_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  if (auth.loginType !== LOGIN_MASTER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const id = Number(e?.parameter?.id || 0);
+  if (!id || id <= 1) return output_({ ok: false, error: "Ongeldige id" }, e);
+  const sh = SpreadsheetApp.getActive().getSheetByName(WAR_SUPPLIERS_SHEET);
+  if (!sh) return output_({ ok: false, error: "Sheet niet gevonden" }, e);
+  sh.deleteRow(id);
+  return output_({ ok: true }, e);
+}
+
+// ------ Templates ophalen ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function war_getTemplates_(e, sheetName) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  const sh = war_getOrCreate_(sheetName, ["ID","Language","Label","Subject","Body"]);
+  const values = sh.getDataRange().getValues();
+  if (values.length < 2) return output_({ ok: true, templates: [] }, e);
+  const headers = values[0].map(String);
+  const idx     = indexMap_(headers);
+  const templates = [];
+  for (let i = 1; i < values.length; i++) {
+    const row   = values[i];
+    const label = String(row[idx["Label"]] || "").trim();
+    if (!label) continue;
+    templates.push({
+      id:       i + 1,
+      language: String(row[idx["Language"]] || "").trim().toLowerCase(),
+      label,
+      subject:  String(row[idx["Subject"]]  || "").trim(),
+      body:     String(row[idx["Body"]]     || "").trim(),
+    });
+  }
+  return output_({ ok: true, templates }, e);
+}
+
+// ------ Template aanmaken / bijwerken ---------------------------------------------------------------------------------------------------------------------------------------
+function war_upsertTemplate_(e, sheetName) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  if (auth.loginType !== LOGIN_MASTER) {
+    return output_({ ok: false, error: "Unauthorized" }, e);
+  }
+  const sh  = war_getOrCreate_(sheetName, ["ID","Language","Label","Subject","Body"]);
+  const id  = Number(e?.parameter?.id || 0);
+  const row = [
+    id || (sh.getLastRow() + 1),
+    String(e?.parameter?.language || "nl"),
+    String(e?.parameter?.label    || ""),
+    String(e?.parameter?.subject  || ""),
+    String(e?.parameter?.body     || ""),
+  ];
+  if (id && id > 1) {
+    sh.getRange(id, 1, 1, row.length).setValues([row]);
+  } else {
+    row[0] = sh.getLastRow() + 1;
+    sh.appendRow(row);
+  }
+  return output_({ ok: true }, e);
+}
+
+// ------ Mail log schrijven ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function war_logMail_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  const sh  = war_getOrCreate_(WAR_LOG_SHEET,
+    ["Timestamp","RowID","To","Kind","Language","Template","Subject"]);
+  const now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm");
+  sh.appendRow([
+    now,
+    String(e?.parameter?.rowId    || ""),
+    String(e?.parameter?.To       || ""),
+    String(e?.parameter?.Kind     || ""),
+    String(e?.parameter?.Language || ""),
+    String(e?.parameter?.Template || ""),
+    String(e?.parameter?.Subject  || ""),
+  ]);
+  return output_({ ok: true }, e);
+}
+
+// ------ Mail log ophalen ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function war_getMailLog_(e) {
+  const auth = resolveAuthFromKey_(e);
+  if (!auth.ok) return output_(auth, e);
+  const rowId = String(e?.parameter?.rowId || "").trim();
+  const sh    = SpreadsheetApp.getActive().getSheetByName(WAR_LOG_SHEET);
+  if (!sh) return output_({ ok: true, rows: [] }, e);
+  const values = sh.getDataRange().getValues();
+  if (values.length < 2) return output_({ ok: true, rows: [] }, e);
+  const headers = values[0].map(String);
+  const idx     = indexMap_(headers);
+  const rows    = [];
+  for (let i = values.length - 1; i >= 1; i--) {
+    const r = values[i];
+    if (String(r[idx["RowID"]] || "").trim() !== rowId) continue;
+    rows.push({
+      Timestamp: formatTs_(r[idx["Timestamp"]]),
+      Template:  String(r[idx["Template"]] || "").trim() || "-",
+      Subject:   String(r[idx["Subject"]]  || "").trim() || "-",
+    });
+    if (rows.length >= 25) break;
+  }
+  return output_({ ok: true, rows }, e);
+}
