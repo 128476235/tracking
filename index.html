@@ -114,7 +114,7 @@
     .toggleRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px dashed var(--border);background:var(--soft);border-radius:12px;cursor:pointer;user-select:none}
     .plusSym{font-weight:700;font-size:18px;line-height:1;color:var(--muted)}
     .flag{display:inline-flex;align-items:center;line-height:1}
-    .flag svg{width:20px;height:14px;display:block;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+    .flag svg{width:16px;height:11px;display:block;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
     .mailGrid{margin-top:10px}
     .flagRow{display:flex;gap:8px;flex-wrap:wrap}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -273,7 +273,7 @@
                     </div>
                     <label>Subject</label><input id="invoiceTemplateSubject" />
                     <label>Body</label><textarea id="invoiceTemplateBodyText" rows="7"></textarea>
-                    <div class="tokenRow">
+                    <div class="tokenRow" id="invoiceTemplateTokenRow">
                       <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
                       <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
                       <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
@@ -297,7 +297,7 @@
                     </div>
                     <label>Subject</label><input id="aftersalesTemplateSubject" />
                     <label>Body</label><textarea id="aftersalesTemplateBodyText" rows="7"></textarea>
-                    <div class="tokenRow">
+                    <div class="tokenRow" id="aftersalesTemplateTokenRow">
                       <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
                       <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
                       <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
@@ -320,7 +320,7 @@
                 </div>
                 <label>Subject</label><input id="editInvoiceCustomerSubject" />
                 <label>Body</label><textarea id="editInvoiceCustomerBodyText" rows="7"></textarea>
-                <div class="tokenRow">
+                <div class="tokenRow" id="editInvoiceCustomerTokenRow">
                   <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
                   <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
                   <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
@@ -494,10 +494,10 @@ let orders=[], selected=null, suppliersList=[], suppliersMailMap={}, suppliersKe
 let indepTemplates=[], customerTemplates=[], supplierTemplates=[], invoiceTemplates=[], invoiceCustomerTemplates=[], aftersalesTemplates=[];
 let lastFocusedField=null, pendingMail=null, currentItems=[];
 const FLAG_SVG={
-  en:'<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#00247D"/><path d="M0,0 L3,2 M3,0 L0,2" stroke="#fff" stroke-width="0.4"/><path d="M0,0 L3,2 M3,0 L0,2" stroke="#CF142B" stroke-width="0.2"/><path d="M1.5,0 V2 M0,1 H3" stroke="#fff" stroke-width="0.6"/><path d="M1.5,0 V2 M0,1 H3" stroke="#CF142B" stroke-width="0.3"/></svg>',
-  nl:'<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#21468B"/><rect width="3" height="1.333" fill="#fff"/><rect width="3" height="0.667" fill="#AE1C28"/></svg>',
-  de:'<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#FFCE00"/><rect width="3" height="1.333" fill="#DD0000"/><rect width="3" height="0.667" fill="#000"/></svg>',
-  fr:'<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>'
+  en:'<svg width="16" height="11" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#00247D"/><path d="M0,0 L3,2 M3,0 L0,2" stroke="#fff" stroke-width="0.4"/><path d="M0,0 L3,2 M3,0 L0,2" stroke="#CF142B" stroke-width="0.2"/><path d="M1.5,0 V2 M0,1 H3" stroke="#fff" stroke-width="0.6"/><path d="M1.5,0 V2 M0,1 H3" stroke="#CF142B" stroke-width="0.3"/></svg>',
+  nl:'<svg width="16" height="11" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#21468B"/><rect width="3" height="1.333" fill="#fff"/><rect width="3" height="0.667" fill="#AE1C28"/></svg>',
+  de:'<svg width="16" height="11" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#FFCE00"/><rect width="3" height="1.333" fill="#DD0000"/><rect width="3" height="0.667" fill="#000"/></svg>',
+  fr:'<svg width="16" height="11" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>'
 };
 function escapeHTML(s){return String(s||"").replace(/[&<>\"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
 function normalizeKey(k){return String(k||"").trim().toLowerCase().replace(/\s+/g," ");}
@@ -522,7 +522,8 @@ function tokenMap(){
   const surf=getAny(selected,["Surfcenter order","SurfcenterOrder"])||"";
   const accName=getAny(selected,["Accountmanager"])||accountmanagerName||"";
   const accMail=accountmanagersMailMap[String(accName).toLowerCase()]||getAny(selected,["Mail Accountmanager","MailAccountmanager"])||accountmanagerMail||"";
-  return {
+  const items=parseItems_(selected);
+  const map={
     "{{Customer}}":firstNameFromCustomer_(fullCustomer),
     "{{CustomerFull}}":fullCustomer,
     "{{DropshipmentOrder}}":drop,
@@ -534,12 +535,31 @@ function tokenMap(){
     "{{SupplierKey}}":rowSupKey||supplierKey,
     "{{Accountmanager}}":accName,
     "{{MailAccountmanager}}":accMail,
-    "{{Items}}":parseItems_(selected).map(i=>`- ${i}`).join("\n")
+    "{{Items}}":items.map(i=>`- ${i}`).join("\n")
   };
+  for(let i=1;i<=10;i++) map[`{{Product${i}}}`]=items[i-1]||"";
+  return map;
 }
 function applyTokens(txt){let out=String(txt||"");const m=tokenMap();for(const k of Object.keys(m)) out=out.split(k).join(String(m[k]||""));return out;}
 function insertAtCursor_(el, text){if(!el)return;const start=typeof el.selectionStart==="number"?el.selectionStart:el.value.length;const end=typeof el.selectionEnd==="number"?el.selectionEnd:el.value.length;el.value=el.value.slice(0,start)+text+el.value.slice(end);const pos=start+text.length;if(el.setSelectionRange)el.setSelectionRange(pos,pos);el.focus&&el.focus();}
-function bindTokenButtons_(){document.querySelectorAll("button[data-token]").forEach(btn=>btn.addEventListener("click",()=>{insertAtCursor_(lastFocusedField||$("indepBodyText")||$("invoiceTemplateBodyText")||$("aftersalesTemplateBodyText")||$("editInvoiceCustomerBodyText")||$("editCustomerBodyText")||$("editSupplierBodyText"),btn.getAttribute("data-token"));}));}
+function bindTokenButtons_(){
+  document.addEventListener("click",e=>{
+    const btn=e.target.closest("button[data-token]");
+    if(!btn) return;
+    insertAtCursor_(lastFocusedField||$("indepBodyText")||$("invoiceTemplateBodyText")||$("aftersalesTemplateBodyText")||$("editInvoiceCustomerBodyText")||$("editCustomerBodyText")||$("editSupplierBodyText"),btn.getAttribute("data-token"));
+  });
+}
+function productTokenButtonsHtml_(){
+  let html="";
+  for(let i=1;i<=10;i++) html+=`<button class="btn small" type="button" data-token="{{Product${i}}}">{{Product${i}}}</button>`;
+  return html;
+}
+function insertProductTokenButtons_(){
+  ["invoiceTemplateTokenRow","editInvoiceCustomerTokenRow","aftersalesTemplateTokenRow"].forEach(id=>{
+    const el=$(id);
+    if(el) el.insertAdjacentHTML("beforeend",productTokenButtonsHtml_());
+  });
+}
 document.addEventListener("focusin",e=>{const el=e.target;const tag=(el?.tagName||"").toLowerCase();if(tag==="input"||tag==="textarea") lastFocusedField=el;});
 function setupToggle(toggleId, bodyId, plusId, onOpen){const t=$(toggleId), b=$(bodyId), p=$(plusId);if(!t||!b||!p)return;t.addEventListener("click",()=>{const hidden=b.classList.toggle("hidden");p.textContent=hidden?"+":"-";if(!hidden&&typeof onOpen==="function") onOpen();});}
 function clearActiveMailButtons_(){document.querySelectorAll(".flagRow .btn.active").forEach(b=>b.classList.remove("active"));}
@@ -1148,6 +1168,7 @@ setupToggle("mailLogToggle","mailLogBody","mailLogPlus");
 setupToggle("completedToggle","completedBody","completedPlus");
 (function init(){
   bindTokenButtons_();
+  insertProductTokenButtons_();
   const k=sessionStorage.getItem("supplier_key")||"";
   const s=sessionStorage.getItem("supplier_name")||"";
   const lt=sessionStorage.getItem("login_type")||"";
