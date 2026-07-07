@@ -113,8 +113,7 @@
     .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.2px;font-weight:700}
     .toggleRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px dashed var(--border);background:var(--soft);border-radius:12px;cursor:pointer;user-select:none}
     .plusSym{font-weight:700;font-size:18px;line-height:1;color:var(--muted)}
-    .flag{display:inline-flex;align-items:center;line-height:1}
-    .flag svg{width:16px;height:11px;display:block;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+    .flag{font-size:16px;line-height:1}
     .mailGrid{margin-top:10px}
     .flagRow{display:flex;gap:8px;flex-wrap:wrap}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -408,6 +407,14 @@
             </table>
           </div>
         </div>
+        <div id="contactsWrap" class="hidden" style="margin-top:12px">
+          <div class="divider"></div>
+          <div class="toggleRow" id="contactsToggle"><div class="sectionTitle">Contacts</div><div class="plusSym" id="contactsPlus">+</div></div>
+          <div id="contactsBody" class="hidden" style="margin-top:10px">
+            <input id="contactsSearch" placeholder="Search contacts..." style="width:100%;margin-bottom:10px" />
+            <div id="contactsList" style="display:flex;flex-direction:column;gap:8px"></div>
+          </div>
+        </div>
       </section>
     </div>
   </div>
@@ -428,6 +435,7 @@
     <div id="invoiceCreateFields" class="hidden">
       <label>Customer</label><input id="newInvoiceCustomer" />
       <label>Mail Customer</label><input id="newInvoiceMailCustomer" type="email" />
+      <div class="hint" id="newInvoiceDuplicateHint"></div>
       <label>Language</label>
       <select id="newInvoiceLanguage">
         <option value="English">English</option>
@@ -443,6 +451,7 @@
         <input id="newInvoicePhoneNumber" type="tel" placeholder="6 12345678" style="flex:1" />
       </div>
       <label id="newInvoiceOrderLabel">Invoice</label><input id="newInvoiceSurfOrder" />
+      <div class="hint" id="newInvoiceOrderNumberHint"></div>
     </div>
     <div class="row" style="margin-top:12px;justify-content:flex-end"><button id="createBtn" class="btn primary" type="button">Add order</button></div>
     <div class="hint" id="createMsg"></div>
@@ -493,12 +502,7 @@ let supplier="", supplierKey="", loginType="", accountmanagerName="", accountman
 let orders=[], selected=null, suppliersList=[], suppliersMailMap={}, suppliersKeyMap={}, accountmanagersList=[], accountmanagersMailMap={};
 let indepTemplates=[], customerTemplates=[], supplierTemplates=[], invoiceTemplates=[], invoiceCustomerTemplates=[], aftersalesTemplates=[];
 let lastFocusedField=null, pendingMail=null, currentItems=[];
-const FLAG_SVG={
-  en:'<svg width="16" height="11" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#00247D"/><path d="M0,0 L3,2 M3,0 L0,2" stroke="#fff" stroke-width="0.4"/><path d="M0,0 L3,2 M3,0 L0,2" stroke="#CF142B" stroke-width="0.2"/><path d="M1.5,0 V2 M0,1 H3" stroke="#fff" stroke-width="0.6"/><path d="M1.5,0 V2 M0,1 H3" stroke="#CF142B" stroke-width="0.3"/></svg>',
-  nl:'<svg width="16" height="11" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#21468B"/><rect width="3" height="1.333" fill="#fff"/><rect width="3" height="0.667" fill="#AE1C28"/></svg>',
-  de:'<svg width="16" height="11" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#FFCE00"/><rect width="3" height="1.333" fill="#DD0000"/><rect width="3" height="0.667" fill="#000"/></svg>',
-  fr:'<svg width="16" height="11" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>'
-};
+const FLAG_EMOJI={en:"\u{1F1EC}\u{1F1E7}",nl:"\u{1F1F3}\u{1F1F1}",de:"\u{1F1E9}\u{1F1EA}",fr:"\u{1F1EB}\u{1F1F7}"};
 function escapeHTML(s){return String(s||"").replace(/[&<>\"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
 function normalizeKey(k){return String(k||"").trim().toLowerCase().replace(/\s+/g," ");}
 function getAny(obj, keys){if(!obj)return "";const map={};for(const k of Object.keys(obj)) map[normalizeKey(k)]=k;for(const want of keys){const hit=map[normalizeKey(want)];if(hit){const v=obj[hit];if(v!==undefined&&v!==null&&String(v).trim()!=="") return String(v).trim();}}return "";}
@@ -585,7 +589,7 @@ function populateCountrySelects_(){
 }
 function paintStaticFlags_(){
   const map={ms_en:"en",ms_nl:"nl"};
-  Object.keys(map).forEach(id=>{const btn=$(id); const span=btn&&btn.querySelector(".flag"); if(span) span.innerHTML=FLAG_SVG[map[id]];});
+  Object.keys(map).forEach(id=>{const btn=$(id); const span=btn&&btn.querySelector(".flag"); if(span) span.textContent=FLAG_EMOJI[map[id]];});
 }
 function combinePhone_(dial, local){const digits=String(local||"").replace(/\D/g,"").replace(/^0+/,"");return digits?`+${dial}${digits}`:"";}
 function splitPhoneForEdit_(full){
@@ -613,7 +617,7 @@ async function loadSuppliers_(){
   accountmanagersList.forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;$("newInvoiceAccountmanagerSelect").appendChild(o);});
 }
 function findTpl_(arr, lang){const l=String(lang||"").toLowerCase();return arr.find(x=>String(x.language||"").toLowerCase()===l&&String(x.label||"").toUpperCase()==="DEFAULT")||arr.find(x=>String(x.language||"").toLowerCase()===l)||null;}
-function langFlag_(lang){const l=String(lang||"").toLowerCase().trim();if(l==="nl"||l==="dutch"||l==="nederlands")return FLAG_SVG.nl;if(l==="de"||l==="german"||l==="deutsch")return FLAG_SVG.de;if(l==="fr"||l==="french"||l==="francais")return FLAG_SVG.fr;if(l==="en"||l==="english")return FLAG_SVG.en;return "";}
+function langFlag_(lang){const l=String(lang||"").toLowerCase().trim();if(l==="nl"||l==="dutch"||l==="nederlands")return FLAG_EMOJI.nl;if(l==="de"||l==="german"||l==="deutsch")return FLAG_EMOJI.de;if(l==="fr"||l==="french"||l==="francais")return FLAG_EMOJI.fr;if(l==="en"||l==="english")return FLAG_EMOJI.en;return "";}
 async function loadAllTemplates_(){
   if(isMasterLogin()){
     const a=await api_(`action=indep_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); indepTemplates=a?.ok&&Array.isArray(a.templates)?a.templates:[];
@@ -852,10 +856,9 @@ async function sendInvoiceTemplate_(tpl){
   const cc=selectedAccountmanagerCC_();
   const subject=applyTokens(tpl.subject||"");
   const body=applyTokens(tpl.body||"");
-  const waText=subject?`${subject}\n\n${body}`:body;
   openMailPicker({
     to,cc,subject,body,
-    whatsapp: phone?{phone,text:waText}:null,
+    whatsapp: phone?{phone,text:body}:null,
     afterOpen:async(via)=>{
       await logMail_({to:to||phone,kind:via==="whatsapp"?"whatsapp":"independent",language:String(tpl.language||"").toLowerCase(),template:tpl.label||"",subject});
       $("invoiceSendMsg").innerHTML='<span style="color:var(--ok)">Sent.</span>';
@@ -870,10 +873,9 @@ async function sendAftersalesTemplate_(tpl){
   const cc=ACCOUNTMANAGER_TEMPLATE_CC;
   const subject=applyTokens(tpl.subject||"");
   const body=applyTokens(tpl.body||"");
-  const waText=subject?`${subject}\n\n${body}`:body;
   openMailPicker({
     to,cc,subject,body,
-    whatsapp: phone?{phone,text:waText}:null,
+    whatsapp: phone?{phone,text:body}:null,
     afterOpen:async(via)=>{
       await logMail_({to:to||phone,kind:via==="whatsapp"?"whatsapp":"independent",language:String(tpl.language||"").toLowerCase(),template:tpl.label||"",subject});
       $("aftersalesSendMsg").innerHTML='<span style="color:var(--ok)">Sent.</span>';
@@ -904,6 +906,7 @@ function applyModeUI_(){
   $("dropshipEditorsWrap").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
   $("mailLogSection").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
   $("completedWrap").classList.remove("hidden");
+  $("contactsWrap").classList.toggle("hidden", !(invoiceLike && (isMasterLogin() || isAccountmanagerLogin())));
   $("newOrderBtn").title=invoiceLike?"Add invoice order":"Add new order";
   $("surfOrderCaption").textContent=invoiceLike?"Invoice":"Surfcenter order";
   $("newInvoiceOrderLabel").textContent="Invoice";
@@ -967,6 +970,7 @@ function renderOrders(){
   document.querySelectorAll("button[data-open]").forEach(btn=>btn.addEventListener("click",()=>openRow(Number(btn.dataset.open))));
   document.querySelectorAll("input[data-toggle-completed]").forEach(cb=>cb.addEventListener("click",e=>e.stopPropagation()));
   document.querySelectorAll("input[data-toggle-completed]").forEach(cb=>cb.addEventListener("change",()=>toggleOrderCompleted_(Number(cb.dataset.toggleCompleted),cb)));
+  renderContacts_();
 }
 async function openRow(rowId){
   clearActiveMailButtons_();
@@ -1020,8 +1024,85 @@ async function save(){
   $("msg").innerHTML="<span style='color:var(--ok)'>Saved.</span>";
   await loadOrders();
 }
+function buildContacts_(){
+  const map=new Map();
+  orders.forEach(o=>{
+    const name=getAny(o,["Customer"]);
+    if(!name) return;
+    const mail=getAny(o,["Mail Customer","MailCustomer"]);
+    const key=(name+"|"+mail).toLowerCase();
+    if(map.has(key)) return;
+    map.set(key,{
+      Customer:name,
+      MailCustomer:mail,
+      Phone:getAny(o,["Phone","WhatsApp","Phone Number","PhoneNumber"]),
+      Accountmanager:getAny(o,["Accountmanager"])||accountmanagerName,
+      Language:getAny(o,["Language"])||"English"
+    });
+  });
+  return Array.from(map.values());
+}
+function fillInvoiceCreateFieldsFromContact_(c){
+  $("newInvoiceCustomer").value=c.Customer||"";
+  $("newInvoiceMailCustomer").value=c.MailCustomer||"";
+  $("newInvoiceLanguage").value=c.Language||"English";
+  if(isMasterLogin() && c.Accountmanager){
+    const opt=Array.from($("newInvoiceAccountmanagerSelect").options).find(o=>o.value.toLowerCase()===c.Accountmanager.toLowerCase());
+    if(opt) $("newInvoiceAccountmanagerSelect").value=opt.value;
+  }
+  if(c.Phone){
+    const split=splitPhoneForEdit_(c.Phone);
+    $("newInvoicePhoneCountry").value=split.dial;
+    $("newInvoicePhoneNumber").value=split.local;
+  }
+}
+function openCreateModalForContact_(c){
+  prepareCreateModal_();
+  fillInvoiceCreateFieldsFromContact_(c);
+  $("newOrderModal").classList.remove("hidden");
+  $("newInvoiceSurfOrder").focus();
+}
+function renderContacts_(){
+  const wrap=$("contactsList");
+  if(!wrap) return;
+  const q=($("contactsSearch").value||"").trim().toLowerCase();
+  const contacts=buildContacts_().filter(c=>!q||`${c.Customer} ${c.MailCustomer} ${c.Accountmanager}`.toLowerCase().includes(q));
+  wrap.innerHTML="";
+  if(!contacts.length){wrap.innerHTML='<div class="muted" style="font-size:13px">No contacts yet.</div>';return;}
+  contacts.forEach((c,i)=>{
+    const row=document.createElement("div");
+    row.className="savedTemplateRow";
+    const metaBits=[c.MailCustomer,c.Phone,isMasterLogin()?c.Accountmanager:""].filter(Boolean);
+    row.innerHTML=`<div class="savedLeft"><div style="min-width:0"><div class="tplName">${escapeHTML(c.Customer)}</div><div class="tplMeta">${escapeHTML(metaBits.join(" - "))}</div></div></div><button class="btn openBtn" type="button" data-contact-new="${i}">New order</button>`;
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll("button[data-contact-new]").forEach(btn=>btn.addEventListener("click",()=>openCreateModalForContact_(contacts[Number(btn.dataset.contactNew)])));
+}
+function checkDuplicateCustomer_(){
+  const hint=$("newInvoiceDuplicateHint");
+  const name=$("newInvoiceCustomer").value.trim().toLowerCase();
+  const mail=$("newInvoiceMailCustomer").value.trim().toLowerCase();
+  if(!name && !mail){hint.innerHTML="";return;}
+  const match=buildContacts_().find(c=>(name && c.Customer.toLowerCase()===name)||(mail && c.MailCustomer.toLowerCase()===mail));
+  if(!match){hint.innerHTML="";return;}
+  hint.innerHTML=`<span style="color:var(--warn)">Existing customer: ${escapeHTML(match.Customer)}${match.MailCustomer?" ("+escapeHTML(match.MailCustomer)+")":""}.</span> <button class="btn small" type="button" id="useDuplicateBtn">Use these details</button>`;
+  $("useDuplicateBtn").addEventListener("click",()=>{
+    fillInvoiceCreateFieldsFromContact_(match);
+    hint.innerHTML="";
+    $("newInvoiceSurfOrder").focus();
+  });
+}
+function checkDuplicateOrderNumber_(){
+  const hint=$("newInvoiceOrderNumberHint");
+  const val=$("newInvoiceSurfOrder").value.trim().toLowerCase();
+  if(!val){hint.innerHTML="";return;}
+  const match=orders.find(o=>getAny(o,["Surfcenter order","SurfcenterOrder"]).toLowerCase()===val);
+  hint.innerHTML=match?`<span style="color:var(--warn)">This number is already used for ${escapeHTML(getAny(match,["Customer"]))}.</span>`:"";
+}
 function prepareCreateModal_(){
   $("createMsg").textContent="";
+  $("newInvoiceDuplicateHint").innerHTML="";
+  $("newInvoiceOrderNumberHint").innerHTML="";
   const invoiceLike = isInvoiceMode() || isAccountmanagerLogin();
   $("newOrderModalTitle").textContent=invoiceLike?"New invoice order":"New order";
   $("dropshipCreateFields").classList.toggle("hidden",!(isDropshipMode() && !isAccountmanagerLogin()));
@@ -1135,6 +1216,10 @@ $("logoutBtn").addEventListener("click",logout);
 $("saveBtn").addEventListener("click",save);
 $("createBtn").addEventListener("click",createOrder);
 $("historySearch").addEventListener("input",renderOrders);
+$("contactsSearch").addEventListener("input",renderContacts_);
+$("newInvoiceCustomer").addEventListener("input",checkDuplicateCustomer_);
+$("newInvoiceMailCustomer").addEventListener("input",checkDuplicateCustomer_);
+$("newInvoiceSurfOrder").addEventListener("input",checkDuplicateOrderNumber_);
 $("editCustomerSave").addEventListener("click",()=>upsertTemplate_("customer_upsert",findTpl_(customerTemplates,$("editCustomerLang").value)?.id||"",$("editCustomerLang").value,"DEFAULT",$("editCustomerSubject").value.trim(),$("editCustomerBodyText").value.trim(),$("editCustomerMsg"),loadAllTemplates_));
 $("editSupplierSave").addEventListener("click",()=>upsertTemplate_("supplier_upsert",findTpl_(supplierTemplates,$("editSupplierLang").value)?.id||"",$("editSupplierLang").value,"DEFAULT",$("editSupplierSubject").value.trim(),$("editSupplierBodyText").value.trim(),$("editSupplierMsg"),loadAllTemplates_));
 $("editInvoiceCustomerSave").addEventListener("click",()=>upsertTemplate_("customer2_upsert",findTpl_(invoiceCustomerTemplates,$("editInvoiceCustomerLang").value)?.id||"",$("editInvoiceCustomerLang").value,"DEFAULT",$("editInvoiceCustomerSubject").value.trim(),$("editInvoiceCustomerBodyText").value.trim(),$("editInvoiceCustomerMsg"),loadAllTemplates_));
@@ -1166,6 +1251,7 @@ setupToggle("editSupplierToggle","editSupplierBody","editSupplierPlus");
 setupToggle("editInvoiceCustomerToggle","editInvoiceCustomerBody","editInvoiceCustomerPlus");
 setupToggle("mailLogToggle","mailLogBody","mailLogPlus");
 setupToggle("completedToggle","completedBody","completedPlus");
+setupToggle("contactsToggle","contactsBody","contactsPlus",renderContacts_);
 (function init(){
   bindTokenButtons_();
   insertProductTokenButtons_();
