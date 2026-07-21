@@ -221,7 +221,17 @@
             <div class="hint" id="notesMsg"></div>
           </div>
           <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
-            <div class="mailGrid" id="dropshipMailGrid">
+            <div class="mailGrid grid2" id="dropshipMailGrid">
+              <div id="customerMailBox">
+                <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
+                <div class="flagRow">
+                  <button class="btn mailFlagBtn" id="mc_en" type="button"><span class="flag"></span></button>
+                  <button class="btn mailFlagBtn" id="mc_nl" type="button"><span class="flag"></span></button>
+                  <button class="btn mailFlagBtn" id="mc_de" type="button"><span class="flag"></span></button>
+                  <button class="btn mailFlagBtn" id="mc_fr" type="button"><span class="flag"></span></button>
+                </div>
+                <div class="hint" id="mailCustomerMsg"></div>
+              </div>
               <div id="supplierMailBox">
                 <div class="sectionTitle" style="margin-bottom:8px">Mail supplier</div>
                 <div class="flagRow">
@@ -588,7 +598,7 @@ function populateCountrySelects_(){
   });
 }
 function paintStaticFlags_(){
-  const map={ms_en:"en",ms_nl:"nl"};
+  const map={ms_en:"en",ms_nl:"nl",mc_en:"en",mc_nl:"nl",mc_de:"de",mc_fr:"fr"};
   Object.keys(map).forEach(id=>{const btn=$(id); const span=btn&&btn.querySelector(".flag"); if(span) span.textContent=FLAG_EMOJI[map[id]];});
 }
 function combinePhone_(dial, local){const digits=String(local||"").replace(/\D/g,"").replace(/^0+/,"");return digits?`+${dial}${digits}`:"";}
@@ -817,6 +827,7 @@ async function toggleOrderCompleted_(rowId, checkbox){
   renderOrders();
 }
 function supplierDraftFromLang_(lang){const t=findTpl_(supplierTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
+function customerDraftFromLang_(lang){const t=findTpl_(customerTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
 function selectedCustomerMail_(){return getAny(selected,["Mail Customer","MailCustomer"]);}
 function selectedAccountmanagerCC_(){const m=tokenMap();return m["{{MailAccountmanager}}"]||"";}
 async function mailSupplier(lang, btn){
@@ -831,6 +842,22 @@ async function mailSupplier(lang, btn){
     afterOpen:async()=>{
       await logMail_({to,kind:"supplier",language:lang,template:`Mail supplier ${lang.toUpperCase()}`,subject:tpl.subject});
       $("mailSupplierMsg").innerHTML='<span style="color:var(--ok)">Mail opened.</span>';
+      await loadMailLog_();
+    }
+  });
+}
+async function mailCustomer(lang, btn){
+  if(!selected||!isDropshipMode()) return;
+  if(btn) setBtnActive_(btn);
+  const to=selectedCustomerMail_();
+  if(!to){$("mailCustomerMsg").innerHTML="<span style='color:var(--warn)'>No customer email found.</span>";return;}
+  const cc=selectedAccountmanagerCC_();
+  const tpl=customerDraftFromLang_(lang);
+  openMailPicker({
+    to,cc,subject:tpl.subject,body:tpl.body,
+    afterOpen:async()=>{
+      await logMail_({to,kind:"customer",language:lang,template:`Mail customer ${lang.toUpperCase()}`,subject:tpl.subject});
+      $("mailCustomerMsg").innerHTML='<span style="color:var(--ok)">Mail opened.</span>';
       await loadMailLog_();
     }
   });
@@ -892,6 +919,7 @@ function applyModeUI_(){
   $("supplierBlock").classList.toggle("hidden", !isDropshipMode());
   $("primaryOrderCaption").classList.toggle("hidden", !isDropshipMode());
   $("primaryOrderLabel").classList.toggle("hidden", !isDropshipMode());
+  $("customerMailBox").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
   $("supplierMailBox").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
   $("dropshipMailGrid").classList.toggle("hidden", invoiceLike);
   $("invoiceExtrasWrap").classList.toggle("hidden", !invoiceLike);
@@ -1232,6 +1260,10 @@ $("aftersalesTemplateCancel").addEventListener("click",resetAftersalesTemplateEd
 $("editCustomerLang").addEventListener("change",()=>fillCustomerEditorFromLang_($("editCustomerLang").value));
 $("editSupplierLang").addEventListener("change",()=>fillSupplierEditorFromLang_($("editSupplierLang").value));
 $("editInvoiceCustomerLang").addEventListener("change",()=>fillInvoiceCustomerEditorFromLang_($("editInvoiceCustomerLang").value));
+$("mc_en").addEventListener("click",e=>mailCustomer("en",e.currentTarget));
+$("mc_nl").addEventListener("click",e=>mailCustomer("nl",e.currentTarget));
+$("mc_de").addEventListener("click",e=>mailCustomer("de",e.currentTarget));
+$("mc_fr").addEventListener("click",e=>mailCustomer("fr",e.currentTarget));
 $("ms_en").addEventListener("click",e=>mailSupplier("en",e.currentTarget));
 $("ms_nl").addEventListener("click",e=>mailSupplier("nl",e.currentTarget));
 $("savePhoneBtn").addEventListener("click",savePhone_);
@@ -1278,4 +1310,3 @@ setupToggle("contactsToggle","contactsBody","contactsPlus",renderContacts_);
 </script>
 </body>
 </html>
-
