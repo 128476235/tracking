@@ -150,7 +150,7 @@
       <div class="brand"><img src="logo.png" alt="Logo"></div>
       <div class="row topRightTools">
         <button id="newOrderBtn" class="btn icon hidden" type="button" title="Add new order"><span style="font-weight:700;font-size:20px;line-height:1">+</span></button>
-        <button id="logoutBtn" class="btn" type="button" title="Logout">Logout</button>
+        <button id="logoutBtn" class="btn icon" type="button" title="Logout">&#9211;</button>
       </div>
     </header>
     <div id="modeWrap" class="modeWrap hidden">
@@ -239,6 +239,18 @@
                   <button class="btn mailFlagBtn" id="ms_nl" type="button"><span class="flag"></span></button>
                 </div>
                 <div class="hint" id="mailSupplierMsg"></div>
+              </div>
+            </div>
+            <div class="mailGrid hidden" id="invoiceMailGrid">
+              <div id="invoiceCustomerMailBox">
+                <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
+                <div class="flagRow">
+                  <button class="btn mailFlagBtn" id="imc_en" type="button"><span class="flag"></span></button>
+                  <button class="btn mailFlagBtn" id="imc_nl" type="button"><span class="flag"></span></button>
+                  <button class="btn mailFlagBtn" id="imc_de" type="button"><span class="flag"></span></button>
+                  <button class="btn mailFlagBtn" id="imc_fr" type="button"><span class="flag"></span></button>
+                </div>
+                <div class="hint" id="mailInvoiceCustomerMsg"></div>
               </div>
             </div>
             <div id="mailTemplatesWrap" class="hidden">
@@ -598,7 +610,7 @@ function populateCountrySelects_(){
   });
 }
 function paintStaticFlags_(){
-  const map={ms_en:"en",ms_nl:"nl",mc_en:"en",mc_nl:"nl",mc_de:"de",mc_fr:"fr"};
+  const map={ms_en:"en",ms_nl:"nl",mc_en:"en",mc_nl:"nl",mc_de:"de",mc_fr:"fr",imc_en:"en",imc_nl:"nl",imc_de:"de",imc_fr:"fr"};
   Object.keys(map).forEach(id=>{const btn=$(id); const span=btn&&btn.querySelector(".flag"); if(span) span.textContent=FLAG_EMOJI[map[id]];});
 }
 function combinePhone_(dial, local){const digits=String(local||"").replace(/\D/g,"").replace(/^0+/,"");return digits?`+${dial}${digits}`:"";}
@@ -828,6 +840,7 @@ async function toggleOrderCompleted_(rowId, checkbox){
 }
 function supplierDraftFromLang_(lang){const t=findTpl_(supplierTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
 function customerDraftFromLang_(lang){const t=findTpl_(customerTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
+function invoiceCustomerDraftFromLang_(lang){const t=findTpl_(invoiceCustomerTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
 function selectedCustomerMail_(){return getAny(selected,["Mail Customer","MailCustomer"]);}
 function selectedAccountmanagerCC_(){const m=tokenMap();return m["{{MailAccountmanager}}"]||"";}
 async function mailSupplier(lang, btn){
@@ -858,6 +871,24 @@ async function mailCustomer(lang, btn){
     afterOpen:async()=>{
       await logMail_({to,kind:"customer",language:lang,template:`Mail customer ${lang.toUpperCase()}`,subject:tpl.subject});
       $("mailCustomerMsg").innerHTML='<span style="color:var(--ok)">Mail opened.</span>';
+      await loadMailLog_();
+    }
+  });
+}
+async function mailInvoiceCustomer(lang, btn){
+  if(!selected||!isInvoiceMode()) return;
+  if(btn) setBtnActive_(btn);
+  const to=selectedCustomerMail_();
+  const phone=selectedPhone_();
+  if(!to && !phone){$("mailInvoiceCustomerMsg").innerHTML="<span style='color:var(--warn)'>No customer email or phone found.</span>";return;}
+  const cc=selectedAccountmanagerCC_();
+  const tpl=invoiceCustomerDraftFromLang_(lang);
+  openMailPicker({
+    to,cc,subject:tpl.subject,body:tpl.body,
+    whatsapp: phone?{phone,text:tpl.body}:null,
+    afterOpen:async(via)=>{
+      await logMail_({to:to||phone,kind:via==="whatsapp"?"whatsapp":"customer",language:lang,template:`Mail customer ${lang.toUpperCase()}`,subject:tpl.subject});
+      $("mailInvoiceCustomerMsg").innerHTML='<span style="color:var(--ok)">Mail opened.</span>';
       await loadMailLog_();
     }
   });
@@ -922,6 +953,7 @@ function applyModeUI_(){
   $("customerMailBox").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
   $("supplierMailBox").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
   $("dropshipMailGrid").classList.toggle("hidden", invoiceLike);
+  $("invoiceMailGrid").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()));
   $("invoiceExtrasWrap").classList.toggle("hidden", !invoiceLike);
   $("trackingFieldsWrap").classList.toggle("hidden", false);
   $("saveBtn").parentElement.classList.toggle("hidden", !(isMasterLogin() || isSupplierLogin() || isAccountmanagerLogin()));
@@ -1264,6 +1296,10 @@ $("mc_en").addEventListener("click",e=>mailCustomer("en",e.currentTarget));
 $("mc_nl").addEventListener("click",e=>mailCustomer("nl",e.currentTarget));
 $("mc_de").addEventListener("click",e=>mailCustomer("de",e.currentTarget));
 $("mc_fr").addEventListener("click",e=>mailCustomer("fr",e.currentTarget));
+$("imc_en").addEventListener("click",e=>mailInvoiceCustomer("en",e.currentTarget));
+$("imc_nl").addEventListener("click",e=>mailInvoiceCustomer("nl",e.currentTarget));
+$("imc_de").addEventListener("click",e=>mailInvoiceCustomer("de",e.currentTarget));
+$("imc_fr").addEventListener("click",e=>mailInvoiceCustomer("fr",e.currentTarget));
 $("ms_en").addEventListener("click",e=>mailSupplier("en",e.currentTarget));
 $("ms_nl").addEventListener("click",e=>mailSupplier("nl",e.currentTarget));
 $("savePhoneBtn").addEventListener("click",savePhone_);
