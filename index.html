@@ -162,6 +162,7 @@
     <header>
       <div class="brand"><img src="logo.png" alt="Logo"></div>
       <div class="row topRightTools">
+        <button id="triggerScrapeBtn" class="btn small hidden" type="button" title="Scrape nu vanuit Count IT">Scrape</button>
         <button id="newOrderBtn" class="btn icon hidden" type="button" title="Add new order"><span style="font-weight:700;font-size:20px;line-height:1">+</span></button>
         <button id="logoutBtn" class="btn icon" type="button" title="Logout">&#9211;</button>
       </div>
@@ -194,10 +195,6 @@
         <div class="modeSwitch">
           <button id="modeWebshopBtn" class="modeBtn" type="button">Webshop</button>
           <button id="modeInvoiceBtn" class="modeBtn active" type="button">Invoice</button>
-        </div>
-        <div class="row" style="align-items:center;gap:10px;margin-top:10px">
-          <button id="triggerScrapeBtn" class="btn small" type="button">Scrape nu vanuit Count IT</button>
-          <span class="hint" id="triggerScrapeMsg"></span>
         </div>
       </div>
     </div>
@@ -541,7 +538,7 @@
   </div>
 </div>
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbywMHpgKJnmchF_0XvHtGGScmjOKjzszIEP0ryY-0sYsJD5X7rX81tQpoiWdY8kNqwh/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbzvWlndryYNwqn3m0zVHb0wseGDRz1jRqqQJHztY8hlbLkeqw4WUamjLz1I73vzAqEX/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -1019,11 +1016,11 @@ function setMode(mode){
 async function triggerScrapeClick_(btn){
   if(!isMasterLogin()) return;
   btn.disabled=true;
-  $("triggerScrapeMsg").textContent="Bezig met starten...";
+  btn.textContent="...";
   const data=await api_(`action=trigger_scrape&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
   btn.disabled=false;
-  if(!data?.ok){$("triggerScrapeMsg").innerHTML=`<span style="color:var(--bad)">${escapeHTML(data?.error||"Mislukt")}</span>`;return;}
-  $("triggerScrapeMsg").innerHTML='<span style="color:var(--ok)">Scrape gestart, kan enkele minuten duren. Herlaad daarna de orders.</span>';
+  btn.textContent="Scrape";
+  btn.title=data?.ok?"Scrape gestart, kan enkele minuten duren. Herlaad daarna de orders.":(data?.error||"Mislukt");
 }
 async function loadOrders(){
   selected=null;
@@ -1457,6 +1454,7 @@ async function doLogin(withKey){
     currentMode=isSupplierLogin()?ORDER_MODE_DROPSHIP:ORDER_MODE_INVOICE;
     showPortal();
     $("newOrderBtn").classList.toggle("hidden",!canCreateOrders());
+    $("triggerScrapeBtn").classList.toggle("hidden",!isMasterLogin());
     if(isWarehouseLogin()){
       enterWarehouseView_();
     }else{
@@ -1480,6 +1478,7 @@ function logout(){
   whPoRows=[];whSalesRows=[];
   $("warehouseView").classList.add("hidden");
   $("modeWrap").classList.remove("hidden");
+  $("triggerScrapeBtn").classList.add("hidden");
   document.querySelector(".two").classList.remove("hidden");
   sessionStorage.clear();
   showLogin();
@@ -1734,6 +1733,7 @@ setupToggle("contactsToggle","contactsBody","contactsPlus");
     currentMode=isSupplierLogin()?ORDER_MODE_DROPSHIP:ORDER_MODE_INVOICE;
     showPortal();
     $("newOrderBtn").classList.toggle("hidden",!canCreateOrders());
+    $("triggerScrapeBtn").classList.toggle("hidden",!isMasterLogin());
     if(isWarehouseLogin()){
       enterWarehouseView_();
     }else{
