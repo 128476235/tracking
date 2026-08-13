@@ -62,7 +62,6 @@
     }
     textarea{resize:vertical}
     input:not([type="checkbox"]):focus,select:focus,textarea:focus{border-color:rgba(15,23,42,.18);box-shadow:0 0 0 4px rgba(15,23,42,.06)}
-    .completedCheckbox{width:18px;height:18px;cursor:pointer;accent-color:var(--primary)}
     select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:none}
     .btn{
       border:1px solid var(--border);background:#fff;color:var(--text);
@@ -76,6 +75,7 @@
     .btn:disabled{opacity:.55;cursor:not-allowed}
     .btn.small{padding:8px 10px;border-radius:10px;font-size:12px;font-weight:500}
     .btn.icon{width:46px;height:46px;padding:0;border-radius:14px;background:#fff;border:1px solid var(--border);color:var(--text);box-shadow:0 4px 10px rgba(15,23,42,.06)}
+    .btn.iconWide{height:46px;padding:0 16px;border-radius:14px;background:#fff;border:1px solid var(--border);color:var(--text);box-shadow:0 4px 10px rgba(15,23,42,.06);font-size:13px;font-weight:600}
     .btn.active{border-color:rgba(15,23,42,.2);box-shadow:0 0 0 4px rgba(15,23,42,.05)}
     .btn.openBtn{min-height:36px;padding:0 12px;border-radius:11px;font-weight:500;font-size:13px;box-shadow:none}
     .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end}
@@ -109,7 +109,6 @@
     .statusCell{text-align:center}
     .statusWrap{width:100%;display:flex;justify-content:center}
     .actionsCell{white-space:nowrap;display:flex;gap:8px;justify-content:flex-start;align-items:center;flex-wrap:nowrap}
-    .completedCell{text-align:center;width:60px}
     .sectionTitle{font-size:12px;color:var(--muted);letter-spacing:.2px;font-weight:700}
     .toggleRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px dashed var(--border);background:var(--soft);border-radius:12px;cursor:pointer;user-select:none}
     .plusSym{font-weight:700;font-size:18px;line-height:1;color:var(--muted)}
@@ -161,7 +160,7 @@
     <header>
       <div class="brand"><img src="logo.png" alt="Logo"></div>
       <div class="row topRightTools">
-        <button id="triggerScrapeBtn" class="btn small hidden" type="button" title="Scrape nu vanuit Count IT">Scrape</button>
+        <button id="triggerScrapeBtn" class="btn iconWide hidden" type="button" title="Scrape nu vanuit Count IT">Scrape</button>
         <button id="newOrderBtn" class="btn icon hidden" type="button" title="Add new order"><span style="font-weight:700;font-size:20px;line-height:1">+</span></button>
         <button id="logoutBtn" class="btn icon" type="button" title="Logout">&#9211;</button>
       </div>
@@ -455,16 +454,16 @@
       <section class="card colStretch">
         <input id="historySearch" placeholder="Zoek op naam, e-mail of ordernummer..." style="width:100%;margin-bottom:12px" />
         <table class="table">
-          <thead><tr><th style="width:60%">Customer</th><th style="width:170px;text-align:center">Status</th><th style="width:260px">Action</th><th class="completedCell">Completed</th></tr></thead>
-          <tbody id="tbodyOpen"><tr><td colspan="4" class="muted">Loading...</td></tr></tbody>
+          <thead><tr><th style="width:60%">Customer</th><th style="width:170px;text-align:center">Status</th><th style="width:260px">Action</th></tr></thead>
+          <tbody id="tbodyOpen"><tr><td colspan="3" class="muted">Loading...</td></tr></tbody>
         </table>
         <div id="completedWrap" class="hidden" style="margin-top:12px">
           <div class="divider"></div>
           <div class="toggleRow" id="completedToggle"><div class="sectionTitle">Completed</div><div class="plusSym" id="completedPlus">+</div></div>
           <div id="completedBody" class="hidden" style="margin-top:10px">
             <table class="table">
-              <thead><tr><th style="width:60%">Customer</th><th style="width:170px;text-align:center">Status</th><th style="width:260px">Action</th><th class="completedCell">Completed</th></tr></thead>
-              <tbody id="tbodyCompleted"><tr><td colspan="4" class="muted">No completed orders.</td></tr></tbody>
+              <thead><tr><th style="width:60%">Customer</th><th style="width:170px;text-align:center">Status</th><th style="width:260px">Action</th></tr></thead>
+              <tbody id="tbodyCompleted"><tr><td colspan="3" class="muted">No completed orders.</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -832,22 +831,6 @@ async function addNote_(){
   $("notesMsg").innerHTML='<span style="color:var(--ok)">Note added.</span>';
   renderNotes_();
 }
-async function setCompleted(o, val){
-  const modeToUse=isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode;
-  const data=await api_(`action=complete&supplierKey=${encodeURIComponent(supplierKey)}&${orderAddressQS_(o)}&Completed=${encodeURIComponent(val?"TRUE":"FALSE")}&mode=${encodeURIComponent(modeToUse)}`).catch(()=>null);
-  return data?.ok?{ok:true}:{ok:false};
-}
-async function toggleOrderCompleted_(key, checkbox){
-  const o=orders.find(x=>orderKey_(x)===key);
-  if(!o) return;
-  checkbox.disabled=true;
-  const res=await setCompleted(o, checkbox.checked);
-  checkbox.disabled=false;
-  if(!res.ok){checkbox.checked=!checkbox.checked;return;}
-  o.Completed=checkbox.checked?"TRUE":"FALSE";
-  if(selected && orderKey_(selected)===key) selected.Completed=o.Completed;
-  renderOrders();
-}
 function supplierDraftFromLang_(lang){const t=findTpl_(supplierTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
 function customerDraftFromLang_(lang){const t=findTpl_(customerTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
 function invoiceCustomerDraftFromLang_(lang){const t=findTpl_(invoiceCustomerTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
@@ -1035,8 +1018,8 @@ async function loadOrders(){
   const data=await jsonp(url).catch(()=>null);
   if(!data?.ok){
     const err=escapeHTML(data?.error||"Error");
-    $("tbodyOpen").innerHTML=`<tr><td colspan="4" class='muted'>${err}</td></tr>`;
-    $("tbodyCompleted").innerHTML=`<tr><td colspan="4" class='muted'>${err}</td></tr>`;
+    $("tbodyOpen").innerHTML=`<tr><td colspan="3" class='muted'>${err}</td></tr>`;
+    $("tbodyCompleted").innerHTML=`<tr><td colspan="3" class='muted'>${err}</td></tr>`;
     return;
   }
   orders=(data.orders||[]).slice().sort((a,b)=>Number(b.rowId||0)-Number(a.rowId||0));
@@ -1047,13 +1030,9 @@ function renderOrders(){
   const match=o=>!q||[getAny(o,["Customer"]),getAny(o,["Mail Customer","MailCustomer"]),getAny(o,["Surfcenter order","SurfcenterOrder"]),getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]),getAny(o,["Accountmanager"])].join(" ").toLowerCase().includes(q);
   const openList=orders.filter(o=>!isTruthy(o.Completed)).filter(match);
   const doneList=orders.filter(o=>isTruthy(o.Completed)).filter(match);
-  // Voor Webshop/Invoice is Count IT nu leidend voor "compleet" (afgeleid van de
-  // eigen verzendstatus) ‚Äî geen handmatig vinkje meer, alleen nog voor klassieke
-  // Dropship-orders (leverancier/master beheren daar hun eigen voortgang).
-  const canToggleCompleted=(isMasterLogin()||isAccountmanagerLogin())&&isDropshipMode();
   const draw=(target,list)=>{
     target.innerHTML="";
-    if(!list.length){target.innerHTML='<tr><td colspan="4" class="muted">No orders found.</td></tr>';return;}
+    if(!list.length){target.innerHTML='<tr><td colspan="3" class="muted">No orders found.</td></tr>';return;}
     list.forEach(o=>{
       const tr=document.createElement("tr");
       const mail=isSupplierLogin()?"":getAny(o,["Mail Customer","MailCustomer"]);
@@ -1067,18 +1046,13 @@ function renderOrders(){
       const lang=getAny(o,["Language"]);
       const flag=lang?langFlag_(lang):"";
       const key=orderKey_(o);
-      const completedCell=canToggleCompleted
-        ? `<input type="checkbox" class="completedCheckbox" data-toggle-completed="${escapeHTML(key)}" ${isTruthy(o.Completed)?"checked":""} />`
-        : "";
-      tr.innerHTML=`<td><div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${flag?`<span style="margin-right:6px;font-weight:400">${flag}</span>`:""}${escapeHTML(getAny(o,["Customer"]))}</div>${mail?`<div class="smallLine">${escapeHTML(mail)}</div>`:""}${thirdLine?`<div class="smallLine">${escapeHTML(thirdLine)}</div>`:""}</td><td class="statusCell"><div class="statusWrap"><span class="status ${trackingComplete(o)?"ready":"missing"}"><span class="dot"></span>${trackingComplete(o)?"Complete":"Missing tracking"}</span></div></td><td><div class="actionsCell"><button class="btn openBtn" data-open="${escapeHTML(key)}">Open</button></div></td><td class="completedCell">${completedCell}</td>`;
+      tr.innerHTML=`<td><div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${flag?`<span style="margin-right:6px;font-weight:400">${flag}</span>`:""}${escapeHTML(getAny(o,["Customer"]))}</div>${mail?`<div class="smallLine">${escapeHTML(mail)}</div>`:""}${thirdLine?`<div class="smallLine">${escapeHTML(thirdLine)}</div>`:""}</td><td class="statusCell"><div class="statusWrap"><span class="status ${trackingComplete(o)?"ready":"missing"}"><span class="dot"></span>${trackingComplete(o)?"Complete":"Missing tracking"}</span></div></td><td><div class="actionsCell"><button class="btn openBtn" data-open="${escapeHTML(key)}">Open</button></div></td>`;
       target.appendChild(tr);
     });
   };
   draw($("tbodyOpen"),openList);
   draw($("tbodyCompleted"),doneList);
   document.querySelectorAll("button[data-open]").forEach(btn=>btn.addEventListener("click",()=>openRow(btn.dataset.open)));
-  document.querySelectorAll("input[data-toggle-completed]").forEach(cb=>cb.addEventListener("click",e=>e.stopPropagation()));
-  document.querySelectorAll("input[data-toggle-completed]").forEach(cb=>cb.addEventListener("change",()=>toggleOrderCompleted_(cb.dataset.toggleCompleted,cb)));
 }
 function orderKey_(o){
   if(o && o.ItemKey) return "item:"+o.ItemKey;
@@ -1199,8 +1173,7 @@ async function loadProductsSection_(surfOrder){
     info.style.minWidth="0";
     const deliveredQty=Number(it.delivered||0), qty=Number(it.qty||0);
     const deliveredHtml=qty?` &middot; <span style="color:${deliveredQty>=qty?"var(--ok)":"var(--warn)"}">${deliveredQty}/${qty} uitgeleverd</span>`:"";
-    const linkHtml=it.productLink?` <a href="${escapeHTML(it.productLink)}" target="_blank" rel="noopener" class="productLinkIcon" title="Open product in Count IT">&#8599;</a>`:"";
-    info.innerHTML=`<div style="font-weight:700">${escapeHTML(it.product||it.barcode)}${linkHtml}</div><div class="tplMeta">${escapeHTML(it.barcode||"")}${it.qty?` &middot; x${escapeHTML(String(it.qty))}`:""}${deliveredHtml}</div>`;
+    info.innerHTML=`<div style="font-weight:700">${escapeHTML(it.product||it.barcode)}</div><div class="tplMeta">${escapeHTML(it.barcode||"")}${it.qty?` &middot; x${escapeHTML(String(it.qty))}`:""}${deliveredHtml}</div>`;
     left.appendChild(info);
     top.appendChild(left);
     const right=document.createElement("div");
@@ -1221,6 +1194,14 @@ async function loadProductsSection_(surfOrder){
     }
     top.appendChild(right);
     row.appendChild(top);
+    const orderLink=getAny(selected,["Link"])||"";
+    if(it.productLink||orderLink){
+      const linksRow=document.createElement("div");
+      linksRow.className="row";
+      linksRow.style.cssText="gap:8px;margin-top:6px";
+      linksRow.innerHTML=`${it.productLink?`<a class="btn small openBtn" href="${escapeHTML(it.productLink)}" target="_blank" rel="noopener">Open product</a>`:""}${orderLink?`<a class="btn small openBtn" href="${escapeHTML(orderLink)}" target="_blank" rel="noopener">Open sales order</a>`:""}`;
+      row.appendChild(linksRow);
+    }
     wrap.appendChild(row);
   });
   updateDropshipBatchBar_();
@@ -1518,16 +1499,14 @@ function whSetTab_(which){
 function whRenderEmpty_(el,text){el.innerHTML=`<div class="muted" style="font-size:13px;padding:20px 0;text-align:center">${escapeHTML(text)}</div>`;}
 function whRenderPoMatches_(matches){
   const wrap=$("whScanResults");
-  wrap.innerHTML="";
   matches.forEach((r,i)=>{
     const isOpen=r.open>0;
     const card=document.createElement("div");
     card.className="whCard po";
-    const linkHtml=r.productLink?` <a href="${escapeHTML(r.productLink)}" target="_blank" rel="noopener" class="productLinkIcon" title="Open product in Count IT">&#8599;</a>`:"";
     card.innerHTML=`
       <div class="row" style="justify-content:space-between;align-items:flex-start" data-po-toggle="${i}">
         <div>
-          <div style="font-weight:700">${escapeHTML(r.product||r.barcode)}${linkHtml}</div>
+          <div style="font-weight:700">${escapeHTML(r.product||r.barcode)}</div>
           <div class="tplMeta">${escapeHTML(r.barcode||"")}</div>
           <div class="tplMeta">${escapeHTML(r.poNumber)} &middot; ${escapeHTML(r.supplier||"Onbekende leverancier")}</div>
         </div>
@@ -1538,8 +1517,9 @@ function whRenderPoMatches_(matches){
           <div class="item"><div class="label">Ontvangen</div><div class="value">${r.delivered}</div></div>
           <div class="item"><div class="label">Open</div><div class="value ${isOpen?"open":""}">${r.open}</div></div>
         </div>
-        <div class="row" style="gap:8px;margin-top:8px">
-          ${r.link?`<a class="btn openBtn" href="${escapeHTML(r.link)}" target="_blank" rel="noopener">Open in Count IT</a>`:""}
+        <div class="row" style="gap:8px;margin-top:8px;flex-wrap:wrap">
+          ${r.link?`<a class="btn openBtn" href="${escapeHTML(r.link)}" target="_blank" rel="noopener">Open purchase order</a>`:""}
+          ${r.productLink?`<a class="btn openBtn" href="${escapeHTML(r.productLink)}" target="_blank" rel="noopener">Open product</a>`:""}
           <button class="btn openBtn" type="button" data-who-waits="${i}">Wie wacht hierop?</button>
         </div>
         <div class="whWaiters hidden" id="whWaiters_${i}"></div>
@@ -1580,6 +1560,11 @@ function whRenderProductSearchResults_(poMatches,salesMatches,qNorm,qLower){
   const wrap=$("whScanResults");
   wrap.innerHTML="";
   if(poMatches.length){
+    const poHeading=document.createElement("div");
+    poHeading.className="sectionTitle";
+    poHeading.style.cssText="margin:0 0 8px";
+    poHeading.textContent="Openstaande inkooporders";
+    wrap.appendChild(poHeading);
     whRenderPoMatches_(poMatches);
   }
   if(salesMatches.length){
@@ -1593,7 +1578,7 @@ function whRenderProductSearchResults_(poMatches,salesMatches,qNorm,qLower){
       card.className="whCard";
       card.style.cursor="pointer";
       const matchedItems=(r.items||[]).filter(it=>whItemMatches_(it,qNorm,qLower));
-      const itemsHtml=matchedItems.map(it=>`<div class="tplMeta">${escapeHTML(it.product||it.barcode)} &middot; ${escapeHTML(it.barcode||"")}</div>`).join("");
+      const itemsHtml=matchedItems.map(it=>`<div class="productRow"><div style="min-width:0"><div style="font-weight:700">${escapeHTML(it.product||it.barcode)}</div><div class="tplMeta">${escapeHTML(it.barcode||"")}</div></div>${it.productLink?`<a class="btn small openBtn" href="${escapeHTML(it.productLink)}" target="_blank" rel="noopener">Open product</a>`:""}</div>`).join("");
       card.innerHTML=`
         <div class="row" style="justify-content:space-between;align-items:flex-start" data-wh-prod-toggle="${i}">
           <div>
@@ -1602,7 +1587,7 @@ function whRenderProductSearchResults_(poMatches,salesMatches,qNorm,qLower){
           </div>
         </div>
         <div class="hidden" id="whProdSalesDetail_${i}" style="margin-top:10px">
-          ${r.link?`<div class="row" style="margin-bottom:10px"><a class="btn openBtn" href="${escapeHTML(r.link)}" target="_blank" rel="noopener">Open in Count IT</a></div>`:""}
+          ${r.link?`<div class="row" style="margin-bottom:10px"><a class="btn openBtn" href="${escapeHTML(r.link)}" target="_blank" rel="noopener">Open sales order</a></div>`:""}
           ${itemsHtml}
         </div>`;
       wrap.appendChild(card);
@@ -1622,8 +1607,7 @@ function whRenderSalesMatches_(matches){
     const itemsHtml=(r.items||[]).map(it=>{
       const deliveredQty=Number(it.delivered||0), qty=Number(it.qty||0);
       const deliveredHtml=qty?` &middot; <span style="color:${deliveredQty>=qty?"var(--ok)":"var(--warn)"}">${deliveredQty}/${qty} uitgeleverd</span>`:"";
-      const linkHtml=it.productLink?` <a href="${escapeHTML(it.productLink)}" target="_blank" rel="noopener" class="productLinkIcon" title="Open product in Count IT">&#8599;</a>`:"";
-      return `<div class="productRow"><div style="min-width:0"><div style="font-weight:700">${escapeHTML(it.product||it.barcode)}${linkHtml}</div><div class="tplMeta">${escapeHTML(it.barcode||"")}${deliveredHtml}</div></div></div>`;
+      return `<div class="productRow"><div style="min-width:0"><div style="font-weight:700">${escapeHTML(it.product||it.barcode)}</div><div class="tplMeta">${escapeHTML(it.barcode||"")}${deliveredHtml}</div></div>${it.productLink?`<a class="btn small openBtn" href="${escapeHTML(it.productLink)}" target="_blank" rel="noopener">Open product</a>`:""}</div>`;
     }).join("");
     card.innerHTML=`
       <div class="row" style="justify-content:space-between;align-items:flex-start" data-wh-toggle="${i}">
@@ -1633,7 +1617,7 @@ function whRenderSalesMatches_(matches){
         </div>
       </div>
       <div class="hidden" id="whSalesDetail_${i}" style="margin-top:10px">
-        ${r.link?`<div class="row" style="margin-bottom:10px"><a class="btn openBtn" href="${escapeHTML(r.link)}" target="_blank" rel="noopener">Open in Count IT</a></div>`:""}
+        ${r.link?`<div class="row" style="margin-bottom:10px"><a class="btn openBtn" href="${escapeHTML(r.link)}" target="_blank" rel="noopener">Open sales order</a></div>`:""}
         ${itemsHtml||'<div class="hint">Nog geen productregels gescraped voor deze order.</div>'}
       </div>`;
     wrap.appendChild(card);
