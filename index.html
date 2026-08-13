@@ -137,7 +137,6 @@
     .stockBadge.no_po_no_stock{background:rgba(220,38,38,.1);color:var(--bad)}
     .productRow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;margin-bottom:8px}
     .whCard{border:1px solid var(--border);border-radius:16px;background:#fff;padding:14px;margin-bottom:10px}
-    .whCard.po{border-left:4px solid #d97706;background:#fffaf0}
     .whKv{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
     .whKv .item{background:var(--soft);border-radius:12px;padding:8px 10px;text-align:center}
     .whKv .label{font-size:10px;color:var(--muted);text-transform:uppercase}
@@ -538,7 +537,7 @@
   </div>
 </div>
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbzvWlndryYNwqn3m0zVHb0wseGDRz1jRqqQJHztY8hlbLkeqw4WUamjLz1I73vzAqEX/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbx9sAz24qmqBIZvmJKU6Iqw-ZCieFKVXPdlUY0MpFpHXjd-Y3_Xx9r5geg_xkribyUsTg/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -1526,22 +1525,31 @@ function whRenderPoMatches_(matches){
     card.className="whCard po";
     const linkHtml=r.productLink?` <a href="${escapeHTML(r.productLink)}" target="_blank" rel="noopener" class="productLinkIcon" title="Open product in Count IT">&#8599;</a>`:"";
     card.innerHTML=`
-      <div style="font-weight:700">${escapeHTML(r.product||r.barcode)}${linkHtml}</div>
-      <div class="tplMeta">${escapeHTML(r.barcode||"")}</div>
-      <div class="tplMeta">${escapeHTML(r.poNumber)} &middot; ${escapeHTML(r.supplier||"Onbekende leverancier")}</div>
-      <div class="whKv">
-        <div class="item"><div class="label">Besteld</div><div class="value">${r.ordered}</div></div>
-        <div class="item"><div class="label">Ontvangen</div><div class="value">${r.delivered}</div></div>
-        <div class="item"><div class="label">Open</div><div class="value ${isOpen?"open":""}">${r.open}</div></div>
+      <div class="row" style="justify-content:space-between;align-items:flex-start" data-po-toggle="${i}">
+        <div>
+          <div style="font-weight:700">${escapeHTML(r.product||r.barcode)}${linkHtml}</div>
+          <div class="tplMeta">${escapeHTML(r.barcode||"")}</div>
+          <div class="tplMeta">${escapeHTML(r.poNumber)} &middot; ${escapeHTML(r.supplier||"Onbekende leverancier")}</div>
+        </div>
       </div>
-      <div class="row" style="gap:8px">
-        ${r.link?`<a class="btn openBtn" href="${escapeHTML(r.link)}" target="_blank" rel="noopener">Open in Count IT</a>`:""}
-        <button class="btn openBtn" type="button" data-who-waits="${i}">Wie wacht hierop?</button>
-      </div>
-      <div class="whWaiters hidden" id="whWaiters_${i}"></div>`;
+      <div class="hidden" id="whPoDetail_${i}" style="margin-top:10px">
+        <div class="whKv">
+          <div class="item"><div class="label">Besteld</div><div class="value">${r.ordered}</div></div>
+          <div class="item"><div class="label">Ontvangen</div><div class="value">${r.delivered}</div></div>
+          <div class="item"><div class="label">Open</div><div class="value ${isOpen?"open":""}">${r.open}</div></div>
+        </div>
+        <div class="row" style="gap:8px;margin-top:8px">
+          ${r.link?`<a class="btn openBtn" href="${escapeHTML(r.link)}" target="_blank" rel="noopener">Open in Count IT</a>`:""}
+          <button class="btn openBtn" type="button" data-who-waits="${i}">Wie wacht hierop?</button>
+        </div>
+        <div class="whWaiters hidden" id="whWaiters_${i}"></div>
+      </div>`;
     wrap.appendChild(card);
   });
-  wrap.querySelectorAll("button[data-who-waits]").forEach(btn=>btn.addEventListener("click",()=>whToggleWaiters_(btn,matches[Number(btn.dataset.whoWaits)])));
+  wrap.querySelectorAll("[data-po-toggle]").forEach(el=>el.addEventListener("click",()=>{
+    $(`whPoDetail_${el.dataset.poToggle}`).classList.toggle("hidden");
+  }));
+  wrap.querySelectorAll("button[data-who-waits]").forEach(btn=>btn.addEventListener("click",e=>{e.stopPropagation();whToggleWaiters_(btn,matches[Number(btn.dataset.whoWaits)]);}));
 }
 async function whToggleWaiters_(btn,row){
   const box=$(`whWaiters_${btn.dataset.whoWaits}`);
@@ -1550,7 +1558,8 @@ async function whToggleWaiters_(btn,row){
   box.innerHTML='<div class="muted" style="font-size:12px">Zoeken...</div>';
   const data=await api_(`action=who_waits&supplierKey=${encodeURIComponent(supplierKey)}&barcode=${encodeURIComponent(row.barcode)}`).catch(()=>null);
   if(!data?.ok||!data.waiters?.length){box.innerHTML='<div class="muted" style="font-size:12px">Geen open klantorders gevonden voor dit product.</div>';return;}
-  box.innerHTML=data.waiters.map(w=>`<div class="tplMeta">${escapeHTML(w.customer)} &middot; ${escapeHTML(w.surfcenterOrder)} (${escapeHTML(w.mode)})</div>`).join("");
+  const productLinkHtml=row.productLink?` <a href="${escapeHTML(row.productLink)}" target="_blank" rel="noopener" class="productLinkIcon" title="Open product in Count IT">&#8599;</a>`:"";
+  box.innerHTML=data.waiters.map(w=>`<div class="tplMeta">${escapeHTML(w.customer)} &middot; ${escapeHTML(w.surfcenterOrder)} (${escapeHTML(w.mode)})${w.link?` &middot; <a href="${escapeHTML(w.link)}" target="_blank" rel="noopener">Open sales order</a>`:""}${productLinkHtml}</div>`).join("");
 }
 function whItemMatches_(it,qNorm,qLower){
   return whNormalizeBarcode_(it.barcode)===qNorm||(it.barcode||"").toLowerCase().includes(qLower)||(it.product||"").toLowerCase().includes(qLower);
