@@ -536,7 +536,7 @@
   </div>
 </div>
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbx9sAz24qmqBIZvmJKU6Iqw-ZCieFKVXPdlUY0MpFpHXjd-Y3_Xx9r5geg_xkribyUsTg/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbztNi399VDGQBdveeI73O9TqRJibW5H6sq_t13LkR3SJXWzv5l5Y83xd8A64ZyZPCEOsw/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -887,7 +887,8 @@ async function mailInvoiceCustomer(lang, btn){
   });
 }
 async function sendIndependentTemplate_(tpl){
-  const to=selectedCustomerMail_(); if(!to) return;
+  const to=selectedCustomerMail_();
+  if(!to){$("indepSendMsg").innerHTML="<span style='color:var(--warn)'>No customer email found.</span>";return;}
   const cc=selectedAccountmanagerCC_();
   const subject=applyTokens(tpl.subject||"");
   const body=applyTokens(tpl.body||"");
@@ -903,7 +904,7 @@ async function sendIndependentTemplate_(tpl){
 async function sendInvoiceTemplate_(tpl){
   const to=selectedCustomerMail_();
   const phone=selectedPhone_();
-  if(!to && !phone) return;
+  if(!to && !phone){$("invoiceSendMsg").innerHTML="<span style='color:var(--warn)'>No customer email or phone found.</span>";return;}
   const cc=selectedAccountmanagerCC_();
   const subject=applyTokens(tpl.subject||"");
   const body=applyTokens(tpl.body||"");
@@ -920,7 +921,7 @@ async function sendInvoiceTemplate_(tpl){
 async function sendAftersalesTemplate_(tpl){
   const to=selectedCustomerMail_();
   const phone=selectedPhone_();
-  if(!to && !phone) return;
+  if(!to && !phone){$("aftersalesSendMsg").innerHTML="<span style='color:var(--warn)'>No customer email or phone found.</span>";return;}
   const cc=ACCOUNTMANAGER_TEMPLATE_CC;
   const subject=applyTokens(tpl.subject||"");
   const body=applyTokens(tpl.body||"");
@@ -1008,8 +1009,8 @@ async function loadOrders(){
   selected=null;
   $("form").classList.add("hidden");
   $("noSelection").classList.remove("hidden");
-  $("tbodyOpen").innerHTML="<tr><td colspan='4' class='muted'>Loading...</td></tr>";
-  $("tbodyCompleted").innerHTML="<tr><td colspan='4' class='muted'>Loading...</td></tr>";
+  $("tbodyOpen").innerHTML="<tr><td colspan='3' class='muted'>Loading...</td></tr>";
+  $("tbodyCompleted").innerHTML="<tr><td colspan='3' class='muted'>Loading...</td></tr>";
   let modeToUse=isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode;
   let url=`${API_BASE}?action=orders&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(modeToUse)}`;
   if(isMasterLogin()) url+=`&supplier=${encodeURIComponent(MASTER_NAME)}`;
@@ -1022,7 +1023,15 @@ async function loadOrders(){
     $("tbodyCompleted").innerHTML=`<tr><td colspan="3" class='muted'>${err}</td></tr>`;
     return;
   }
-  orders=(data.orders||[]).slice().sort((a,b)=>Number(b.rowId||0)-Number(a.rowId||0));
+  // Webshop/Invoice-orders komen uit SalesOrders en hebben altijd rowId=0 (geen
+  // vaste rij) ‚Äî sorteren op rowId doet daar dus niets. Die sorteren we op
+  // OrderDate (meest recent boven); Dropship-orders (Sheet1) hebben geen
+  // OrderDate en blijven op rowId (= aanmaakvolgorde) gesorteerd.
+  orders=(data.orders||[]).slice().sort((a,b)=>{
+    const ad=getAny(a,["OrderDate"]), bd=getAny(b,["OrderDate"]);
+    if(ad||bd) return bd.localeCompare(ad);
+    return Number(b.rowId||0)-Number(a.rowId||0);
+  });
   renderOrders();
 }
 function renderOrders(){
