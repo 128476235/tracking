@@ -160,6 +160,8 @@
     <header>
       <div class="brand"><img src="logo.png" alt="Logo"></div>
       <div class="row topRightTools">
+        <input id="backfillDate" type="date" class="hidden" style="height:46px;border-radius:14px;padding:0 10px;font-size:12px;border:1px solid var(--border)" title="Vanaf deze datum historisch scrapen" />
+        <button id="startBackfillBtn" class="btn iconWide hidden" type="button" title="Historische orders scrapen vanaf de gekozen datum">Historie</button>
         <button id="triggerScrapeBtn" class="btn iconWide hidden" type="button" title="Scrape nu vanuit Count IT">Scrape</button>
         <button id="newOrderBtn" class="btn icon hidden" type="button" title="Add new order"><span style="font-weight:700;font-size:20px;line-height:1">+</span></button>
         <button id="logoutBtn" class="btn icon" type="button" title="Logout">&#9211;</button>
@@ -536,7 +538,7 @@
   </div>
 </div>
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbztNi399VDGQBdveeI73O9TqRJibW5H6sq_t13LkR3SJXWzv5l5Y83xd8A64ZyZPCEOsw/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbxC-kHptKzwnqNfIcEWQZMWu14zI-0yTYvj7Wtx2N6RZfRWN8ivBPKAmLv9Nz6337vpRQ/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -997,13 +999,24 @@ function setMode(mode){
   loadOrders();
 }
 async function triggerScrapeClick_(btn){
-  if(!isMasterLogin()) return;
+  if(!isMasterLogin()&&!isAccountmanagerLogin()) return;
   btn.disabled=true;
   btn.textContent="...";
   const data=await api_(`action=trigger_scrape&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
   btn.disabled=false;
   btn.textContent="Scrape";
   btn.title=data?.ok?"Scrape gestart, kan enkele minuten duren. Herlaad daarna de orders.":(data?.error||"Mislukt");
+}
+async function startBackfillClick_(btn){
+  if(!isMasterLogin()&&!isAccountmanagerLogin()) return;
+  const fromDate=$("backfillDate").value;
+  if(!fromDate){btn.title="Kies eerst een datum.";return;}
+  btn.disabled=true;
+  btn.textContent="...";
+  const data=await api_(`action=start_backfill&supplierKey=${encodeURIComponent(supplierKey)}&fromDate=${encodeURIComponent(fromDate)}`).catch(()=>null);
+  btn.disabled=false;
+  btn.textContent="Historie";
+  btn.title=data?.ok?(data.note||"Backfill gestart."):(data?.error||"Mislukt");
 }
 async function loadOrders(){
   selected=null;
@@ -1443,7 +1456,9 @@ async function doLogin(withKey){
     currentMode=isSupplierLogin()?ORDER_MODE_DROPSHIP:ORDER_MODE_INVOICE;
     showPortal();
     $("newOrderBtn").classList.toggle("hidden",!canCreateOrders());
-    $("triggerScrapeBtn").classList.toggle("hidden",!isMasterLogin());
+    $("triggerScrapeBtn").classList.toggle("hidden",!(isMasterLogin()||isAccountmanagerLogin()));
+    $("startBackfillBtn").classList.toggle("hidden",!(isMasterLogin()||isAccountmanagerLogin()));
+    $("backfillDate").classList.toggle("hidden",!(isMasterLogin()||isAccountmanagerLogin()));
     if(isWarehouseLogin()){
       enterWarehouseView_();
     }else{
@@ -1468,6 +1483,8 @@ function logout(){
   $("warehouseView").classList.add("hidden");
   $("modeWrap").classList.remove("hidden");
   $("triggerScrapeBtn").classList.add("hidden");
+  $("startBackfillBtn").classList.add("hidden");
+  $("backfillDate").classList.add("hidden");
   document.querySelector(".two").classList.remove("hidden");
   sessionStorage.clear();
   showLogin();
@@ -1710,6 +1727,7 @@ paintStaticFlags_();
 $("modeWebshopBtn").addEventListener("click",()=>setMode(ORDER_MODE_WEBSHOP));
 $("modeInvoiceBtn").addEventListener("click",()=>setMode(ORDER_MODE_INVOICE));
 $("triggerScrapeBtn").addEventListener("click",e=>triggerScrapeClick_(e.currentTarget));
+$("startBackfillBtn").addEventListener("click",e=>startBackfillClick_(e.currentTarget));
 $("whTabScan").addEventListener("click",()=>whSetTab_("scan"));
 $("whTabSales").addEventListener("click",()=>whSetTab_("sales"));
 setupToggle("mailTemplatesToggle","mailTemplatesBody","mailTemplatesPlus");
@@ -1735,7 +1753,9 @@ setupToggle("contactsToggle","contactsBody","contactsPlus");
     currentMode=isSupplierLogin()?ORDER_MODE_DROPSHIP:ORDER_MODE_INVOICE;
     showPortal();
     $("newOrderBtn").classList.toggle("hidden",!canCreateOrders());
-    $("triggerScrapeBtn").classList.toggle("hidden",!isMasterLogin());
+    $("triggerScrapeBtn").classList.toggle("hidden",!(isMasterLogin()||isAccountmanagerLogin()));
+    $("startBackfillBtn").classList.toggle("hidden",!(isMasterLogin()||isAccountmanagerLogin()));
+    $("backfillDate").classList.toggle("hidden",!(isMasterLogin()||isAccountmanagerLogin()));
     if(isWarehouseLogin()){
       enterWarehouseView_();
     }else{
