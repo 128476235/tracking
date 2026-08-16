@@ -74,11 +74,11 @@
     .btn.primary{background:linear-gradient(180deg,var(--primary),var(--primary2));border-color:transparent;color:#fff;box-shadow:0 8px 16px rgba(15,23,42,.16)}
     .btn:disabled{opacity:.55;cursor:not-allowed}
     .btn.small{padding:8px 10px;border-radius:10px;font-size:12px;font-weight:500}
-    .btn.icon{width:46px;height:46px;padding:0;border-radius:14px;background:#fff;border:1px solid var(--border);color:var(--text);box-shadow:0 4px 10px rgba(15,23,42,.06)}
-    .btn.iconWide{height:46px;padding:0 16px;border-radius:14px;background:#fff;border:1px solid var(--border);color:var(--text);box-shadow:0 4px 10px rgba(15,23,42,.06);font-size:13px;font-weight:600}
+    .btn.icon{width:46px;height:46px;padding:0;border-radius:14px;background:#fff;border:1px solid var(--border);color:var(--text);box-shadow:0 4px 10px rgba(15,23,42,.06);flex-shrink:0}
+    .btn.iconWide{height:46px;padding:0 16px;border-radius:14px;background:#fff;border:1px solid var(--border);color:var(--text);box-shadow:0 4px 10px rgba(15,23,42,.06);font-size:13px;font-weight:600;flex-shrink:0;white-space:nowrap}
     .btn.active{border-color:rgba(15,23,42,.2);box-shadow:0 0 0 4px rgba(15,23,42,.05)}
     .btn.openBtn{min-height:36px;padding:0 12px;border-radius:11px;font-weight:500;font-size:13px;box-shadow:none}
-    .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end}
+    .topRightTools{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:nowrap}
     .modeWrap{display:flex;justify-content:flex-start;margin-bottom:14px}
     .modeSwitch{display:inline-flex;align-items:center;gap:8px;padding:8px;background:var(--pill);border-radius:999px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
     .modeBtn{border:none;background:transparent;color:var(--pillText);padding:12px 22px;border-radius:999px;font-size:14px;cursor:pointer;min-width:140px;font-family:inherit;font-weight:500}
@@ -160,7 +160,7 @@
     <header>
       <div class="brand"><img src="logo.png" alt="Logo"></div>
       <div class="row topRightTools">
-        <input id="backfillDate" type="date" class="hidden" style="height:46px;border-radius:14px;padding:0 10px;font-size:12px;border:1px solid var(--border)" title="Vanaf deze datum historisch scrapen" />
+        <input id="backfillDate" type="date" class="hidden" style="height:46px;width:150px;flex-shrink:0;border-radius:14px;padding:0 10px;font-size:12px;border:1px solid var(--border)" title="Vanaf deze datum historisch scrapen" />
         <button id="startBackfillBtn" class="btn iconWide hidden" type="button" title="Historische orders scrapen vanaf de gekozen datum">Historie</button>
         <button id="triggerScrapeBtn" class="btn iconWide hidden" type="button" title="Scrape nu vanuit Count IT">Scrape</button>
         <button id="newOrderBtn" class="btn icon hidden" type="button" title="Add new order"><span style="font-weight:700;font-size:20px;line-height:1">+</span></button>
@@ -369,6 +369,27 @@
                     <div class="hint" id="aftersalesTemplateSaveMsg"></div>
                   </div>
                 </div>
+                <div id="generalTemplateSection" class="hidden">
+                  <div class="divider"></div>
+                  <div class="toggleRow" id="editGeneralToggle"><div class="sectionTitle">Algemene mail klant</div><div class="plusSym" id="editGeneralPlus">+</div></div>
+                  <div id="editGeneralBody" class="hidden" style="margin-top:10px">
+                    <div class="grid2">
+                      <div><label style="margin-top:0">Language</label><select id="editGeneralLang"><option value="en">EN</option><option value="nl">NL</option><option value="de">DE</option><option value="fr">FR</option></select></div>
+                      <div></div>
+                    </div>
+                    <label>Subject</label><input id="editGeneralSubject" />
+                    <label>Body</label><textarea id="editGeneralBodyText" rows="7"></textarea>
+                    <div class="tokenRow" id="editGeneralTokenRow">
+                      <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                      <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                      <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
+                    </div>
+                    <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editGeneralSave" class="btn primary" type="button">Save</button></div>
+                    <div class="hint" id="editGeneralMsg"></div>
+                  </div>
+                </div>
               </div>
             </div>
             <div id="invoiceCustomerEditorSection" class="hidden">
@@ -421,7 +442,7 @@
               <div class="toggleRow" id="editSupplierToggle"><div class="sectionTitle">Edit Mail supplier</div><div class="plusSym" id="editSupplierPlus">+</div></div>
               <div id="editSupplierBody" class="hidden" style="margin-top:10px">
                 <div class="grid2">
-                  <div><label style="margin-top:0">Language</label><select id="editSupplierLang"><option value="en">EN</option><option value="nl">NL</option></select></div>
+                  <div><label style="margin-top:0">Language</label><select id="editSupplierLang"><option value="en">EN</option><option value="nl">NL</option><option value="de">DE</option><option value="fr">FR</option></select></div>
                   <div></div>
                 </div>
                 <label>Subject</label><input id="editSupplierSubject" />
@@ -538,7 +559,7 @@
   </div>
 </div>
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbxC-kHptKzwnqNfIcEWQZMWu14zI-0yTYvj7Wtx2N6RZfRWN8ivBPKAmLv9Nz6337vpRQ/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbyfbfAM_lP0LqQUpWL5DzNmdGsEV009zuxf4JhP96SQnrcnhKliPu-kBm1xkGsQbOBiIg/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -570,7 +591,7 @@ const COUNTRY_DIAL_CODES=[
 const $ = (id)=>document.getElementById(id);
 let supplier="", supplierKey="", loginType="", accountmanagerName="", accountmanagerMail="", currentMode=ORDER_MODE_DROPSHIP;
 let orders=[], selected=null, suppliersList=[], suppliersMailMap={}, suppliersKeyMap={}, accountmanagersList=[], accountmanagersMailMap={};
-let indepTemplates=[], customerTemplates=[], supplierTemplates=[], invoiceTemplates=[], invoiceCustomerTemplates=[], aftersalesTemplates=[];
+let indepTemplates=[], customerTemplates=[], supplierTemplates=[], invoiceTemplates=[], invoiceCustomerTemplates=[], aftersalesTemplates=[], generalCustomerTemplates=[];
 let lastFocusedField=null, pendingMail=null;
 const FLAG_EMOJI={en:"\u{1F1EC}\u{1F1E7}",nl:"\u{1F1F3}\u{1F1F1}",de:"\u{1F1E9}\u{1F1EA}",fr:"\u{1F1EB}\u{1F1F7}"};
 function escapeHTML(s){return String(s||"").replace(/[&<>\"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
@@ -705,12 +726,16 @@ async function loadAllTemplates_(){
   if(isAccountmanagerLogin()){
     const a3=await api_(`action=aftersales_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); aftersalesTemplates=a3?.ok&&Array.isArray(a3.templates)?a3.templates:[];
   }
+  if(isMasterLogin()||isAccountmanagerLogin()){
+    const g=await api_(`action=general_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); generalCustomerTemplates=g?.ok&&Array.isArray(g.templates)?g.templates:[];
+  }
   renderIndepTemplates_();
   renderInvoiceTemplates_();
   renderAftersalesTemplates_();
   fillCustomerEditorFromLang_($("editCustomerLang").value);
   fillSupplierEditorFromLang_($("editSupplierLang").value);
   fillInvoiceCustomerEditorFromLang_($("editInvoiceCustomerLang").value);
+  fillGeneralEditorFromLang_($("editGeneralLang").value);
 }
 function renderTemplateList_(wrapId, list, sendAttr, sendFn, editAttr, editFn){
   const wrap=$(wrapId); wrap.innerHTML="";
@@ -731,6 +756,7 @@ function renderAftersalesTemplates_(){renderTemplateList_("aftersalesTemplatesLi
 function fillCustomerEditorFromLang_(lang){const t=findTpl_(customerTemplates, lang);$("editCustomerSubject").value=t?.subject||"";$("editCustomerBodyText").value=t?.body||"";$("editCustomerMsg").textContent="";}
 function fillSupplierEditorFromLang_(lang){const t=findTpl_(supplierTemplates, lang);$("editSupplierSubject").value=t?.subject||"";$("editSupplierBodyText").value=t?.body||"";$("editSupplierMsg").textContent="";}
 function fillInvoiceCustomerEditorFromLang_(lang){const t=findTpl_(invoiceCustomerTemplates, lang);$("editInvoiceCustomerSubject").value=t?.subject||"";$("editInvoiceCustomerBodyText").value=t?.body||"";$("editInvoiceCustomerMsg").textContent="";}
+function fillGeneralEditorFromLang_(lang){const t=findTpl_(generalCustomerTemplates, lang);$("editGeneralSubject").value=t?.subject||"Surfcenter - bestelling {{SurfcenterOrder}}";$("editGeneralBodyText").value=t?.body||"Hallo {{Customer}},\n\n";$("editGeneralMsg").textContent="";}
 function resetIndepEditor_(){$("indepLang").value="en";$("indepLabel").value="";$("indepSubject").value="";$("indepBodyText").value="";$("indepSaveMsg").textContent="";delete $("indepSave").dataset.editId;$("indepSave").textContent="Save";}
 function resetInvoiceTemplateEditor_(){$("invoiceTemplateLang").value="en";$("invoiceTemplateLabel").value="";$("invoiceTemplateSubject").value="";$("invoiceTemplateBodyText").value="";$("invoiceTemplateSaveMsg").textContent="";delete $("invoiceTemplateSave").dataset.editId;$("invoiceTemplateSave").textContent="Save";}
 function resetAftersalesTemplateEditor_(){$("aftersalesTemplateLang").value="en";$("aftersalesTemplateLabel").value="";$("aftersalesTemplateSubject").value="";$("aftersalesTemplateBodyText").value="";$("aftersalesTemplateSaveMsg").textContent="";delete $("aftersalesTemplateSave").dataset.editId;$("aftersalesTemplateSave").textContent="Save";}
@@ -777,7 +803,7 @@ async function loadMailLog_(){
     const dt=formatMailLogDateTime_(r.Timestamp||"");
     const line=document.createElement("div");
     line.className="savedTemplateRow";
-    line.innerHTML=`<div style="width:100%"><div class="mailLogRow"><div class="mailLogDate">${escapeHTML(dt.date)}</div><div class="mailLogTime">${escapeHTML(dt.time)}</div></div><div class="tplMeta" style="margin-top:6px">${escapeHTML(r.Template||"-")} - ${escapeHTML(r.Subject||"-")}</div></div>`;
+    line.innerHTML=`<div style="width:100%"><div class="mailLogRow"><div class="mailLogDate">${escapeHTML(dt.date)}</div><div class="mailLogTime">${escapeHTML(dt.time)}</div></div><div class="tplMeta" style="margin-top:6px">${escapeHTML(r.Template||"-")} - ${escapeHTML(r.Subject||"-")}</div>${r.LoggedInBy?`<div class="tplMeta">Door: ${escapeHTML(r.LoggedInBy)}</div>`:""}</div>`;
     wrap.appendChild(line);
   });
   $("mailLogList").innerHTML="";
@@ -943,8 +969,9 @@ async function sendGeneralCustomerMail_(btn){
   if(!to){$("generalMailMsg").innerHTML="<span style='color:var(--warn)'>No customer email found.</span>";return;}
   if(btn) setBtnActive_(btn);
   const cc=selectedAccountmanagerCC_();
-  const subject=applyTokens("Surfcenter - bestelling {{SurfcenterOrder}}");
-  const body=applyTokens("Hallo {{Customer}},\n\n");
+  const tpl=findTpl_(generalCustomerTemplates,"nl")||{subject:"Surfcenter - bestelling {{SurfcenterOrder}}",body:"Hallo {{Customer}},\n\n"};
+  const subject=applyTokens(tpl.subject);
+  const body=applyTokens(tpl.body);
   openMailPicker({
     to,cc,subject,body,
     afterOpen:async()=>{
@@ -979,8 +1006,14 @@ function applyModeUI_(){
   $("dropshipTemplatesSection").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
   $("invoiceTemplatesSection").classList.toggle("hidden", !(isMasterLogin() && mailLike));
   $("aftersalesTemplatesSection").classList.toggle("hidden", !isAccountmanagerLogin());
+  $("generalTemplateSection").classList.toggle("hidden", !(isMasterLogin()||isAccountmanagerLogin()));
   $("invoiceCustomerEditorSection").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()));
-  $("dropshipEditorsWrap").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
+  // Dropship-mode als apart tabblad bestaat niet meer voor master (dropship zit
+  // nu per item in Invoice/Webshop-orders) ‚Äî maar het "Mail leverancier"-sjabloon
+  // dat hier bewerkt wordt, wordt nog gewoon gebruikt door de item-level
+  // dropship-mailflow (toggleItemDropshipDetail_) in √©lke mode. Aan isDropshipMode()
+  // blijven hangen maakte dit paneel dus onbereikbaar voor master.
+  $("dropshipEditorsWrap").classList.toggle("hidden", !isMasterLogin());
   $("mailLogSection").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
   $("completedWrap").classList.remove("hidden");
   $("contactsWrap").classList.add("hidden");
@@ -1208,10 +1241,10 @@ async function loadProductsSection_(surfOrder){
       else statusLabel='<span style="color:var(--warn)">geen tracking</span>';
       const btn=document.createElement("button");
       btn.type="button";
-      btn.className="btn small";
+      btn.className="btn small itemDropshipToggleBtn";
       btn.style.whiteSpace="nowrap";
-      btn.innerHTML=`${escapeHTML(d.supplier)} &middot; ${statusLabel}`;
-      btn.addEventListener("click",()=>toggleItemDropshipDetail_(row,it,surfOrder));
+      btn.innerHTML=`${escapeHTML(d.supplier)} &middot; ${statusLabel} <span class="itemDropshipChevron">&#9662;</span>`;
+      btn.addEventListener("click",()=>toggleItemDropshipDetail_(row,it,surfOrder,btn));
       right.appendChild(btn);
     }
     top.appendChild(right);
@@ -1294,9 +1327,11 @@ function applyTokensForItem_(txt,it,tracking){
   Object.keys(base).forEach(k=>{ out=out.split(k).join(String(overrides[k]!==undefined?overrides[k]:(base[k]||""))); });
   return out;
 }
-function toggleItemDropshipDetail_(row,it,surfOrder){
+function toggleItemDropshipDetail_(row,it,surfOrder,btn){
+  const chevron=btn?.querySelector(".itemDropshipChevron");
   const existing=row.querySelector(".itemDropshipDetail");
-  if(existing){existing.remove();return;}
+  if(existing){existing.remove();if(chevron)chevron.innerHTML="&#9662;";return;}
+  if(chevron)chevron.innerHTML="&#9652;";
   row.querySelectorAll(".itemDropshipForm").forEach(n=>n.remove());
   const d=it.dropship;
   const itemKey=`${surfOrder}|${it.barcode}`;
@@ -1700,6 +1735,7 @@ $("createBtn").addEventListener("click",createOrder);
 $("historySearch").addEventListener("input",renderOrders);
 $("editCustomerSave").addEventListener("click",()=>upsertTemplate_("customer_upsert",findTpl_(customerTemplates,$("editCustomerLang").value)?.id||"",$("editCustomerLang").value,"DEFAULT",$("editCustomerSubject").value.trim(),$("editCustomerBodyText").value.trim(),$("editCustomerMsg"),loadAllTemplates_));
 $("editSupplierSave").addEventListener("click",()=>upsertTemplate_("supplier_upsert",findTpl_(supplierTemplates,$("editSupplierLang").value)?.id||"",$("editSupplierLang").value,"DEFAULT",$("editSupplierSubject").value.trim(),$("editSupplierBodyText").value.trim(),$("editSupplierMsg"),loadAllTemplates_));
+$("editGeneralSave").addEventListener("click",()=>upsertTemplate_("general_upsert",findTpl_(generalCustomerTemplates,$("editGeneralLang").value)?.id||"",$("editGeneralLang").value,"DEFAULT",$("editGeneralSubject").value.trim(),$("editGeneralBodyText").value.trim(),$("editGeneralMsg"),loadAllTemplates_));
 $("editInvoiceCustomerSave").addEventListener("click",()=>upsertTemplate_("customer2_upsert",findTpl_(invoiceCustomerTemplates,$("editInvoiceCustomerLang").value)?.id||"",$("editInvoiceCustomerLang").value,"DEFAULT",$("editInvoiceCustomerSubject").value.trim(),$("editInvoiceCustomerBodyText").value.trim(),$("editInvoiceCustomerMsg"),loadAllTemplates_));
 $("indepSave").addEventListener("click",()=>upsertTemplate_("indep_upsert",$("indepSave").dataset.editId||"",$("indepLang").value,$("indepLabel").value.trim(),$("indepSubject").value.trim(),$("indepBodyText").value.trim(),$("indepSaveMsg"),async()=>{resetIndepEditor_();await loadAllTemplates_();}));
 $("invoiceTemplateSave").addEventListener("click",()=>upsertTemplate_("invoice_template_upsert",$("invoiceTemplateSave").dataset.editId||"",$("invoiceTemplateLang").value,$("invoiceTemplateLabel").value.trim(),$("invoiceTemplateSubject").value.trim(),$("invoiceTemplateBodyText").value.trim(),$("invoiceTemplateSaveMsg"),async()=>{resetInvoiceTemplateEditor_();await loadAllTemplates_();}));
@@ -1709,6 +1745,7 @@ $("invoiceTemplateCancel").addEventListener("click",resetInvoiceTemplateEditor_)
 $("aftersalesTemplateCancel").addEventListener("click",resetAftersalesTemplateEditor_);
 $("editCustomerLang").addEventListener("change",()=>fillCustomerEditorFromLang_($("editCustomerLang").value));
 $("editSupplierLang").addEventListener("change",()=>fillSupplierEditorFromLang_($("editSupplierLang").value));
+$("editGeneralLang").addEventListener("change",()=>fillGeneralEditorFromLang_($("editGeneralLang").value));
 $("editInvoiceCustomerLang").addEventListener("change",()=>fillInvoiceCustomerEditorFromLang_($("editInvoiceCustomerLang").value));
 $("generalMailBtn").addEventListener("click",e=>sendGeneralCustomerMail_(e.currentTarget));
 $("mc_en").addEventListener("click",e=>mailCustomer("en",e.currentTarget));
@@ -1736,6 +1773,7 @@ setupToggle("addInvoiceTemplateToggle","addInvoiceTemplateBody","addInvoiceTempl
 setupToggle("addAftersalesTemplateToggle","addAftersalesTemplateBody","addAftersalesTemplatePlus",resetAftersalesTemplateEditor_);
 setupToggle("editCustomerToggle","editCustomerBody","editCustomerPlus");
 setupToggle("editSupplierToggle","editSupplierBody","editSupplierPlus");
+setupToggle("editGeneralToggle","editGeneralBody","editGeneralPlus");
 setupToggle("editInvoiceCustomerToggle","editInvoiceCustomerBody","editInvoiceCustomerPlus");
 setupToggle("mailLogToggle","mailLogBody","mailLogPlus");
 setupToggle("completedToggle","completedBody","completedPlus");
