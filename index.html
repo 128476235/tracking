@@ -238,6 +238,10 @@
             <label>Tracking link</label><input id="trackingLink" />
             <div class="row" style="margin-top:12px"><button id="saveBtn" class="btn primary" type="button">Save</button></div>
           </div>
+          <div id="generalMailBox" class="hidden" style="margin-top:12px">
+            <button class="btn" id="generalMailBtn" type="button">Open mail</button>
+            <div class="hint" id="generalMailMsg"></div>
+          </div>
           <div id="productsSection" class="hidden" style="margin-top:12px">
             <div class="divider"></div>
             <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -256,10 +260,6 @@
             <div class="hint" id="notesMsg"></div>
           </div>
           <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
-            <div id="generalMailBox" class="hidden" style="margin-bottom:12px">
-              <button class="btn" id="generalMailBtn" type="button">Open mail</button>
-              <div class="hint" id="generalMailMsg"></div>
-            </div>
             <div class="mailGrid grid2" id="dropshipMailGrid">
               <div id="customerMailBox">
                 <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
@@ -1018,7 +1018,7 @@ function applyModeUI_(){
   $("customerMailBox").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
   $("supplierMailBox").classList.toggle("hidden", !(isMasterLogin() && isDropshipMode()));
   $("dropshipMailGrid").classList.toggle("hidden", !isDropshipMode());
-  $("invoiceMailGrid").classList.toggle("hidden", !(isMasterLogin() && mailLike));
+  $("invoiceMailGrid").classList.toggle("hidden", !((isMasterLogin()||isAccountmanagerLogin()) && mailLike));
   $("invoiceExtrasWrap").classList.toggle("hidden", !invoiceLike);
   $("trackingFieldsWrap").classList.toggle("hidden", false);
   $("saveBtn").parentElement.classList.toggle("hidden", !(isMasterLogin() || isSupplierLogin() || isAccountmanagerLogin()));
@@ -1864,4 +1864,3 @@ setupToggle("contactsToggle","contactsBody","contactsPlus");
 </script>
 </body>
 </html>
-
