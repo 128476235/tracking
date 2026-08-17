@@ -230,6 +230,10 @@
             </div>
             <div class="kvBlock" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
               <span id="statusBadge" class="status missing"><span class="dot"></span><span id="statusText">No selection</span></span>
+              <div id="generalMailBox" class="hidden" style="text-align:right">
+                <button class="btn" id="generalMailBtn" type="button">Open mail</button>
+                <div class="hint" id="generalMailMsg"></div>
+              </div>
             </div>
           </div>
           <div id="trackingFieldsWrap">
@@ -238,28 +242,7 @@
             <label>Tracking link</label><input id="trackingLink" />
             <div class="row" style="margin-top:12px"><button id="saveBtn" class="btn primary" type="button">Save</button></div>
           </div>
-          <div id="generalMailBox" class="hidden" style="margin-top:12px">
-            <button class="btn" id="generalMailBtn" type="button">Open mail</button>
-            <div class="hint" id="generalMailMsg"></div>
-          </div>
-          <div id="productsSection" class="hidden" style="margin-top:12px">
-            <div class="divider"></div>
-            <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
-              <div class="sectionTitle">Products</div>
-            </div>
-            <div id="deliveryMixSummary" class="tplMeta hidden" style="margin-bottom:8px"></div>
-            <div id="productsList"><div class="muted" style="font-size:13px">Loading...</div></div>
-            <div class="hint" id="productsMsg"></div>
-          </div>
-          <div id="invoiceExtrasWrap" class="hidden" style="margin-top:12px">
-            <div class="divider"></div>
-            <div class="sectionTitle" style="margin-bottom:8px">Notes</div>
-            <div id="notesList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
-            <textarea id="newNoteText" rows="2" placeholder="Add a note..."></textarea>
-            <div class="row" style="margin-top:8px;justify-content:flex-end"><button id="addNoteBtn" class="btn primary" type="button">Add note</button></div>
-            <div class="hint" id="notesMsg"></div>
-          </div>
-          <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
+          <div id="mailCustomerFlagsWrap" style="margin-top:12px">
             <div class="mailGrid grid2" id="dropshipMailGrid">
               <div id="customerMailBox">
                 <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
@@ -292,6 +275,25 @@
                 <div class="hint" id="mailInvoiceCustomerMsg"></div>
               </div>
             </div>
+          </div>
+          <div id="productsSection" class="hidden" style="margin-top:12px">
+            <div class="divider"></div>
+            <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div class="sectionTitle">Products</div>
+            </div>
+            <div id="deliveryMixSummary" class="tplMeta hidden" style="margin-bottom:8px"></div>
+            <div id="productsList"><div class="muted" style="font-size:13px">Loading...</div></div>
+            <div class="hint" id="productsMsg"></div>
+          </div>
+          <div id="invoiceExtrasWrap" class="hidden" style="margin-top:12px">
+            <div class="divider"></div>
+            <div class="sectionTitle" style="margin-bottom:8px">Notes</div>
+            <div id="notesList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+            <textarea id="newNoteText" rows="2" placeholder="Add a note..."></textarea>
+            <div class="row" style="margin-top:8px;justify-content:flex-end"><button id="addNoteBtn" class="btn primary" type="button">Add note</button></div>
+            <div class="hint" id="notesMsg"></div>
+          </div>
+          <div id="mailCustomerWrap" class="hidden" style="margin-top:12px">
             <div id="mailTemplatesWrap" class="hidden">
               <div class="divider"></div>
               <div class="toggleRow" id="mailTemplatesToggle"><div class="sectionTitle">Mail templates</div><div class="plusSym" id="mailTemplatesPlus">+</div></div>
@@ -316,6 +318,12 @@
                       <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
                       <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
                       <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                      <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                      <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
+                      <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{Items}}">{{Items}}</button>
+                      <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
                     </div>
                     <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px"><button id="indepCancel" class="btn" type="button">Cancel</button><button id="indepSave" class="btn primary" type="button">Save</button></div>
                     <div class="hint" id="indepSaveMsg"></div>
@@ -336,10 +344,17 @@
                     <div class="tokenRow" id="invoiceTemplateTokenRow">
                       <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
                       <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                      <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
                       <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                      <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                      <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
                       <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
                       <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
                       <button class="btn small" type="button" data-token="{{Items}}">{{Items}}</button>
+                      <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
                     </div>
                     <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px"><button id="invoiceTemplateCancel" class="btn" type="button">Cancel</button><button id="invoiceTemplateSave" class="btn primary" type="button">Save</button></div>
                     <div class="hint" id="invoiceTemplateSaveMsg"></div>
@@ -360,9 +375,17 @@
                     <div class="tokenRow" id="aftersalesTemplateTokenRow">
                       <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
                       <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                      <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
                       <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                      <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                      <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
                       <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
                       <button class="btn small" type="button" data-token="{{Items}}">{{Items}}</button>
+                      <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
                     </div>
                     <div class="row" style="margin-top:10px;justify-content:flex-end;gap:8px"><button id="aftersalesTemplateCancel" class="btn" type="button">Cancel</button><button id="aftersalesTemplateSave" class="btn primary" type="button">Save</button></div>
                     <div class="hint" id="aftersalesTemplateSaveMsg"></div>
@@ -381,9 +404,17 @@
                     <div class="tokenRow" id="editGeneralTokenRow">
                       <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
                       <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                      <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
                       <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                      <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                      <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
                       <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
                       <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{Items}}">{{Items}}</button>
+                      <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
                     </div>
                     <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editGeneralSave" class="btn primary" type="button">Save</button></div>
                     <div class="hint" id="editGeneralMsg"></div>
@@ -402,13 +433,20 @@
                 <label>Subject</label><input id="editInvoiceCustomerSubject" />
                 <label>Body</label><textarea id="editInvoiceCustomerBodyText" rows="7"></textarea>
                 <div class="tokenRow" id="editInvoiceCustomerTokenRow">
-                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
-                  <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
-                  <button class="btn small" type="button" data-token="{{Items}}">{{Items}}</button>
-                </div>
+                      <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                      <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                      <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                      <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                      <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
+                      <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{Items}}">{{Items}}</button>
+                      <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
+                    </div>
                 <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editInvoiceCustomerSave" class="btn primary" type="button">Save</button></div>
                 <div class="hint" id="editInvoiceCustomerMsg"></div>
               </div>
@@ -424,16 +462,20 @@
                 <label>Subject</label><input id="editCustomerSubject" />
                 <label>Body</label><textarea id="editCustomerBodyText" rows="7"></textarea>
                 <div class="tokenRow">
-                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                  <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
-                  <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
-                  <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
-                  <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
-                  <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
-                </div>
+                      <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                      <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                      <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                      <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                      <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
+                      <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{Items}}">{{Items}}</button>
+                      <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
+                    </div>
                 <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editCustomerSave" class="btn primary" type="button">Save</button></div>
                 <div class="hint" id="editCustomerMsg"></div>
               </div>
@@ -447,16 +489,20 @@
                 <label>Subject</label><input id="editSupplierSubject" />
                 <label>Body</label><textarea id="editSupplierBodyText" rows="7"></textarea>
                 <div class="tokenRow">
-                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                  <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
-                  <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
-                  <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
-                  <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
-                  <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
-                </div>
+                      <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                      <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                      <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                      <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                      <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
+                      <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{Items}}">{{Items}}</button>
+                      <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
+                    </div>
                 <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editSupplierSave" class="btn primary" type="button">Save</button></div>
                 <div class="hint" id="editSupplierMsg"></div>
               </div>
@@ -470,14 +516,20 @@
                 <label>Subject</label><input id="editSupplierOrderSubject" />
                 <label>Body</label><textarea id="editSupplierOrderBodyText" rows="7"></textarea>
                 <div class="tokenRow">
-                  <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
-                  <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
-                  <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
-                  <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
-                  <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
-                  <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
-                </div>
+                      <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                      <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                      <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                      <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                      <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
+                      <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{Items}}">{{Items}}</button>
+                      <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
+                    </div>
                 <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editSupplierOrderSave" class="btn primary" type="button">Save</button></div>
                 <div class="hint" id="editSupplierOrderMsg"></div>
               </div>
@@ -579,7 +631,7 @@
   </div>
 </div>
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbyAe5UG2kMIgS0DBjaPZ6Sf-5dT2zy8W629uRc2BotNkHxvRulUvXEA_hFIHw1dBp0tfA/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbzmTN76Tr2tP2J_aooQr_26gQHY61rkxktbOjZ-hmslTV1hCvJmSQwGNKFyHp9NTfksWg/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -759,33 +811,57 @@ async function loadAllTemplates_(){
   fillInvoiceCustomerEditorFromLang_($("editInvoiceCustomerLang").value);
   fillGeneralEditorFromLang_($("editGeneralLang").value);
 }
-function renderTemplateList_(wrapId, list, sendAttr, sendFn, editAttr, editFn){
+// Sjablonen stonden 1 rij per taal (dus 4x dezelfde template) ‚Äî nu 1 rij per
+// label, met 4 taalvlaggen om direct in die taal te versturen. Bewerken opent
+// de eerste beschikbare taal; wisselen van taal in het formulier laadt de
+// bijbehorende inhoud uit dezelfde groep (of leeg, klaar om een nieuwe taal
+// onder dat label aan te maken).
+function groupTemplatesByLabel_(list){
+  const groups={}; const order=[];
+  list.forEach(t=>{
+    const key=String(t.label||"").trim()||("id:"+t.id);
+    if(!groups[key]){groups[key]={label:t.label||"",items:{}};order.push(key);}
+    groups[key].items[String(t.language||"").toLowerCase()]=t;
+  });
+  order.sort((a,b)=>String(groups[a].label||"").localeCompare(String(groups[b].label||"")));
+  return order.map(k=>groups[k]);
+}
+function renderTemplateList_(wrapId, list, sendFn, editFn){
   const wrap=$(wrapId); wrap.innerHTML="";
-  const items=list.slice().sort((a,b)=>String(a.label||"").localeCompare(String(b.label||"")));
-  if(!items.length){wrap.innerHTML='<div class="muted" style="font-size:13px">No templates.</div>';return;}
-  items.forEach(t=>{
+  const groups=groupTemplatesByLabel_(list);
+  if(!groups.length){wrap.innerHTML='<div class="muted" style="font-size:13px">No templates.</div>';return;}
+  groups.forEach(g=>{
+    const sample=g.items.en||g.items.nl||g.items.de||g.items.fr||Object.values(g.items)[0];
     const row=document.createElement("div");
     row.className="savedTemplateRow";
-    row.innerHTML=`<div class="savedLeft"><div class="flag">${langFlag_(t.language)}</div><div style="min-width:0"><div class="tplName">${escapeHTML(t.label||"")}</div><div class="tplMeta">${escapeHTML(t.subject||"")}</div></div></div><div class="row" style="gap:8px;flex-wrap:nowrap">${editAttr?`<button class="btn openBtn" type="button" ${editAttr}="${escapeHTML(t.id)}">Edit</button>`:""}<button class="btn openBtn" type="button" ${sendAttr}="${escapeHTML(t.id)}">Send</button></div>`;
+    const flagsHtml=["en","nl","de","fr"].map(lang=>{
+      const has=!!g.items[lang];
+      return `<button class="btn mailFlagBtn" type="button" data-lang="${lang}" ${has?"":'disabled style="opacity:.3;cursor:not-allowed"'}><span class="flag">${langFlag_(lang)}</span></button>`;
+    }).join("");
+    row.innerHTML=`<div class="savedLeft"><div style="min-width:0"><div class="tplName">${escapeHTML(g.label||"(geen naam)")}</div><div class="tplMeta">${escapeHTML(sample?.subject||"")}</div></div></div><div class="row" style="gap:6px;flex-wrap:nowrap;align-items:center"><button class="btn openBtn" type="button" data-group-edit>Edit</button>${flagsHtml}</div>`;
+    row.querySelectorAll("button[data-lang]").forEach(btn=>{
+      if(btn.disabled) return;
+      btn.addEventListener("click",()=>{const t=g.items[btn.dataset.lang];if(t) sendFn(t);});
+    });
+    row.querySelector("button[data-group-edit]").addEventListener("click",()=>editFn(g));
     wrap.appendChild(row);
   });
-  wrap.querySelectorAll(`button[${sendAttr}]`).forEach(btn=>btn.addEventListener("click",()=>{const t=items.find(x=>String(x.id)===String(btn.getAttribute(sendAttr)));if(t) sendFn(t);}));
-  if(editAttr&&editFn) wrap.querySelectorAll(`button[${editAttr}]`).forEach(btn=>btn.addEventListener("click",()=>{const t=items.find(x=>String(x.id)===String(btn.getAttribute(editAttr)));if(t) editFn(t);}));
 }
-function renderIndepTemplates_(){renderTemplateList_("indepTemplatesList", indepTemplates, "data-indep-send", sendIndependentTemplate_, "data-indep-edit", editIndependentTemplate_);}
-function renderInvoiceTemplates_(){renderTemplateList_("invoiceTemplatesList", invoiceTemplates, "data-invoice-send", sendInvoiceTemplate_, "data-invoice-edit", editInvoiceTemplate_);}
-function renderAftersalesTemplates_(){renderTemplateList_("aftersalesTemplatesList", aftersalesTemplates, "data-aftersales-send", sendAftersalesTemplate_, "data-aftersales-edit", editAftersalesTemplate_);}
+function renderIndepTemplates_(){renderTemplateList_("indepTemplatesList", indepTemplates, sendIndependentTemplate_, editIndependentTemplate_);}
+function renderInvoiceTemplates_(){renderTemplateList_("invoiceTemplatesList", invoiceTemplates, sendInvoiceTemplate_, editInvoiceTemplate_);}
+function renderAftersalesTemplates_(){renderTemplateList_("aftersalesTemplatesList", aftersalesTemplates, sendAftersalesTemplate_, editAftersalesTemplate_);}
 function fillCustomerEditorFromLang_(lang){const t=findTpl_(customerTemplates, lang);$("editCustomerSubject").value=t?.subject||"";$("editCustomerBodyText").value=t?.body||"";$("editCustomerMsg").textContent="";}
 function fillSupplierEditorFromLang_(lang){const t=findTpl_(supplierTemplates, lang);$("editSupplierSubject").value=t?.subject||"";$("editSupplierBodyText").value=t?.body||"";$("editSupplierMsg").textContent="";}
 function fillSupplierOrderEditorFromLang_(lang){const t=findTpl_(supplierOrderTemplates, lang);$("editSupplierOrderSubject").value=t?.subject||"";$("editSupplierOrderBodyText").value=t?.body||"";$("editSupplierOrderMsg").textContent="";}
 function fillInvoiceCustomerEditorFromLang_(lang){const t=findTpl_(invoiceCustomerTemplates, lang);$("editInvoiceCustomerSubject").value=t?.subject||"";$("editInvoiceCustomerBodyText").value=t?.body||"";$("editInvoiceCustomerMsg").textContent="";}
 function fillGeneralEditorFromLang_(lang){const t=findTpl_(generalCustomerTemplates, lang);$("editGeneralSubject").value=t?.subject||"Surfcenter - bestelling {{SurfcenterOrder}}";$("editGeneralBodyText").value=t?.body||"Hallo {{Customer}},\n\n";$("editGeneralMsg").textContent="";}
-function resetIndepEditor_(){$("indepLang").value="en";$("indepLabel").value="";$("indepSubject").value="";$("indepBodyText").value="";$("indepSaveMsg").textContent="";delete $("indepSave").dataset.editId;$("indepSave").textContent="Save";}
-function resetInvoiceTemplateEditor_(){$("invoiceTemplateLang").value="en";$("invoiceTemplateLabel").value="";$("invoiceTemplateSubject").value="";$("invoiceTemplateBodyText").value="";$("invoiceTemplateSaveMsg").textContent="";delete $("invoiceTemplateSave").dataset.editId;$("invoiceTemplateSave").textContent="Save";}
-function resetAftersalesTemplateEditor_(){$("aftersalesTemplateLang").value="en";$("aftersalesTemplateLabel").value="";$("aftersalesTemplateSubject").value="";$("aftersalesTemplateBodyText").value="";$("aftersalesTemplateSaveMsg").textContent="";delete $("aftersalesTemplateSave").dataset.editId;$("aftersalesTemplateSave").textContent="Save";}
-function editIndependentTemplate_(tpl){$("addIndepBody").classList.remove("hidden");$("addIndepPlus").textContent="-";$("indepLang").value=(tpl.language||"en").toLowerCase();$("indepLabel").value=tpl.label||"";$("indepSubject").value=tpl.subject||"";$("indepBodyText").value=tpl.body||"";$("indepSave").dataset.editId=String(tpl.id||"");$("indepSave").textContent="Update";}
-function editInvoiceTemplate_(tpl){$("addInvoiceTemplateBody").classList.remove("hidden");$("addInvoiceTemplatePlus").textContent="-";$("invoiceTemplateLang").value=(tpl.language||"en").toLowerCase();$("invoiceTemplateLabel").value=tpl.label||"";$("invoiceTemplateSubject").value=tpl.subject||"";$("invoiceTemplateBodyText").value=tpl.body||"";$("invoiceTemplateSave").dataset.editId=String(tpl.id||"");$("invoiceTemplateSave").textContent="Update";}
-function editAftersalesTemplate_(tpl){$("addAftersalesTemplateBody").classList.remove("hidden");$("addAftersalesTemplatePlus").textContent="-";$("aftersalesTemplateLang").value=(tpl.language||"en").toLowerCase();$("aftersalesTemplateLabel").value=tpl.label||"";$("aftersalesTemplateSubject").value=tpl.subject||"";$("aftersalesTemplateBodyText").value=tpl.body||"";$("aftersalesTemplateSave").dataset.editId=String(tpl.id||"");$("aftersalesTemplateSave").textContent="Update";}
+let indepEditGroup_=null, invoiceEditGroup_=null, aftersalesEditGroup_=null;
+function resetIndepEditor_(){indepEditGroup_=null;$("indepLang").value="en";$("indepLabel").value="";$("indepSubject").value="";$("indepBodyText").value="";$("indepSaveMsg").textContent="";$("indepSave").textContent="Save";}
+function resetInvoiceTemplateEditor_(){invoiceEditGroup_=null;$("invoiceTemplateLang").value="en";$("invoiceTemplateLabel").value="";$("invoiceTemplateSubject").value="";$("invoiceTemplateBodyText").value="";$("invoiceTemplateSaveMsg").textContent="";$("invoiceTemplateSave").textContent="Save";}
+function resetAftersalesTemplateEditor_(){aftersalesEditGroup_=null;$("aftersalesTemplateLang").value="en";$("aftersalesTemplateLabel").value="";$("aftersalesTemplateSubject").value="";$("aftersalesTemplateBodyText").value="";$("aftersalesTemplateSaveMsg").textContent="";$("aftersalesTemplateSave").textContent="Save";}
+function editIndependentTemplate_(group){indepEditGroup_=group;$("addIndepBody").classList.remove("hidden");$("addIndepPlus").textContent="-";const lang=Object.keys(group.items)[0]||"en";const t=group.items[lang];$("indepLang").value=lang;$("indepLabel").value=group.label||"";$("indepSubject").value=t?.subject||"";$("indepBodyText").value=t?.body||"";$("indepSave").textContent="Update";}
+function editInvoiceTemplate_(group){invoiceEditGroup_=group;$("addInvoiceTemplateBody").classList.remove("hidden");$("addInvoiceTemplatePlus").textContent="-";const lang=Object.keys(group.items)[0]||"en";const t=group.items[lang];$("invoiceTemplateLang").value=lang;$("invoiceTemplateLabel").value=group.label||"";$("invoiceTemplateSubject").value=t?.subject||"";$("invoiceTemplateBodyText").value=t?.body||"";$("invoiceTemplateSave").textContent="Update";}
+function editAftersalesTemplate_(group){aftersalesEditGroup_=group;$("addAftersalesTemplateBody").classList.remove("hidden");$("addAftersalesTemplatePlus").textContent="-";const lang=Object.keys(group.items)[0]||"en";const t=group.items[lang];$("aftersalesTemplateLang").value=lang;$("aftersalesTemplateLabel").value=group.label||"";$("aftersalesTemplateSubject").value=t?.subject||"";$("aftersalesTemplateBodyText").value=t?.body||"";$("aftersalesTemplateSave").textContent="Update";}
 async function upsertTemplate_(action, id, lang, label, subject, body, msgEl, done){
   msgEl.textContent="Saving...";
   const data=await api_(`action=${action}&supplierKey=${encodeURIComponent(supplierKey)}`+(id?`&id=${encodeURIComponent(id)}`:"")+`&language=${encodeURIComponent(lang)}&label=${encodeURIComponent(label)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`).catch(()=>null);
@@ -1030,7 +1106,7 @@ function applyModeUI_(){
   $("invoiceTemplatesSection").classList.toggle("hidden", !(isMasterLogin() && mailLike));
   $("aftersalesTemplatesSection").classList.toggle("hidden", !isAccountmanagerLogin());
   $("generalTemplateSection").classList.toggle("hidden", !(isMasterLogin()||isAccountmanagerLogin()));
-  $("invoiceCustomerEditorSection").classList.toggle("hidden", !(isMasterLogin() && isInvoiceMode()));
+  $("invoiceCustomerEditorSection").classList.toggle("hidden", !((isMasterLogin()||isAccountmanagerLogin()) && mailLike));
   // Dropship-mode als apart tabblad bestaat niet meer voor master (dropship zit
   // nu per item in Invoice/Webshop-orders) ‚Äî maar het "Mail leverancier"-sjabloon
   // dat hier bewerkt wordt, wordt nog gewoon gebruikt door de item-level
@@ -1801,9 +1877,12 @@ $("editSupplierSave").addEventListener("click",()=>upsertTemplate_("supplier_ups
 $("editSupplierOrderSave").addEventListener("click",()=>upsertTemplate_("supplier_order_upsert",findTpl_(supplierOrderTemplates,$("editSupplierOrderLang").value)?.id||"",$("editSupplierOrderLang").value,"DEFAULT",$("editSupplierOrderSubject").value.trim(),$("editSupplierOrderBodyText").value.trim(),$("editSupplierOrderMsg"),loadAllTemplates_));
 $("editGeneralSave").addEventListener("click",()=>upsertTemplate_("general_upsert",findTpl_(generalCustomerTemplates,$("editGeneralLang").value)?.id||"",$("editGeneralLang").value,"DEFAULT",$("editGeneralSubject").value.trim(),$("editGeneralBodyText").value.trim(),$("editGeneralMsg"),loadAllTemplates_));
 $("editInvoiceCustomerSave").addEventListener("click",()=>upsertTemplate_("customer2_upsert",findTpl_(invoiceCustomerTemplates,$("editInvoiceCustomerLang").value)?.id||"",$("editInvoiceCustomerLang").value,"DEFAULT",$("editInvoiceCustomerSubject").value.trim(),$("editInvoiceCustomerBodyText").value.trim(),$("editInvoiceCustomerMsg"),loadAllTemplates_));
-$("indepSave").addEventListener("click",()=>upsertTemplate_("indep_upsert",$("indepSave").dataset.editId||"",$("indepLang").value,$("indepLabel").value.trim(),$("indepSubject").value.trim(),$("indepBodyText").value.trim(),$("indepSaveMsg"),async()=>{resetIndepEditor_();await loadAllTemplates_();}));
-$("invoiceTemplateSave").addEventListener("click",()=>upsertTemplate_("invoice_template_upsert",$("invoiceTemplateSave").dataset.editId||"",$("invoiceTemplateLang").value,$("invoiceTemplateLabel").value.trim(),$("invoiceTemplateSubject").value.trim(),$("invoiceTemplateBodyText").value.trim(),$("invoiceTemplateSaveMsg"),async()=>{resetInvoiceTemplateEditor_();await loadAllTemplates_();}));
-$("aftersalesTemplateSave").addEventListener("click",()=>upsertTemplate_("aftersales_template_upsert",$("aftersalesTemplateSave").dataset.editId||"",$("aftersalesTemplateLang").value,$("aftersalesTemplateLabel").value.trim(),$("aftersalesTemplateSubject").value.trim(),$("aftersalesTemplateBodyText").value.trim(),$("aftersalesTemplateSaveMsg"),async()=>{resetAftersalesTemplateEditor_();await loadAllTemplates_();}));
+$("indepSave").addEventListener("click",()=>upsertTemplate_("indep_upsert",indepEditGroup_?.items[$("indepLang").value]?.id||"",$("indepLang").value,$("indepLabel").value.trim(),$("indepSubject").value.trim(),$("indepBodyText").value.trim(),$("indepSaveMsg"),async()=>{resetIndepEditor_();await loadAllTemplates_();}));
+$("invoiceTemplateSave").addEventListener("click",()=>upsertTemplate_("invoice_template_upsert",invoiceEditGroup_?.items[$("invoiceTemplateLang").value]?.id||"",$("invoiceTemplateLang").value,$("invoiceTemplateLabel").value.trim(),$("invoiceTemplateSubject").value.trim(),$("invoiceTemplateBodyText").value.trim(),$("invoiceTemplateSaveMsg"),async()=>{resetInvoiceTemplateEditor_();await loadAllTemplates_();}));
+$("aftersalesTemplateSave").addEventListener("click",()=>upsertTemplate_("aftersales_template_upsert",aftersalesEditGroup_?.items[$("aftersalesTemplateLang").value]?.id||"",$("aftersalesTemplateLang").value,$("aftersalesTemplateLabel").value.trim(),$("aftersalesTemplateSubject").value.trim(),$("aftersalesTemplateBodyText").value.trim(),$("aftersalesTemplateSaveMsg"),async()=>{resetAftersalesTemplateEditor_();await loadAllTemplates_();}));
+$("indepLang").addEventListener("change",()=>{if(!indepEditGroup_)return;const t=indepEditGroup_.items[$("indepLang").value];$("indepSubject").value=t?.subject||"";$("indepBodyText").value=t?.body||"";});
+$("invoiceTemplateLang").addEventListener("change",()=>{if(!invoiceEditGroup_)return;const t=invoiceEditGroup_.items[$("invoiceTemplateLang").value];$("invoiceTemplateSubject").value=t?.subject||"";$("invoiceTemplateBodyText").value=t?.body||"";});
+$("aftersalesTemplateLang").addEventListener("change",()=>{if(!aftersalesEditGroup_)return;const t=aftersalesEditGroup_.items[$("aftersalesTemplateLang").value];$("aftersalesTemplateSubject").value=t?.subject||"";$("aftersalesTemplateBodyText").value=t?.body||"";});
 $("indepCancel").addEventListener("click",resetIndepEditor_);
 $("invoiceTemplateCancel").addEventListener("click",resetInvoiceTemplateEditor_);
 $("aftersalesTemplateCancel").addEventListener("click",resetAftersalesTemplateEditor_);
