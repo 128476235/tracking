@@ -993,12 +993,17 @@ async function addNote_(){
   const existing=parseNotes_(selected);
   if(existing.length>=20){$("notesMsg").innerHTML="<span style='color:var(--warn)'>Maximum of 20 notes reached.</span>";return;}
   // Auteur wordt server-side afgeleid van de ingelogde persoon (master/"Jasper" of
-  // de accountmanager) ‚Äî hier alleen voor de optimistische UI-update.
+  // de accountmanager) ‚Äî hier alleen voor de optimistische UI-update. Datum
+  // is een client-side benadering (server-tijd kan een paar seconden afwijken)
+  // zodat de notitie meteen met datum verschijnt i.p.v. pas na een herlaad.
   const author=isMasterLogin()?MASTER_NAME:accountmanagerName;
+  const now=new Date();
+  const pad2=n=>String(n).padStart(2,"0");
+  const dateStr=`${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
   $("notesMsg").textContent="Saving...";
   const data=await api_(`action=add_note&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(ORDER_MODE_INVOICE)}&${orderAddressQS_(selected)}&Note=${encodeURIComponent(text)}`).catch(()=>null);
   if(!data?.ok){$("notesMsg").innerHTML=`<span style="color:var(--bad)">${escapeHTML(data?.error||"Save failed.")}</span>`;return;}
-  selected[`Note ${existing.length+1}`]=`${text} - ${author}`;
+  selected[`Note ${existing.length+1}`]=`${text} - ${author} (${dateStr})`;
   const idx=orders.findIndex(o=>orderKey_(o)===orderKey_(selected));
   if(idx>=0) orders[idx]=selected;
   $("newNoteText").value="";
@@ -1138,9 +1143,9 @@ function applyModeUI_(){
   $("primaryOrderCaption").classList.remove("hidden");
   $("primaryOrderLabel").classList.remove("hidden");
   $("primaryOrderCaption").textContent = isDropshipMode() ? "Dropshipment order" : "Description";
-  $("customerMailBox").classList.toggle("hidden", !isMasterLogin());
-  $("supplierMailBox").classList.toggle("hidden", !isMasterLogin());
-  $("dropshipMailGrid").classList.toggle("hidden", !isMasterLogin());
+  $("customerMailBox").classList.toggle("hidden", !isDropshipMode());
+  $("supplierMailBox").classList.toggle("hidden", !isDropshipMode());
+  $("dropshipMailGrid").classList.toggle("hidden", !isDropshipMode());
   $("invoiceMailGrid").classList.toggle("hidden", !((isMasterLogin()||isAccountmanagerLogin()) && mailLike));
   $("invoiceExtrasWrap").classList.toggle("hidden", !invoiceLike);
   $("trackingFieldsWrap").classList.toggle("hidden", false);
@@ -1240,7 +1245,7 @@ function renderOrders(){
       const productLabel=itemCount>1?`${itemCount} producten`:getAny(o,["Product"]);
       const thirdLine=isDropshipMode()
         ? (o.ItemKey
-            ? [productLabel,getAny(o,["Surfcenter order","SurfcenterOrder"])].filter(Boolean).join(" ¬¨‚àë #")
+            ? [productLabel,getAny(o,["Surfcenter order","SurfcenterOrder"])].filter(Boolean).join(" - #")
             : (getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||getAny(o,["Surfcenter order","SurfcenterOrder"])))
         : getAny(o,["Phone"]);
       const lang=getAny(o,["Language"]);
@@ -1326,7 +1331,7 @@ function renderDeliveryMixSummary_(items){
   if(ownStockCount) parts.push(`${ownStockCount}x eigen voorraad`);
   Object.keys(bySupplier).forEach(sup=>parts.push(`${bySupplier[sup]}x dropship (${sup})`));
   if(!parts.length){el.classList.add("hidden");return;}
-  el.textContent=parts.join(" ¬¨‚àë ");
+  el.textContent=parts.join(" - ");
   el.classList.remove("hidden");
 }
 let dropshipSelection_=new Set();
