@@ -245,6 +245,26 @@
             <div class="row" style="margin-top:12px"><button id="saveBtn" class="btn primary" type="button">Save</button></div>
           </div>
           <div id="mailCustomerFlagsWrap" style="margin-top:12px">
+            <div class="mailGrid grid2" id="dropshipMailGrid">
+              <div id="customerMailBox">
+                <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
+                <div class="flagRow">
+                  <button class="btn mailFlagBtn" id="mc_en" type="button"><span class="flag"></span></button>
+                  <button class="btn mailFlagBtn" id="mc_nl" type="button"><span class="flag"></span></button>
+                  <button class="btn mailFlagBtn" id="mc_de" type="button"><span class="flag"></span></button>
+                  <button class="btn mailFlagBtn" id="mc_fr" type="button"><span class="flag"></span></button>
+                </div>
+                <div class="hint" id="mailCustomerMsg"></div>
+              </div>
+              <div id="supplierMailBox">
+                <div class="sectionTitle" style="margin-bottom:8px">Mail supplier</div>
+                <div class="flagRow">
+                  <button class="btn mailFlagBtn" id="ms_en" type="button"><span class="flag"></span></button>
+                  <button class="btn mailFlagBtn" id="ms_nl" type="button"><span class="flag"></span></button>
+                </div>
+                <div class="hint" id="mailSupplierMsg"></div>
+              </div>
+            </div>
             <div class="mailGrid hidden" id="invoiceMailGrid">
               <div id="invoiceCustomerMailBox">
                 <div class="sectionTitle" style="margin-bottom:8px">Mail customer</div>
@@ -402,6 +422,34 @@
                     <div class="hint" id="editGeneralMsg"></div>
                   </div>
                 </div>
+                <div id="productTemplateSection" class="hidden">
+                  <div class="divider"></div>
+                  <div class="toggleRow" id="editProductToggle"><div class="sectionTitle">Product update mail</div><div class="plusSym" id="editProductPlus">+</div></div>
+                  <div id="editProductBody" class="hidden" style="margin-top:10px">
+                    <div class="grid2">
+                      <div><label style="margin-top:0">Language</label><select id="editProductLang"><option value="en">EN</option><option value="nl">NL</option><option value="de">DE</option><option value="fr">FR</option></select></div>
+                      <div></div>
+                    </div>
+                    <label>Subject</label><input id="editProductSubject" />
+                    <label>Body</label><textarea id="editProductBodyText" rows="7"></textarea>
+                    <div class="tokenRow" id="editProductTokenRow">
+                      <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                      <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                      <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                      <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                      <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
+                      <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
+                    </div>
+                    <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editProductSave" class="btn primary" type="button">Save</button></div>
+                    <div class="hint" id="editProductMsg"></div>
+                  </div>
+                </div>
               </div>
             </div>
             <div id="invoiceCustomerEditorSection" class="hidden">
@@ -435,6 +483,33 @@
             </div>
             <div id="dropshipEditorsWrap" class="hidden">
               <div class="divider"></div>
+              <div class="toggleRow" id="editCustomerToggle"><div class="sectionTitle">Edit Mail customer</div><div class="plusSym" id="editCustomerPlus">+</div></div>
+              <div id="editCustomerBody" class="hidden" style="margin-top:10px">
+                <div class="grid2">
+                  <div><label style="margin-top:0">Language</label><select id="editCustomerLang"><option value="en">EN</option><option value="nl">NL</option><option value="de">DE</option><option value="fr">FR</option></select></div>
+                  <div></div>
+                </div>
+                <label>Subject</label><input id="editCustomerSubject" />
+                <label>Body</label><textarea id="editCustomerBodyText" rows="7"></textarea>
+                <div class="tokenRow">
+                      <button class="btn small" type="button" data-token="{{Customer}}">{{Customer}}</button>
+                      <button class="btn small" type="button" data-token="{{CustomerFull}}">{{CustomerFull}}</button>
+                      <button class="btn small" type="button" data-token="{{DropshipmentOrder}}">{{DropshipmentOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{SurfcenterOrder}}">{{SurfcenterOrder}}</button>
+                      <button class="btn small" type="button" data-token="{{Carrier}}">{{Carrier}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackingnumber}}">{{Trackingnumber}}</button>
+                      <button class="btn small" type="button" data-token="{{Trackinglink}}">{{Trackinglink}}</button>
+                      <button class="btn small" type="button" data-token="{{Supplier}}">{{Supplier}}</button>
+                      <button class="btn small" type="button" data-token="{{SupplierKey}}">{{SupplierKey}}</button>
+                      <button class="btn small" type="button" data-token="{{Accountmanager}}">{{Accountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{MailAccountmanager}}">{{MailAccountmanager}}</button>
+                      <button class="btn small" type="button" data-token="{{Items}}">{{Items}}</button>
+                      <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
+                    </div>
+                <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editCustomerSave" class="btn primary" type="button">Save</button></div>
+                <div class="hint" id="editCustomerMsg"></div>
+              </div>
+              <div class="divider"></div>
               <div class="toggleRow" id="editSupplierToggle"><div class="sectionTitle">Edit Mail supplier</div><div class="plusSym" id="editSupplierPlus">+</div></div>
               <div id="editSupplierBody" class="hidden" style="margin-top:10px">
                 <div class="grid2">
@@ -462,7 +537,7 @@
                 <div class="hint" id="editSupplierMsg"></div>
               </div>
               <div class="divider"></div>
-              <div class="toggleRow" id="editSupplierOrderToggle"><div class="sectionTitle">Edit Bestelmail leverancier</div><div class="plusSym" id="editSupplierOrderPlus">+</div></div>
+              <div class="toggleRow" id="editSupplierOrderToggle"><div class="sectionTitle">Edit order request</div><div class="plusSym" id="editSupplierOrderPlus">+</div></div>
               <div id="editSupplierOrderBody" class="hidden" style="margin-top:10px">
                 <div class="grid2">
                   <div><label style="margin-top:0">Language</label><select id="editSupplierOrderLang"><option value="en">EN</option><option value="nl">NL</option><option value="de">DE</option><option value="fr">FR</option></select></div>
@@ -486,6 +561,7 @@
                       <button class="btn small" type="button" data-token="{{Product}}">{{Product}}</button>
                       <button class="btn small" type="button" data-token="{{Email}}">{{Email}}</button>
                       <button class="btn small" type="button" data-token="{{Phone}}">{{Phone}}</button>
+                      <button class="btn small" type="button" data-token="{{Address}}">{{Address}}</button>
                     </div>
                 <div class="row" style="margin-top:10px;justify-content:flex-end"><button id="editSupplierOrderSave" class="btn primary" type="button">Save</button></div>
                 <div class="hint" id="editSupplierOrderMsg"></div>
@@ -588,7 +664,7 @@
   </div>
 </div>
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbxHYCgwquppKztJEuHNVi5eHpXHh87v1tjKGoWFz1dk4y_9S_W3OKznU2fQ2F1JK9XSwQ/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbybZ6gKPMqNzQfrXsox1DRC8oY3Rt3o2gtydIe8CwbdsatekfSJygvpUNJVtM5FYHGV3A/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -620,7 +696,7 @@ const COUNTRY_DIAL_CODES=[
 const $ = (id)=>document.getElementById(id);
 let supplier="", supplierKey="", loginType="", accountmanagerName="", accountmanagerMail="", currentMode=ORDER_MODE_DROPSHIP, availableRoles=[];
 let orders=[], selected=null, suppliersList=[], suppliersMailMap={}, suppliersKeyMap={}, accountmanagersList=[], accountmanagersMailMap={};
-let indepTemplates=[], supplierTemplates=[], invoiceTemplates=[], invoiceCustomerTemplates=[], aftersalesTemplates=[], generalCustomerTemplates=[], supplierOrderTemplates=[];
+let indepTemplates=[], customerTemplates=[], supplierTemplates=[], invoiceTemplates=[], invoiceCustomerTemplates=[], aftersalesTemplates=[], generalCustomerTemplates=[], supplierOrderTemplates=[], productMailTemplates=[];
 let lastFocusedField=null, pendingMail=null;
 const FLAG_EMOJI={en:"\u{1F1EC}\u{1F1E7}",nl:"\u{1F1F3}\u{1F1F1}",de:"\u{1F1E9}\u{1F1EA}",fr:"\u{1F1EB}\u{1F1F7}"};
 function escapeHTML(s){return String(s||"").replace(/[&<>\"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
@@ -671,6 +747,7 @@ function tokenMap(){
     "{{Product}}":getAny(selected,["Product"])||"",
     "{{Email}}":selectedCustomerMail_(),
     "{{Phone}}":selectedPhone_(),
+    "{{Address}}":getAny(selected,["Address"])||"",
   };
   for(let i=1;i<=10;i++) map[`{{Product${i}}}`]=items[i-1]||"";
   return map;
@@ -719,7 +796,7 @@ function populateCountrySelects_(){
   });
 }
 function paintStaticFlags_(){
-  const map={imc_en:"en",imc_nl:"nl",imc_de:"de",imc_fr:"fr"};
+  const map={mc_en:"en",mc_nl:"nl",mc_de:"de",mc_fr:"fr",ms_en:"en",ms_nl:"nl",imc_en:"en",imc_nl:"nl",imc_de:"de",imc_fr:"fr"};
   Object.keys(map).forEach(id=>{const btn=$(id); const span=btn&&btn.querySelector(".flag"); if(span) span.textContent=FLAG_EMOJI[map[id]];});
 }
 function combinePhone_(dial, local){const digits=String(local||"").replace(/\D/g,"").replace(/^0+/,"");return digits?`+${dial}${digits}`:"";}
@@ -754,6 +831,7 @@ function langFlag_(lang){const l=String(lang||"").toLowerCase().trim();if(l==="n
 async function loadAllTemplates_(){
   if(isMasterLogin()){
     const a=await api_(`action=indep_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); indepTemplates=a?.ok&&Array.isArray(a.templates)?a.templates:[];
+    const c=await api_(`action=customer_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); customerTemplates=c?.ok&&Array.isArray(c.templates)?c.templates:[];
     const s=await api_(`action=supplier_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); supplierTemplates=s?.ok&&Array.isArray(s.templates)?s.templates:[];
     const so=await api_(`action=supplier_order_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); supplierOrderTemplates=so?.ok&&Array.isArray(so.templates)?so.templates:[];
     const i=await api_(`action=invoice_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); invoiceTemplates=i?.ok&&Array.isArray(i.templates)?i.templates:[];
@@ -767,14 +845,17 @@ async function loadAllTemplates_(){
     // bij BEIDE rollen te horen ‚Äî stond eerder alleen in het master-blok, waardoor
     // een KAM-only login (bv. Reinder) hier altijd een leeg sjabloon kreeg.
     const c2=await api_(`action=customer2_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); invoiceCustomerTemplates=c2?.ok&&Array.isArray(c2.templates)?c2.templates:[];
+    const pm=await api_(`action=product_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); productMailTemplates=pm?.ok&&Array.isArray(pm.templates)?pm.templates:[];
   }
   renderIndepTemplates_();
   renderInvoiceTemplates_();
   renderAftersalesTemplates_();
+  fillCustomerEditorFromLang_($("editCustomerLang").value);
   fillSupplierEditorFromLang_($("editSupplierLang").value);
   fillSupplierOrderEditorFromLang_($("editSupplierOrderLang").value);
   fillInvoiceCustomerEditorFromLang_($("editInvoiceCustomerLang").value);
   fillGeneralEditorFromLang_($("editGeneralLang").value);
+  fillProductMailEditorFromLang_($("editProductLang").value);
 }
 // Sjablonen stonden 1 rij per taal (dus 4x dezelfde template) ‚Äî nu 1 rij per
 // label, met 4 taalvlaggen om direct in die taal te versturen. Bewerken opent
@@ -815,10 +896,12 @@ function renderTemplateList_(wrapId, list, sendFn, editFn){
 function renderIndepTemplates_(){renderTemplateList_("indepTemplatesList", indepTemplates, sendIndependentTemplate_, editIndependentTemplate_);}
 function renderInvoiceTemplates_(){renderTemplateList_("invoiceTemplatesList", invoiceTemplates, sendInvoiceTemplate_, editInvoiceTemplate_);}
 function renderAftersalesTemplates_(){renderTemplateList_("aftersalesTemplatesList", aftersalesTemplates, sendAftersalesTemplate_, editAftersalesTemplate_);}
+function fillCustomerEditorFromLang_(lang){const t=findTpl_(customerTemplates, lang);$("editCustomerSubject").value=t?.subject||"";$("editCustomerBodyText").value=t?.body||"";$("editCustomerMsg").textContent="";}
 function fillSupplierEditorFromLang_(lang){const t=findTpl_(supplierTemplates, lang);$("editSupplierSubject").value=t?.subject||"";$("editSupplierBodyText").value=t?.body||"";$("editSupplierMsg").textContent="";}
 function fillSupplierOrderEditorFromLang_(lang){const t=findTpl_(supplierOrderTemplates, lang);$("editSupplierOrderSubject").value=t?.subject||"";$("editSupplierOrderBodyText").value=t?.body||"";$("editSupplierOrderMsg").textContent="";}
 function fillInvoiceCustomerEditorFromLang_(lang){const t=findTpl_(invoiceCustomerTemplates, lang);$("editInvoiceCustomerSubject").value=t?.subject||"";$("editInvoiceCustomerBodyText").value=t?.body||"";$("editInvoiceCustomerMsg").textContent="";}
 function fillGeneralEditorFromLang_(lang){const t=findTpl_(generalCustomerTemplates, lang);$("editGeneralSubject").value=t?.subject||"Surfcenter - bestelling {{SurfcenterOrder}}";$("editGeneralBodyText").value=t?.body||"Hallo {{Customer}},\n\n";$("editGeneralMsg").textContent="";}
+function fillProductMailEditorFromLang_(lang){const t=findTpl_(productMailTemplates, lang);$("editProductSubject").value=t?.subject||"";$("editProductBodyText").value=t?.body||"";$("editProductMsg").textContent="";}
 let indepEditGroup_=null, invoiceEditGroup_=null, aftersalesEditGroup_=null;
 function resetIndepEditor_(){indepEditGroup_=null;$("indepLang").value="en";$("indepLabel").value="";$("indepSubject").value="";$("indepBodyText").value="";$("indepSaveMsg").textContent="";$("indepSave").textContent="Save";}
 function resetInvoiceTemplateEditor_(){invoiceEditGroup_=null;$("invoiceTemplateLang").value="en";$("invoiceTemplateLabel").value="";$("invoiceTemplateSubject").value="";$("invoiceTemplateBodyText").value="";$("invoiceTemplateSaveMsg").textContent="";$("invoiceTemplateSave").textContent="Save";}
@@ -923,8 +1006,42 @@ async function addNote_(){
   renderNotes_();
 }
 function invoiceCustomerDraftFromLang_(lang){const t=findTpl_(invoiceCustomerTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
+function supplierDraftFromLang_(lang){const t=findTpl_(supplierTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
+function customerDraftFromLang_(lang){const t=findTpl_(customerTemplates, lang)||{subject:"",body:""};return {subject:applyTokens(t.subject), body:applyTokens(t.body)};}
 function selectedCustomerMail_(){return getAny(selected,["Mail Customer","MailCustomer"]);}
 function selectedAccountmanagerCC_(){const m=tokenMap();return m["{{MailAccountmanager}}"]||"";}
+async function mailSupplier(lang, btn){
+  if(!selected||!isDropshipMode()) return;
+  if(btn) setBtnActive_(btn);
+  const supName=getAny(selected,["Supplier"])||"";
+  const to=suppliersMailMap[String(supName).toLowerCase()]||getAny(selected,["Mail Supplier","MailSupplier"])||"";
+  if(!to){$("mailSupplierMsg").innerHTML="<span style='color:var(--warn)'>No supplier email found.</span>";return;}
+  const tpl=supplierDraftFromLang_(lang);
+  openMailPicker({
+    to,cc:"",subject:tpl.subject,body:tpl.body,
+    afterOpen:async()=>{
+      await logMail_({to,kind:"supplier",language:lang,template:`Mail supplier ${lang.toUpperCase()}`,subject:tpl.subject});
+      $("mailSupplierMsg").innerHTML='<span style="color:var(--ok)">Mail opened.</span>';
+      await loadMailLog_();
+    }
+  });
+}
+async function mailCustomer(lang, btn){
+  if(!selected||!isDropshipMode()) return;
+  if(btn) setBtnActive_(btn);
+  const to=selectedCustomerMail_();
+  if(!to){$("mailCustomerMsg").innerHTML="<span style='color:var(--warn)'>No customer email found.</span>";return;}
+  const cc=selectedAccountmanagerCC_();
+  const tpl=customerDraftFromLang_(lang);
+  openMailPicker({
+    to,cc,subject:tpl.subject,body:tpl.body,
+    afterOpen:async()=>{
+      await logMail_({to,kind:"customer",language:lang,template:`Mail customer ${lang.toUpperCase()}`,subject:tpl.subject});
+      $("mailCustomerMsg").innerHTML='<span style="color:var(--ok)">Mail opened.</span>';
+      await loadMailLog_();
+    }
+  });
+}
 async function mailInvoiceCustomer(lang, btn){
   if(!selected||!(isInvoiceMode()||isWebshopMode())) return;
   if(btn) setBtnActive_(btn);
@@ -1021,6 +1138,9 @@ function applyModeUI_(){
   $("primaryOrderCaption").classList.remove("hidden");
   $("primaryOrderLabel").classList.remove("hidden");
   $("primaryOrderCaption").textContent = isDropshipMode() ? "Dropshipment order" : "Description";
+  $("customerMailBox").classList.toggle("hidden", !isMasterLogin());
+  $("supplierMailBox").classList.toggle("hidden", !isMasterLogin());
+  $("dropshipMailGrid").classList.toggle("hidden", !isMasterLogin());
   $("invoiceMailGrid").classList.toggle("hidden", !((isMasterLogin()||isAccountmanagerLogin()) && mailLike));
   $("invoiceExtrasWrap").classList.toggle("hidden", !invoiceLike);
   $("trackingFieldsWrap").classList.toggle("hidden", false);
@@ -1036,6 +1156,7 @@ function applyModeUI_(){
   $("invoiceTemplatesSection").classList.toggle("hidden", !(isMasterLogin() && mailLike));
   $("aftersalesTemplatesSection").classList.toggle("hidden", !isAccountmanagerLogin());
   $("generalTemplateSection").classList.toggle("hidden", !(isMasterLogin()||isAccountmanagerLogin()));
+  $("productTemplateSection").classList.toggle("hidden", !(isMasterLogin()||isAccountmanagerLogin()));
   $("invoiceCustomerEditorSection").classList.toggle("hidden", !((isMasterLogin()||isAccountmanagerLogin()) && mailLike));
   // Dropship-mode als apart tabblad bestaat niet meer voor master (dropship zit
   // nu per item in Invoice/Webshop-orders) ‚Äî maar het "Mail leverancier"-sjabloon
@@ -1119,7 +1240,7 @@ function renderOrders(){
       const productLabel=itemCount>1?`${itemCount} producten`:getAny(o,["Product"]);
       const thirdLine=isDropshipMode()
         ? (o.ItemKey
-            ? [productLabel,getAny(o,["Surfcenter order","SurfcenterOrder"])].filter(Boolean).join(" ¬∑ #")
+            ? [productLabel,getAny(o,["Surfcenter order","SurfcenterOrder"])].filter(Boolean).join(" ¬¨‚àë #")
             : (getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||getAny(o,["Surfcenter order","SurfcenterOrder"])))
         : getAny(o,["Phone"]);
       const lang=getAny(o,["Language"]);
@@ -1205,7 +1326,7 @@ function renderDeliveryMixSummary_(items){
   if(ownStockCount) parts.push(`${ownStockCount}x eigen voorraad`);
   Object.keys(bySupplier).forEach(sup=>parts.push(`${bySupplier[sup]}x dropship (${sup})`));
   if(!parts.length){el.classList.add("hidden");return;}
-  el.textContent=parts.join(" ¬∑ ");
+  el.textContent=parts.join(" ¬¨‚àë ");
   el.classList.remove("hidden");
 }
 let dropshipSelection_=new Set();
@@ -1278,12 +1399,50 @@ async function loadProductsSection_(surfOrder){
     top.appendChild(right);
     row.appendChild(top);
     const orderLink=getAny(selected,["Link"])||"";
-    if(it.productLink||orderLink){
+    if(it.productLink||orderLink||it.barcode){
       const linksRow=document.createElement("div");
       linksRow.className="row";
-      linksRow.style.cssText="gap:8px;margin-top:6px";
-      linksRow.innerHTML=`${it.productLink?`<a class="btn small openBtn" href="${escapeHTML(it.productLink)}" target="_blank" rel="noopener">Open product</a>`:""}${orderLink?`<a class="btn small openBtn" href="${escapeHTML(orderLink)}" target="_blank" rel="noopener">Open sales order</a>`:""}`;
+      linksRow.style.cssText="gap:8px;margin-top:6px;align-items:center";
+      linksRow.innerHTML=`${it.productLink?`<a class="btn small openBtn" href="${escapeHTML(it.productLink)}" target="_blank" rel="noopener">Open product</a>`:""}${orderLink?`<a class="btn small openBtn" href="${escapeHTML(orderLink)}" target="_blank" rel="noopener">Open sales order</a>`:""}${it.barcode?`<button type="button" class="btn small newPoBtn" data-barcode="${escapeHTML(it.barcode)}">Nieuwe inkooporder</button><span class="hint newPoMsg"></span>`:""}`;
       row.appendChild(linksRow);
+      const poBtn=linksRow.querySelector(".newPoBtn");
+      // Count IT's "Add purchase order"-pagina leest geen URL-parameters, maar
+      // vult zelf naam/prijs/VAT/voorraad aan zodra je de barcode in het
+      // Productcode-veld plakt ‚Äî dus kopi√´ren + nieuw tabblad openen is hier
+      // net zo snel als een volledig voorinvulde link, zonder dat we hun
+      // interne aanmaak-formulier hoeven te reverse-engineeren.
+      if(poBtn) poBtn.addEventListener("click",async()=>{
+        try{ await navigator.clipboard.writeText(poBtn.dataset.barcode); }catch(_){}
+        window.open("https://start.count-it.eu/en/orders/purchaseorder-add","_blank","noopener");
+        const msg=linksRow.querySelector(".newPoMsg");
+        if(msg) msg.textContent="Barcode gekopieerd ‚Äî plak in Productcode-veld";
+      });
+    }
+    if(canAssign){
+      const mailRow=document.createElement("div");
+      mailRow.className="row";
+      mailRow.style.cssText="gap:6px;margin-top:6px;align-items:center";
+      mailRow.innerHTML=`<span class="tplMeta" style="margin-right:2px">Update over dit product:</span>${["en","nl","de","fr"].map(lang=>`<button class="btn mailFlagBtn productMailBtn" type="button" data-lang="${lang}"><span class="flag">${langFlag_(lang)}</span></button>`).join("")}<span class="hint productMailMsg"></span>`;
+      row.appendChild(mailRow);
+      mailRow.querySelectorAll(".productMailBtn").forEach(btn=>btn.addEventListener("click",async()=>{
+        setBtnActive_(btn);
+        const lang=btn.dataset.lang;
+        const to=selectedCustomerMail_();
+        const msg=mailRow.querySelector(".productMailMsg");
+        if(!to){msg.innerHTML="<span style='color:var(--warn)'>No customer email found.</span>";return;}
+        const tpl=findTpl_(productMailTemplates,lang)||{subject:"",body:""};
+        const tracking=it.dropship?{carrier:it.dropship.carrier||"",trackingNumber:it.dropship.trackingNumber||"",trackingLink:it.dropship.trackingLink||""}:{};
+        const cc=selectedAccountmanagerCC_();
+        const subject=applyTokensForItem_(tpl.subject,it,tracking);
+        const body=applyTokensForItem_(tpl.body,it,tracking);
+        openMailPicker({
+          to,cc,subject,body,
+          afterOpen:async()=>{
+            await logMail_({to,kind:"product",language:lang,template:`Product update ${lang.toUpperCase()}`,subject,RowID:`${surfOrder}|${it.barcode}`,OrderID:surfOrder});
+            msg.innerHTML='<span style="color:var(--ok)">Mail geopend.</span>';
+          }
+        });
+      }));
     }
     wrap.appendChild(row);
   });
@@ -1806,9 +1965,11 @@ $("logoutBtn").addEventListener("click",logout);
 $("saveBtn").addEventListener("click",save);
 $("createBtn").addEventListener("click",createOrder);
 $("historySearch").addEventListener("input",renderOrders);
+$("editCustomerSave").addEventListener("click",()=>upsertTemplate_("customer_upsert",findTpl_(customerTemplates,$("editCustomerLang").value)?.id||"",$("editCustomerLang").value,"DEFAULT",$("editCustomerSubject").value.trim(),$("editCustomerBodyText").value.trim(),$("editCustomerMsg"),loadAllTemplates_));
 $("editSupplierSave").addEventListener("click",()=>upsertTemplate_("supplier_upsert",findTpl_(supplierTemplates,$("editSupplierLang").value)?.id||"",$("editSupplierLang").value,"DEFAULT",$("editSupplierSubject").value.trim(),$("editSupplierBodyText").value.trim(),$("editSupplierMsg"),loadAllTemplates_));
 $("editSupplierOrderSave").addEventListener("click",()=>upsertTemplate_("supplier_order_upsert",findTpl_(supplierOrderTemplates,$("editSupplierOrderLang").value)?.id||"",$("editSupplierOrderLang").value,"DEFAULT",$("editSupplierOrderSubject").value.trim(),$("editSupplierOrderBodyText").value.trim(),$("editSupplierOrderMsg"),loadAllTemplates_));
 $("editGeneralSave").addEventListener("click",()=>upsertTemplate_("general_upsert",findTpl_(generalCustomerTemplates,$("editGeneralLang").value)?.id||"",$("editGeneralLang").value,"DEFAULT",$("editGeneralSubject").value.trim(),$("editGeneralBodyText").value.trim(),$("editGeneralMsg"),loadAllTemplates_));
+$("editProductSave").addEventListener("click",()=>upsertTemplate_("product_upsert",findTpl_(productMailTemplates,$("editProductLang").value)?.id||"",$("editProductLang").value,"DEFAULT",$("editProductSubject").value.trim(),$("editProductBodyText").value.trim(),$("editProductMsg"),loadAllTemplates_));
 $("editInvoiceCustomerSave").addEventListener("click",()=>upsertTemplate_("customer2_upsert",findTpl_(invoiceCustomerTemplates,$("editInvoiceCustomerLang").value)?.id||"",$("editInvoiceCustomerLang").value,"DEFAULT",$("editInvoiceCustomerSubject").value.trim(),$("editInvoiceCustomerBodyText").value.trim(),$("editInvoiceCustomerMsg"),loadAllTemplates_));
 $("indepSave").addEventListener("click",()=>upsertTemplate_("indep_upsert",indepEditGroup_?.items[$("indepLang").value]?.id||"",$("indepLang").value,$("indepLabel").value.trim(),$("indepSubject").value.trim(),$("indepBodyText").value.trim(),$("indepSaveMsg"),async()=>{resetIndepEditor_();await loadAllTemplates_();}));
 $("invoiceTemplateSave").addEventListener("click",()=>upsertTemplate_("invoice_template_upsert",invoiceEditGroup_?.items[$("invoiceTemplateLang").value]?.id||"",$("invoiceTemplateLang").value,$("invoiceTemplateLabel").value.trim(),$("invoiceTemplateSubject").value.trim(),$("invoiceTemplateBodyText").value.trim(),$("invoiceTemplateSaveMsg"),async()=>{resetInvoiceTemplateEditor_();await loadAllTemplates_();}));
@@ -1819,11 +1980,19 @@ $("aftersalesTemplateLang").addEventListener("change",()=>{if(!aftersalesEditGro
 $("indepCancel").addEventListener("click",resetIndepEditor_);
 $("invoiceTemplateCancel").addEventListener("click",resetInvoiceTemplateEditor_);
 $("aftersalesTemplateCancel").addEventListener("click",resetAftersalesTemplateEditor_);
+$("editCustomerLang").addEventListener("change",()=>fillCustomerEditorFromLang_($("editCustomerLang").value));
 $("editSupplierLang").addEventListener("change",()=>fillSupplierEditorFromLang_($("editSupplierLang").value));
 $("editSupplierOrderLang").addEventListener("change",()=>fillSupplierOrderEditorFromLang_($("editSupplierOrderLang").value));
 $("editGeneralLang").addEventListener("change",()=>fillGeneralEditorFromLang_($("editGeneralLang").value));
+$("editProductLang").addEventListener("change",()=>fillProductMailEditorFromLang_($("editProductLang").value));
 $("editInvoiceCustomerLang").addEventListener("change",()=>fillInvoiceCustomerEditorFromLang_($("editInvoiceCustomerLang").value));
 $("generalMailBtn").addEventListener("click",e=>sendGeneralCustomerMail_(e.currentTarget));
+$("mc_en").addEventListener("click",e=>mailCustomer("en",e.currentTarget));
+$("mc_nl").addEventListener("click",e=>mailCustomer("nl",e.currentTarget));
+$("mc_de").addEventListener("click",e=>mailCustomer("de",e.currentTarget));
+$("mc_fr").addEventListener("click",e=>mailCustomer("fr",e.currentTarget));
+$("ms_en").addEventListener("click",e=>mailSupplier("en",e.currentTarget));
+$("ms_nl").addEventListener("click",e=>mailSupplier("nl",e.currentTarget));
 $("imc_en").addEventListener("click",e=>mailInvoiceCustomer("en",e.currentTarget));
 $("imc_nl").addEventListener("click",e=>mailInvoiceCustomer("nl",e.currentTarget));
 $("imc_de").addEventListener("click",e=>mailInvoiceCustomer("de",e.currentTarget));
@@ -1841,9 +2010,11 @@ setupToggle("mailTemplatesToggle","mailTemplatesBody","mailTemplatesPlus");
 setupToggle("addIndepToggle","addIndepBody","addIndepPlus",resetIndepEditor_);
 setupToggle("addInvoiceTemplateToggle","addInvoiceTemplateBody","addInvoiceTemplatePlus",resetInvoiceTemplateEditor_);
 setupToggle("addAftersalesTemplateToggle","addAftersalesTemplateBody","addAftersalesTemplatePlus",resetAftersalesTemplateEditor_);
+setupToggle("editCustomerToggle","editCustomerBody","editCustomerPlus");
 setupToggle("editSupplierToggle","editSupplierBody","editSupplierPlus");
 setupToggle("editSupplierOrderToggle","editSupplierOrderBody","editSupplierOrderPlus");
 setupToggle("editGeneralToggle","editGeneralBody","editGeneralPlus");
+setupToggle("editProductToggle","editProductBody","editProductPlus");
 setupToggle("editInvoiceCustomerToggle","editInvoiceCustomerBody","editInvoiceCustomerPlus");
 setupToggle("mailLogToggle","mailLogBody","mailLogPlus");
 setupToggle("completedToggle","completedBody","completedPlus");
@@ -1868,3 +2039,4 @@ setupToggle("contactsToggle","contactsBody","contactsPlus");
 </script>
 </body>
 </html>
+
