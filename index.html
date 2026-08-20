@@ -124,7 +124,7 @@
     .savedLeft{min-width:0;display:flex;gap:10px;align-items:flex-start}
     .tplName{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
     .tplMeta{color:var(--muted);font-size:12px;white-space:normal;overflow-wrap:anywhere;word-break:break-word;max-width:520px;font-weight:500}
-    #indepTemplatesList,#invoiceTemplatesList,#aftersalesTemplatesList{display:flex;flex-direction:column;gap:10px}
+    #indepTemplatesListDropship,#indepTemplatesListGeneral,#invoiceTemplatesList,#aftersalesTemplatesList{display:flex;flex-direction:column;gap:10px}
     .mailLogRow{display:flex;justify-content:space-between;gap:16px;align-items:center;width:100%}
     .mailLogDate{font-size:13px;font-weight:700;color:var(--text)}
     .mailLogTime{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
@@ -302,7 +302,11 @@
               <div class="toggleRow" id="mailTemplatesToggle"><div class="sectionTitle">Mail templates</div><div class="plusSym" id="mailTemplatesPlus">+</div></div>
               <div id="mailTemplatesBody" class="hidden" style="margin-top:10px">
                 <div id="dropshipTemplatesSection" class="hidden">
-                  <div id="indepTemplatesList"><div class="muted" style="font-size:13px">No templates.</div></div>
+                  <div class="sectionTitle" style="margin-bottom:8px">Dropshipment</div>
+                  <div id="indepTemplatesListDropship"><div class="muted" style="font-size:13px">No templates.</div></div>
+                  <div class="divider"></div>
+                  <div class="sectionTitle" style="margin:12px 0 8px">Algemeen</div>
+                  <div id="indepTemplatesListGeneral"><div class="muted" style="font-size:13px">No templates.</div></div>
                   <div class="hint" id="indepSendMsg"></div>
                   <div class="divider"></div>
                   <div class="toggleRow" id="addIndepToggle"><div class="sectionTitle">Add template</div><div class="plusSym" id="addIndepPlus">+</div></div>
@@ -311,6 +315,8 @@
                       <div><label style="margin-top:0">Language</label><select id="indepLang"><option value="en">EN</option><option value="nl">NL</option><option value="de">DE</option><option value="fr">FR</option></select></div>
                       <div><label style="margin-top:0">Template name</label><input id="indepLabel" /></div>
                     </div>
+                    <label style="margin-top:0">Categorie</label>
+                    <select id="indepCategory"><option value="">Algemeen</option><option value="dropshipment">Dropshipment</option></select>
                     <label>Subject</label><input id="indepSubject" />
                     <label>Body</label><textarea id="indepBodyText" rows="7"></textarea>
                     <div class="tokenRow">
@@ -665,7 +671,7 @@
   </div>
 </div>
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbybZ6gKPMqNzQfrXsox1DRC8oY3Rt3o2gtydIe8CwbdsatekfSJygvpUNJVtM5FYHGV3A/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbySM3iYab9F4chULk5CWVN8UcOkEceS-TsJXd0dYGzYbQKimUBOXIoboU_-h5Bk4O6C8Q/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -867,7 +873,7 @@ function groupTemplatesByLabel_(list){
   const groups={}; const order=[];
   list.forEach(t=>{
     const key=String(t.label||"").trim()||("id:"+t.id);
-    if(!groups[key]){groups[key]={label:t.label||"",items:{}};order.push(key);}
+    if(!groups[key]){groups[key]={label:t.label||"",category:t.category||"",items:{}};order.push(key);}
     groups[key].items[String(t.language||"").toLowerCase()]=t;
   });
   order.sort((a,b)=>String(groups[a].label||"").localeCompare(String(groups[b].label||"")));
@@ -894,7 +900,12 @@ function renderTemplateList_(wrapId, list, sendFn, editFn){
     wrap.appendChild(row);
   });
 }
-function renderIndepTemplates_(){renderTemplateList_("indepTemplatesList", indepTemplates, sendIndependentTemplate_, editIndependentTemplate_);}
+function renderIndepTemplates_(){
+  const dropship=indepTemplates.filter(t=>String(t.category||"").toLowerCase()==="dropshipment");
+  const general=indepTemplates.filter(t=>String(t.category||"").toLowerCase()!=="dropshipment");
+  renderTemplateList_("indepTemplatesListDropship", dropship, sendIndependentTemplate_, editIndependentTemplate_);
+  renderTemplateList_("indepTemplatesListGeneral", general, sendIndependentTemplate_, editIndependentTemplate_);
+}
 function renderInvoiceTemplates_(){renderTemplateList_("invoiceTemplatesList", invoiceTemplates, sendInvoiceTemplate_, editInvoiceTemplate_);}
 function renderAftersalesTemplates_(){renderTemplateList_("aftersalesTemplatesList", aftersalesTemplates, sendAftersalesTemplate_, editAftersalesTemplate_);}
 function fillCustomerEditorFromLang_(lang){const t=findTpl_(customerTemplates, lang);$("editCustomerSubject").value=t?.subject||"";$("editCustomerBodyText").value=t?.body||"";$("editCustomerMsg").textContent="";}
@@ -904,15 +915,15 @@ function fillInvoiceCustomerEditorFromLang_(lang){const t=findTpl_(invoiceCustom
 function fillGeneralEditorFromLang_(lang){const t=findTpl_(generalCustomerTemplates, lang);$("editGeneralSubject").value=t?.subject||"Surfcenter - bestelling {{SurfcenterOrder}}";$("editGeneralBodyText").value=t?.body||"Hallo {{Customer}},\n\n";$("editGeneralMsg").textContent="";}
 function fillProductMailEditorFromLang_(lang){const t=findTpl_(productMailTemplates, lang);$("editProductSubject").value=t?.subject||"";$("editProductBodyText").value=t?.body||"";$("editProductMsg").textContent="";}
 let indepEditGroup_=null, invoiceEditGroup_=null, aftersalesEditGroup_=null;
-function resetIndepEditor_(){indepEditGroup_=null;$("indepLang").value="en";$("indepLabel").value="";$("indepSubject").value="";$("indepBodyText").value="";$("indepSaveMsg").textContent="";$("indepSave").textContent="Save";}
+function resetIndepEditor_(){indepEditGroup_=null;$("indepLang").value="en";$("indepLabel").value="";$("indepCategory").value="";$("indepSubject").value="";$("indepBodyText").value="";$("indepSaveMsg").textContent="";$("indepSave").textContent="Save";}
 function resetInvoiceTemplateEditor_(){invoiceEditGroup_=null;$("invoiceTemplateLang").value="en";$("invoiceTemplateLabel").value="";$("invoiceTemplateSubject").value="";$("invoiceTemplateBodyText").value="";$("invoiceTemplateSaveMsg").textContent="";$("invoiceTemplateSave").textContent="Save";}
 function resetAftersalesTemplateEditor_(){aftersalesEditGroup_=null;$("aftersalesTemplateLang").value="en";$("aftersalesTemplateLabel").value="";$("aftersalesTemplateSubject").value="";$("aftersalesTemplateBodyText").value="";$("aftersalesTemplateSaveMsg").textContent="";$("aftersalesTemplateSave").textContent="Save";}
-function editIndependentTemplate_(group){indepEditGroup_=group;$("addIndepBody").classList.remove("hidden");$("addIndepPlus").textContent="-";const lang=Object.keys(group.items)[0]||"en";const t=group.items[lang];$("indepLang").value=lang;$("indepLabel").value=group.label||"";$("indepSubject").value=t?.subject||"";$("indepBodyText").value=t?.body||"";$("indepSave").textContent="Update";}
+function editIndependentTemplate_(group){indepEditGroup_=group;$("addIndepBody").classList.remove("hidden");$("addIndepPlus").textContent="-";const lang=Object.keys(group.items)[0]||"en";const t=group.items[lang];$("indepLang").value=lang;$("indepLabel").value=group.label||"";$("indepCategory").value=group.category||"";$("indepSubject").value=t?.subject||"";$("indepBodyText").value=t?.body||"";$("indepSave").textContent="Update";}
 function editInvoiceTemplate_(group){invoiceEditGroup_=group;$("addInvoiceTemplateBody").classList.remove("hidden");$("addInvoiceTemplatePlus").textContent="-";const lang=Object.keys(group.items)[0]||"en";const t=group.items[lang];$("invoiceTemplateLang").value=lang;$("invoiceTemplateLabel").value=group.label||"";$("invoiceTemplateSubject").value=t?.subject||"";$("invoiceTemplateBodyText").value=t?.body||"";$("invoiceTemplateSave").textContent="Update";}
 function editAftersalesTemplate_(group){aftersalesEditGroup_=group;$("addAftersalesTemplateBody").classList.remove("hidden");$("addAftersalesTemplatePlus").textContent="-";const lang=Object.keys(group.items)[0]||"en";const t=group.items[lang];$("aftersalesTemplateLang").value=lang;$("aftersalesTemplateLabel").value=group.label||"";$("aftersalesTemplateSubject").value=t?.subject||"";$("aftersalesTemplateBodyText").value=t?.body||"";$("aftersalesTemplateSave").textContent="Update";}
-async function upsertTemplate_(action, id, lang, label, subject, body, msgEl, done){
+async function upsertTemplate_(action, id, lang, label, subject, body, msgEl, done, category){
   msgEl.textContent="Saving...";
-  const data=await api_(`action=${action}&supplierKey=${encodeURIComponent(supplierKey)}`+(id?`&id=${encodeURIComponent(id)}`:"")+`&language=${encodeURIComponent(lang)}&label=${encodeURIComponent(label)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`).catch(()=>null);
+  const data=await api_(`action=${action}&supplierKey=${encodeURIComponent(supplierKey)}`+(id?`&id=${encodeURIComponent(id)}`:"")+`&language=${encodeURIComponent(lang)}&label=${encodeURIComponent(label)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`+(category!==undefined?`&category=${encodeURIComponent(category)}`:"")).catch(()=>null);
   if(!data?.ok){msgEl.innerHTML=`<span style="color:var(--bad)">${escapeHTML(data?.error||"Save failed.")}</span>`;return;}
   msgEl.innerHTML='<span style="color:var(--ok)">Saved.</span>';
   if(done) await done();
@@ -1993,7 +2004,7 @@ $("editSupplierOrderSave").addEventListener("click",()=>upsertTemplate_("supplie
 $("editGeneralSave").addEventListener("click",()=>upsertTemplate_("general_upsert",findTpl_(generalCustomerTemplates,$("editGeneralLang").value)?.id||"",$("editGeneralLang").value,"DEFAULT",$("editGeneralSubject").value.trim(),$("editGeneralBodyText").value.trim(),$("editGeneralMsg"),loadAllTemplates_));
 $("editProductSave").addEventListener("click",()=>upsertTemplate_("product_upsert",findTpl_(productMailTemplates,$("editProductLang").value)?.id||"",$("editProductLang").value,"DEFAULT",$("editProductSubject").value.trim(),$("editProductBodyText").value.trim(),$("editProductMsg"),loadAllTemplates_));
 $("editInvoiceCustomerSave").addEventListener("click",()=>upsertTemplate_("customer2_upsert",findTpl_(invoiceCustomerTemplates,$("editInvoiceCustomerLang").value)?.id||"",$("editInvoiceCustomerLang").value,"DEFAULT",$("editInvoiceCustomerSubject").value.trim(),$("editInvoiceCustomerBodyText").value.trim(),$("editInvoiceCustomerMsg"),loadAllTemplates_));
-$("indepSave").addEventListener("click",()=>upsertTemplate_("indep_upsert",indepEditGroup_?.items[$("indepLang").value]?.id||"",$("indepLang").value,$("indepLabel").value.trim(),$("indepSubject").value.trim(),$("indepBodyText").value.trim(),$("indepSaveMsg"),async()=>{resetIndepEditor_();await loadAllTemplates_();}));
+$("indepSave").addEventListener("click",()=>upsertTemplate_("indep_upsert",indepEditGroup_?.items[$("indepLang").value]?.id||"",$("indepLang").value,$("indepLabel").value.trim(),$("indepSubject").value.trim(),$("indepBodyText").value.trim(),$("indepSaveMsg"),async()=>{resetIndepEditor_();await loadAllTemplates_();},$("indepCategory").value));
 $("invoiceTemplateSave").addEventListener("click",()=>upsertTemplate_("invoice_template_upsert",invoiceEditGroup_?.items[$("invoiceTemplateLang").value]?.id||"",$("invoiceTemplateLang").value,$("invoiceTemplateLabel").value.trim(),$("invoiceTemplateSubject").value.trim(),$("invoiceTemplateBodyText").value.trim(),$("invoiceTemplateSaveMsg"),async()=>{resetInvoiceTemplateEditor_();await loadAllTemplates_();}));
 $("aftersalesTemplateSave").addEventListener("click",()=>upsertTemplate_("aftersales_template_upsert",aftersalesEditGroup_?.items[$("aftersalesTemplateLang").value]?.id||"",$("aftersalesTemplateLang").value,$("aftersalesTemplateLabel").value.trim(),$("aftersalesTemplateSubject").value.trim(),$("aftersalesTemplateBodyText").value.trim(),$("aftersalesTemplateSaveMsg"),async()=>{resetAftersalesTemplateEditor_();await loadAllTemplates_();}));
 $("indepLang").addEventListener("change",()=>{if(!indepEditGroup_)return;const t=indepEditGroup_.items[$("indepLang").value];$("indepSubject").value=t?.subject||"";$("indepBodyText").value=t?.body||"";});
