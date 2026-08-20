@@ -587,7 +587,10 @@
         </div>
       </section>
       <section class="card colStretch">
-        <input id="historySearch" placeholder="Zoek op naam, e-mail of ordernummer..." style="width:100%;margin-bottom:12px" />
+        <div class="row" style="gap:8px;margin-bottom:12px">
+          <input id="historySearch" placeholder="Zoek op naam, e-mail of ordernummer..." style="width:100%;margin-bottom:0" />
+          <select id="kamFilter" class="hidden" style="flex-shrink:0;width:150px"><option value="">Alle KAM's</option></select>
+        </div>
         <table class="table">
           <thead><tr><th style="width:60%">Customer</th><th style="width:170px;text-align:center">Status</th><th style="width:260px">Action</th></tr></thead>
           <tbody id="tbodyOpen"><tr><td colspan="3" class="muted">Loading...</td></tr></tbody>
@@ -671,7 +674,7 @@
   </div>
 </div>
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbySM3iYab9F4chULk5CWVN8UcOkEceS-TsJXd0dYGzYbQKimUBOXIoboU_-h5Bk4O6C8Q/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbzvIDk3BmDKJB6Fmke4qMAat8Pi17iUpDmshVqe6UGOy1C4QT2yPpLQPYwIbRXDj6dASA/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -831,6 +834,11 @@ async function loadSuppliers_(){
     accountmanagersMailMap=am?.ok&&typeof am.mailMap==="object"?am.mailMap:{};
     $("newInvoiceAccountmanagerSelect").innerHTML="";
     accountmanagersList.forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;$("newInvoiceAccountmanagerSelect").appendChild(o);});
+    const kamSel=$("kamFilter");
+    const keepValue=kamSel.value;
+    kamSel.innerHTML='<option value="">Alle KAM\'s</option>';
+    accountmanagersList.forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;kamSel.appendChild(o);});
+    kamSel.value=accountmanagersList.includes(keepValue)?keepValue:"";
   }
 }
 function findTpl_(arr, lang){const l=String(lang||"").toLowerCase();return arr.find(x=>String(x.language||"").toLowerCase()===l&&String(x.label||"").toUpperCase()==="DEFAULT")||arr.find(x=>String(x.language||"").toLowerCase()===l)||null;}
@@ -1188,6 +1196,9 @@ function applyModeUI_(){
   $("newOrderBtn").classList.toggle("hidden", !canCreateOrders());
   $("surfOrderCaption").textContent=invoiceLike?"Invoice":"Surfcenter order";
   $("newInvoiceOrderLabel").textContent="Invoice";
+  // KAM-dropdown is alleen zinvol voor master op de Invoice-lijst ‚Äî Webshop- en
+  // Dropship-orders hebben geen Accountmanager-veld om op te filteren.
+  $("kamFilter").classList.toggle("hidden", !(isMasterLogin()&&isInvoiceMode()));
 }
 function setMode(mode){
   if(!isMasterLogin()) return;
@@ -1260,7 +1271,11 @@ async function loadOrders(){
 }
 function renderOrders(){
   const q=($("historySearch").value||"").trim().toLowerCase();
-  const match=o=>!q||[getAny(o,["Customer"]),getAny(o,["Mail Customer","MailCustomer"]),getAny(o,["Surfcenter order","SurfcenterOrder"]),getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]),getAny(o,["Accountmanager"])].join(" ").toLowerCase().includes(q);
+  const kam=($("kamFilter").value||"").trim().toLowerCase();
+  const match=o=>{
+    if(kam && String(getAny(o,["Accountmanager"])||"").trim().toLowerCase()!==kam) return false;
+    return !q||[getAny(o,["Customer"]),getAny(o,["Mail Customer","MailCustomer"]),getAny(o,["Surfcenter order","SurfcenterOrder"]),getAny(o,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"]),getAny(o,["Accountmanager"])].join(" ").toLowerCase().includes(q);
+  };
   const openList=orders.filter(o=>!isTruthy(o.Completed)).filter(match);
   const doneList=orders.filter(o=>isTruthy(o.Completed)).filter(match);
   const draw=(target,list)=>{
@@ -1998,6 +2013,7 @@ $("logoutBtn").addEventListener("click",logout);
 $("saveBtn").addEventListener("click",save);
 $("createBtn").addEventListener("click",createOrder);
 $("historySearch").addEventListener("input",renderOrders);
+$("kamFilter").addEventListener("change",renderOrders);
 $("editCustomerSave").addEventListener("click",()=>upsertTemplate_("customer_upsert",findTpl_(customerTemplates,$("editCustomerLang").value)?.id||"",$("editCustomerLang").value,"DEFAULT",$("editCustomerSubject").value.trim(),$("editCustomerBodyText").value.trim(),$("editCustomerMsg"),loadAllTemplates_));
 $("editSupplierSave").addEventListener("click",()=>upsertTemplate_("supplier_upsert",findTpl_(supplierTemplates,$("editSupplierLang").value)?.id||"",$("editSupplierLang").value,"DEFAULT",$("editSupplierSubject").value.trim(),$("editSupplierBodyText").value.trim(),$("editSupplierMsg"),loadAllTemplates_));
 $("editSupplierOrderSave").addEventListener("click",()=>upsertTemplate_("supplier_order_upsert",findTpl_(supplierOrderTemplates,$("editSupplierOrderLang").value)?.id||"",$("editSupplierOrderLang").value,"DEFAULT",$("editSupplierOrderSubject").value.trim(),$("editSupplierOrderBodyText").value.trim(),$("editSupplierOrderMsg"),loadAllTemplates_));
