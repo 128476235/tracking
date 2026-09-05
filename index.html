@@ -228,7 +228,12 @@
                 <div class="kvLabel" id="surfOrderCaption">Surfcenter order</div>
                 <div class="kvValue" id="surfOrderLabel">-</div>
                 <div class="smallLine hidden" id="orderDateLine"></div>
-                <a id="orderCountItLink" class="btn small hidden" style="margin-top:6px" target="_blank" rel="noopener">Open in Count IT</a>
+                <div class="row" style="gap:6px;margin-top:6px;align-items:center;flex-wrap:wrap">
+                  <a id="orderCountItLink" class="btn small hidden" target="_blank" rel="noopener">Open in Count IT</a>
+                  <span id="orderFreshBadge" class="hidden" style="font-size:11px;padding:3px 8px;border-radius:999px"></span>
+                  <button id="refreshOrderBtn" class="btn small hidden" type="button">Ververs</button>
+                </div>
+                <div class="hint" id="refreshOrderMsg"></div>
               </div>
             </div>
             <div class="kvBlock" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
@@ -674,7 +679,7 @@
   </div>
 </div>
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbzvIDk3BmDKJB6Fmke4qMAat8Pi17iUpDmshVqe6UGOy1C4QT2yPpLQPYwIbRXDj6dASA/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbwJpMBPC2SQulJKxEwUMApAK1yyckZl5cq2dqTxMHKfAiuHlOH3OhrkmDThGMsxFZ0ITg/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -714,7 +719,7 @@ function normalizeKey(k){return String(k||"").trim().toLowerCase().replace(/\s+/
 function getAny(obj, keys){if(!obj)return "";const map={};for(const k of Object.keys(obj)) map[normalizeKey(k)]=k;for(const want of keys){const hit=map[normalizeKey(want)];if(hit){const v=obj[hit];if(v!==undefined&&v!==null&&String(v).trim()!=="") return String(v).trim();}}return "";}
 function jsonp(url){return new Promise((resolve,reject)=>{const cb="cb_"+Math.random().toString(36).slice(2);const s=document.createElement("script");window[cb]=(data)=>{try{delete window[cb]}catch(_){}s.remove();resolve(data);};s.src=url+(url.includes("?")?"&":"?")+"callback="+cb;s.onerror=()=>{try{delete window[cb]}catch(_){}s.remove();reject(new Error("JSONP failed"));};document.head.appendChild(s);});}
 // asRole vertelt de backend welke rol NU actief is in de UI (relevant voor
-// mensen met zowel fulfillment als KAM, bv. Jelle/Mark) ‚Äî zonder dit valt
+// mensen met zowel fulfillment als KAM, bv. Jelle/Mark) - zonder dit valt
 // resolveAuthFromKey_ altijd terug op de standaardrol (fulfillment als die
 // bestaat), ongeacht wat de frontend na het wisselen laat zien. Dat gaf een
 // echt datalek: als KAM zag je dan toch gewoon alle orders van iedereen.
@@ -857,7 +862,7 @@ async function loadAllTemplates_(){
   if(isMasterLogin()||isAccountmanagerLogin()){
     const g=await api_(`action=general_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); generalCustomerTemplates=g?.ok&&Array.isArray(g.templates)?g.templates:[];
     // customer2_templates ("Mail customer" bij Invoice) hoort net als general_templates
-    // bij BEIDE rollen te horen ‚Äî stond eerder alleen in het master-blok, waardoor
+    // bij BEIDE rollen te horen - stond eerder alleen in het master-blok, waardoor
     // een KAM-only login (bv. Reinder) hier altijd een leeg sjabloon kreeg.
     const c2=await api_(`action=customer2_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); invoiceCustomerTemplates=c2?.ok&&Array.isArray(c2.templates)?c2.templates:[];
     const pm=await api_(`action=product_templates&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null); productMailTemplates=pm?.ok&&Array.isArray(pm.templates)?pm.templates:[];
@@ -872,7 +877,7 @@ async function loadAllTemplates_(){
   fillGeneralEditorFromLang_($("editGeneralLang").value);
   fillProductMailEditorFromLang_($("editProductLang").value);
 }
-// Sjablonen stonden 1 rij per taal (dus 4x dezelfde template) ‚Äî nu 1 rij per
+// Sjablonen stonden 1 rij per taal (dus 4x dezelfde template) - nu 1 rij per
 // label, met 4 taalvlaggen om direct in die taal te versturen. Bewerken opent
 // de eerste beschikbare taal; wisselen van taal in het formulier laadt de
 // bijbehorende inhoud uit dezelfde groep (of leeg, klaar om een nieuwe taal
@@ -942,8 +947,60 @@ function formatMailLogDateTime_(ts){
   if(m) return {date:m[1], time:m[2]};
   return {date:s,time:""};
 }
+// Toont hoe recent deze order voor het laatst echt is gescraped (niet: wanneer
+// je 'm voor het laatst hebt bekeken) ‚Äî losstaand van de Completed/Missing
+// tracking-badge, want een order kan al lang geleden bijgewerkt zijn zonder
+// dat dat zichtbaar was. Groen/oranje/rood geeft in √©√©n oogopslag aan of de
+// getoonde gegevens (levering, adres, notities) nog vers genoeg zijn om op te
+// vertrouwen, of dat een "Ververs"-klik zinvol is.
+function renderFreshBadge_(){
+  const badge=$("orderFreshBadge");
+  const raw=(getAny(selected,["UpdatedAt"])||"").trim();
+  if(!raw){badge.classList.add("hidden");return;}
+  const m=raw.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
+  if(!m){badge.classList.add("hidden");return;}
+  const updated=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]),Number(m[4]),Number(m[5]));
+  const hoursAgo=(Date.now()-updated.getTime())/3600000;
+  let label, bg, fg;
+  if(hoursAgo<0){label="Bijgewerkt: zojuist";bg="#dcfce7";fg="#166534";}
+  else if(hoursAgo<24){label=`Bijgewerkt: ${Math.max(1,Math.round(hoursAgo))}u geleden`;bg="#dcfce7";fg="#166534";}
+  else if(hoursAgo<24*7){label=`Bijgewerkt: ${Math.round(hoursAgo/24)}d geleden`;bg="#fef3c7";fg="#92400e";}
+  else{label=`Bijgewerkt: ${Math.round(hoursAgo/24)}d geleden (verouderd)`;bg="#fee2e2";fg="#991b1b";}
+  badge.textContent=label;
+  badge.style.background=bg;
+  badge.style.color=fg;
+  badge.classList.remove("hidden");
+}
+async function refreshOrderClick_(btn){
+  const surfOrder=getAny(selected,["Surfcenter order","SurfcenterOrder"]);
+  if(!surfOrder) return;
+  const key=orderKey_(selected);
+  btn.disabled=true;
+  const orig=btn.textContent;
+  btn.textContent="...";
+  $("refreshOrderMsg").textContent="Ophalen bij Count IT, kan tot een minuut duren...";
+  const data=await api_(`action=refresh_order&supplierKey=${encodeURIComponent(supplierKey)}&surfOrder=${encodeURIComponent(surfOrder)}`).catch(()=>null);
+  btn.disabled=false;
+  btn.textContent=orig;
+  if(!data?.ok){$("refreshOrderMsg").innerHTML=`<span style="color:var(--bad)">${escapeHTML(data?.error||"Verversen mislukt.")}</span>`;return;}
+  // loadOrders() reset selected/toont "no selection" - orders opnieuw ophalen
+  // en dezelfde order daarna weer openen, i.p.v. het paneel dicht te laten
+  // klappen na een ververs-actie.
+  const url=`${API_BASE}?action=orders&supplierKey=${encodeURIComponent(supplierKey)}&mode=${encodeURIComponent(isAccountmanagerLogin()?ORDER_MODE_INVOICE:currentMode)}&asRole=${encodeURIComponent(loginType)}`+(isMasterLogin()?`&supplier=${encodeURIComponent(MASTER_NAME)}`:"")+(isAccountmanagerLogin()?`&accountmanager=${encodeURIComponent(accountmanagerName)}`:"");
+  const fresh=await jsonp(url).catch(()=>null);
+  if(fresh?.ok){
+    orders=(fresh.orders||[]).slice().sort((a,b)=>{
+      const ad=getAny(a,["OrderDate"]), bd=getAny(b,["OrderDate"]);
+      if(ad||bd) return bd.localeCompare(ad);
+      return Number(b.rowId||0)-Number(a.rowId||0);
+    });
+    renderOrders();
+  }
+  await openRow(key);
+  $("refreshOrderMsg").innerHTML=`<span style="color:var(--ok)">Ververst - status: ${escapeHTML(data.deliveryStatus||"-")}.</span>`;
+}
 // RowID=selected.rowId is ALTIJD 0 voor SalesOrders-backed (Invoice/Webshop)
-// orders ‚Äî als sleutel gebruikt zou dat het maillog van elke klant mengen met
+// orders - als sleutel gebruikt zou dat het maillog van elke klant mengen met
 // dat van alle andere. orderKey_() geeft een echt unieke sleutel per order
 // (so:OrderNumber / row:N / item:...); payload.RowID kan dit overschrijven
 // voor sub-sleutels zoals een specifiek dropship-item.
@@ -1013,7 +1070,7 @@ async function addNote_(){
   const existing=parseNotes_(selected);
   if(existing.length>=20){$("notesMsg").innerHTML="<span style='color:var(--warn)'>Maximum of 20 notes reached.</span>";return;}
   // Auteur wordt server-side afgeleid van de ingelogde persoon (master/"Jasper" of
-  // de accountmanager) ‚Äî hier alleen voor de optimistische UI-update. Datum
+  // de accountmanager) - hier alleen voor de optimistische UI-update. Datum
   // is een client-side benadering (server-tijd kan een paar seconden afwijken)
   // zodat de notitie meteen met datum verschijnt i.p.v. pas na een herlaad.
   const author=isMasterLogin()?MASTER_NAME:accountmanagerName;
@@ -1175,7 +1232,7 @@ function applyModeUI_(){
   $("generalMailBox").classList.toggle("hidden", !(isMasterLogin()||isAccountmanagerLogin()));
   $("mailTemplatesWrap").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
   // isDropshipMode() is voor master onbereikbaar sinds Dropship geen los tabblad
-  // meer is (zit nu per item in Invoice/Webshop) ‚Äî deze sectie stond dus, net als
+  // meer is (zit nu per item in Invoice/Webshop) - deze sectie stond dus, net als
   // dropshipEditorsWrap hierboven, per ongeluk altijd verborgen.
   $("dropshipTemplatesSection").classList.toggle("hidden", !isMasterLogin());
   $("invoiceTemplatesSection").classList.toggle("hidden", !(isMasterLogin() && mailLike));
@@ -1184,9 +1241,9 @@ function applyModeUI_(){
   $("productTemplateSection").classList.toggle("hidden", !(isMasterLogin()||isAccountmanagerLogin()));
   $("invoiceCustomerEditorSection").classList.toggle("hidden", !((isMasterLogin()||isAccountmanagerLogin()) && mailLike));
   // Dropship-mode als apart tabblad bestaat niet meer voor master (dropship zit
-  // nu per item in Invoice/Webshop-orders) ‚Äî maar het "Mail leverancier"-sjabloon
+  // nu per item in Invoice/Webshop-orders) - maar het "Mail leverancier"-sjabloon
   // dat hier bewerkt wordt, wordt nog gewoon gebruikt door de item-level
-  // dropship-mailflow (toggleItemDropshipDetail_) in √©lke mode. Aan isDropshipMode()
+  // dropship-mailflow (toggleItemDropshipDetail_) in elke mode. Aan isDropshipMode()
   // blijven hangen maakte dit paneel dus onbereikbaar voor master.
   $("dropshipEditorsWrap").classList.toggle("hidden", !isMasterLogin());
   $("mailLogSection").classList.toggle("hidden", !(isMasterLogin() || isAccountmanagerLogin()));
@@ -1196,7 +1253,7 @@ function applyModeUI_(){
   $("newOrderBtn").classList.toggle("hidden", !canCreateOrders());
   $("surfOrderCaption").textContent=invoiceLike?"Invoice":"Surfcenter order";
   $("newInvoiceOrderLabel").textContent="Invoice";
-  // KAM-dropdown is alleen zinvol voor master op de Invoice-lijst ‚Äî Webshop- en
+  // KAM-dropdown is alleen zinvol voor master op de Invoice-lijst - Webshop- en
   // Dropship-orders hebben geen Accountmanager-veld om op te filteren.
   $("kamFilter").classList.toggle("hidden", !(isMasterLogin()&&isInvoiceMode()));
 }
@@ -1209,7 +1266,7 @@ function setMode(mode){
   applyModeUI_();
   loadOrders();
 }
-// E√©n knop voor duidelijkheid: staat er een datum in het veld, dan is het een
+// Een knop voor duidelijkheid: staat er een datum in het veld, dan is het een
 // historische scrape vanaf die datum; anders gewoon een normale scrape nu.
 async function triggerScrapeClick_(btn){
   if(!isMasterLogin()&&!isAccountmanagerLogin()) return;
@@ -1259,7 +1316,7 @@ async function loadOrders(){
     return;
   }
   // Webshop/Invoice-orders komen uit SalesOrders en hebben altijd rowId=0 (geen
-  // vaste rij) ‚Äî sorteren op rowId doet daar dus niets. Die sorteren we op
+  // vaste rij) - sorteren op rowId doet daar dus niets. Die sorteren we op
   // OrderDate (meest recent boven); Dropship-orders (Sheet1) hebben geen
   // OrderDate en blijven op rowId (= aanmaakvolgorde) gesorteerd.
   orders=(data.orders||[]).slice().sort((a,b)=>{
@@ -1333,7 +1390,7 @@ async function openRow(key){
     ? (selectedItemCount>1?`Producten (${selectedItemCount}, dropship)`:"Product (dropship)")
     : (isDropshipMode() ? "Dropshipment order" : "Description");
   $("primaryOrderLabel").textContent=selected.ItemKey
-    ? `${getAny(selected,["Product"])||"-"}${getAny(selected,["Dropshipment order","DropshipmentOrder"])?" ‚Äî dropship #"+getAny(selected,["Dropshipment order","DropshipmentOrder"]):""}`
+    ? `${getAny(selected,["Product"])||"-"}${getAny(selected,["Dropshipment order","DropshipmentOrder"])?" - dropship #"+getAny(selected,["Dropshipment order","DropshipmentOrder"]):""}`
     : (isDropshipMode()
         ? (getAny(selected,["Dropshipment order","DropshipmentOrder","Order ID","OrderID"])||"-")
         : (getAny(selected,["Description"])||"-"));
@@ -1344,6 +1401,9 @@ async function openRow(key){
   const countItLink=getAny(selected,["Link"])||"";
   $("orderCountItLink").classList.toggle("hidden",!countItLink);
   if(countItLink) $("orderCountItLink").href=countItLink;
+  renderFreshBadge_();
+  $("refreshOrderBtn").classList.toggle("hidden",!(!isDropshipMode()&&(isMasterLogin()||isAccountmanagerLogin())&&getAny(selected,["Surfcenter order","SurfcenterOrder"])));
+  $("refreshOrderMsg").textContent="";
   $("carrier").value=getAny(selected,["Carrier"])||"";
   $("trackingNumber").value=getAny(selected,["Trackingnumber","Tracking Number"])||"";
   $("trackingLink").value=getAny(selected,["Trackinglink","Tracking Link"])||"";
@@ -1361,7 +1421,7 @@ async function openRow(key){
   await loadMailLog_();
 }
 // Snel overzicht per order van de leveringsmix (eigen voorraad vs. dropship,
-// per leverancier) ‚Äî zodat je niet elk product apart hoeft te bekijken om te
+// per leverancier) - zodat je niet elk product apart hoeft te bekijken om te
 // zien of een order een mix van beide is.
 function renderDeliveryMixSummary_(items){
   const el=$("deliveryMixSummary");
@@ -1454,14 +1514,14 @@ async function loadProductsSection_(surfOrder){
       const poBtn=linksRow.querySelector(".newPoBtn");
       // Count IT's "Add purchase order"-pagina leest geen URL-parameters, maar
       // vult zelf naam/prijs/VAT/voorraad aan zodra je de barcode in het
-      // Productcode-veld plakt ‚Äî dus kopi√´ren + nieuw tabblad openen is hier
+      // Productcode-veld plakt - dus kopieren + nieuw tabblad openen is hier
       // net zo snel als een volledig voorinvulde link, zonder dat we hun
       // interne aanmaak-formulier hoeven te reverse-engineeren.
       if(poBtn) poBtn.addEventListener("click",async()=>{
         try{ await navigator.clipboard.writeText(poBtn.dataset.barcode); }catch(_){}
         window.open("https://start.count-it.eu/en/orders/purchaseorder-add","_blank","noopener");
         const msg=linksRow.querySelector(".newPoMsg");
-        if(msg) msg.textContent="Barcode gekopieerd ‚Äî plak in Productcode-veld";
+        if(msg) msg.textContent="Barcode gekopieerd - plak in Productcode-veld";
       });
     }
     if(canAssign){
@@ -1506,8 +1566,8 @@ function updateDropshipBatchBar_(){
     if(form) form.remove();
   }
 }
-// E√©n leverancier + dropshipordernummer toewijzen aan 1 of meerdere geselecteerde
-// items tegelijk ‚Äî dekt zowel losse items als gebundelde dropship-zendingen.
+// Een leverancier + dropshipordernummer toewijzen aan 1 of meerdere geselecteerde
+// items tegelijk - dekt zowel losse items als gebundelde dropship-zendingen.
 function toggleBatchDropshipForm_(surfOrder){
   const existing=document.querySelector(".dropshipBatchForm");
   if(existing){existing.remove();return;}
@@ -1528,8 +1588,8 @@ async function submitBatchDropship_(surfOrder,form){
   if(!Supplier||!barcodes.length){msg.innerHTML="<span style='color:var(--warn)'>Vul een leverancier in.</span>";return;}
   form.querySelector(".itemDsSave").disabled=true;
   // Zonder dropshipordernummer (bv. besteld via mail) is er geen natuurlijke
-  // groepeersleutel ‚Äî een gedeelde BatchKey zorgt dat deze items toch als √©√©n
-  // zending worden behandeld (gedeelde tracking/voltooid, √©√©n regel bij de
+  // groepeersleutel - een gedeelde BatchKey zorgt dat deze items toch als een
+  // zending worden behandeld (gedeelde tracking/voltooid, een regel bij de
   // leverancier) i.p.v. los van elkaar.
   const batchKey=`batch-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   let done=0,failed=0;
@@ -1727,7 +1787,7 @@ function showPortal(){
   $("masterOverviewWrap").classList.add("hidden");
   document.querySelector(".two").classList.remove("hidden");
 }
-// Gedeelde tail na authenticatie ‚Äî gebruikt door zowel een verse login, het
+// Gedeelde tail na authenticatie - gebruikt door zowel een verse login, het
 // herstellen van een sessie (init()) als switchRole_() (voor mensen met zowel
 // een fulfillment- als een KAM-rol op dezelfde key, bv. Jelle/Mark).
 async function enterPostAuthView_(){
@@ -1805,12 +1865,12 @@ function logout(){
   showLogin();
 }
 /* =========================
- * WAREHOUSE ‚Äî Scan product (open PO's) / Zoek order (sales), overgenomen uit
+ * WAREHOUSE - Scan product (open PO's) / Zoek order (sales), overgenomen uit
  * fulfillment-scan.html en aangesloten op dezelfde backend als de rest van de tool.
  * ========================= */
 let whPoRows=[], whSalesRows=[];
 function whNormalizeBarcode_(v){return String(v||"").trim().replace(/^0+(?=\d)/,"");}
-// "Not sent" betekent nog open, dus niet zomaar op het woord "sent" matchen ‚Äî
+// "Not sent" betekent nog open, dus niet zomaar op het woord "sent" matchen  - 
 // alleen exact "Sent" (of vergelijkbaar afgeronde status) telt als niet-open.
 function whOrderIsOpen_(r){
   const s=String(r.deliveryStatus||"").trim().toLowerCase();
@@ -1824,7 +1884,7 @@ function enterWarehouseView_(){
   whLoadAll_();
 }
 // Master ziet Zoeken permanent bovenaan, met Webshop/Invoice-overzicht en
-// -communicatie eronder ‚Äî zoeken is de hoofdfunctie, niet een aparte tab.
+// -communicatie eronder - zoeken is de hoofdfunctie, niet een aparte tab.
 function enterMasterLayout_(){
   $("warehouseView").classList.remove("hidden");
   $("masterOverviewWrap").classList.remove("hidden");
@@ -2053,6 +2113,7 @@ $("modeWebshopBtn").addEventListener("click",()=>setMode(ORDER_MODE_WEBSHOP));
 $("modeInvoiceBtn").addEventListener("click",()=>setMode(ORDER_MODE_INVOICE));
 $("triggerScrapeBtn").addEventListener("click",e=>triggerScrapeClick_(e.currentTarget));
 $("archiveOrdersBtn").addEventListener("click",e=>archiveOrdersClick_(e.currentTarget));
+$("refreshOrderBtn").addEventListener("click",e=>refreshOrderClick_(e.currentTarget));
 $("roleSwitchBtn").addEventListener("click",switchRole_);
 $("whTabScan").addEventListener("click",()=>whSetTab_("scan"));
 $("whTabSales").addEventListener("click",()=>whSetTab_("sales"));
