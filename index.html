@@ -679,7 +679,7 @@
   </div>
 </div>
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbwJpMBPC2SQulJKxEwUMApAK1yyckZl5cq2dqTxMHKfAiuHlOH3OhrkmDThGMsxFZ0ITg/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbykX5SN_SUdNdwuBEYMJAxFO6fZnR2RPq7uwSA0JPOiPHRhI0Za5ljLh9oWVOSjQ77Epg/exec";
 const MASTER_NAME = "Jasper";
 const ORDER_MODE_DROPSHIP = "dropshipment";
 const ORDER_MODE_INVOICE = "invoice";
@@ -1268,6 +1268,31 @@ function setMode(mode){
 }
 // Een knop voor duidelijkheid: staat er een datum in het veld, dan is het een
 // historische scrape vanaf die datum; anders gewoon een normale scrape nu.
+function sleep_(ms){return new Promise(r=>setTimeout(r,ms));}
+// Polt scrape_status tot de HUIDIGE run klaar is (max ~5 min run + wat marge,
+// dus max 40x 10s) en toont ondertussen een draaiend rondje + de cursorpositie
+// zodat zichtbaar is dat de (mogelijk meerdaagse) backfill-rotatie echt
+// vooruitgaat, i.p.v. dat de knop meteen terugspringt zonder verder signaal.
+// "Klaar" betekent hier alleen: deze ene run is afgerond, niet per se dat de
+// hele backfill al compleet is - dat kan nog altijd meerdere runs duren.
+async function pollScrapeStatus_(btn){
+  for(let i=0;i<40;i++){
+    await sleep_(10000);
+    const status=await api_(`action=scrape_status&supplierKey=${encodeURIComponent(supplierKey)}`).catch(()=>null);
+    if(!status?.ok){continue;}
+    btn.textContent="‚è≥";
+    btn.title=`Scrape loopt... (cursor bij regel ${status.cursor})`;
+    if(!status.running){
+      btn.textContent="‚úì";
+      btn.title=`Klaar voor nu (cursor bij regel ${status.cursor}). Bij een grote backfill kan het meerdere runs duren voor alles ververst is.`;
+      await loadOrders();
+      await sleep_(2500);
+      break;
+    }
+  }
+  btn.disabled=false;
+  btn.textContent="Scrape";
+}
 async function triggerScrapeClick_(btn){
   if(!isMasterLogin()&&!isAccountmanagerLogin()) return;
   const fromDate=$("backfillDate").value;
@@ -1277,9 +1302,14 @@ async function triggerScrapeClick_(btn){
     ? `action=start_backfill&supplierKey=${encodeURIComponent(supplierKey)}&fromDate=${encodeURIComponent(fromDate)}`
     : `action=trigger_scrape&supplierKey=${encodeURIComponent(supplierKey)}`;
   const data=await api_(url).catch(()=>null);
-  btn.disabled=false;
-  btn.textContent="Scrape";
-  btn.title=data?.ok?(data.note||"Scrape gestart, kan enkele minuten duren. Herlaad daarna de orders."):(data?.error||"Mislukt");
+  if(!data?.ok){
+    btn.disabled=false;
+    btn.textContent="Scrape";
+    btn.title=data?.error||"Mislukt";
+    return;
+  }
+  btn.title=data.note||"Scrape gestart...";
+  pollScrapeStatus_(btn);
 }
 // Master-only: verplaatst afgeronde Dropship-orders en (Count IT-)geleverde
 // Invoice/Webshop-orders ouder dan 90 dagen naar aparte Archive-tabbladen in
